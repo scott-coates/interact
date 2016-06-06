@@ -16,7 +16,7 @@ def drop_neo_index(models, schema_editor):
 
 class Migration(migrations.Migration):
   dependencies = [
-    ('client', '0001_initial'),
+    ('common_domain', '0001_initial'),
   ]
 
   operations = [
