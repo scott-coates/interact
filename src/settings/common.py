@@ -105,6 +105,7 @@ LOCAL_APPS = (
   'src.domain.topic',
 
   # APPS
+  'src.apps.engagement_discovery',
   'src.apps.graph',
 
   # LIBS

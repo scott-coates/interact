@@ -40,6 +40,19 @@ GRAPH_DB_PASSWORD = None
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
+CACHES = {
+  'default': {
+    'BACKEND': 'django_redis.cache.RedisCache',
+    'LOCATION': 'localhost:6379',
+    'OPTIONS': {
+      'DB': 0,
+    }
+  }
+}
+########## END CACHE CONFIGURATION
+
+########## CACHE CONFIGURATION
+# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
 
 ########## END CACHE CONFIGURATION
 

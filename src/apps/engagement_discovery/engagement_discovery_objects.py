@@ -1,5 +1,6 @@
 from collections import namedtuple
-from src.libs.datetime_utils.parsers.datetime_parser import get_datetime
+
+from src.libs.datetime_utils.datetime_parser import get_datetime
 
 EngagementOpportunityDiscoveryObject = namedtuple(
     'EngagementOpportunityDiscoveryObject',
