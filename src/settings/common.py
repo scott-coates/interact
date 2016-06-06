@@ -104,6 +104,7 @@ THIRD_PARTY_APPS = (
 
 LOCAL_APPS = (
   # AGGREGATES
+  'src.domain.client',
   'src.domain.topic',
 
   # APPS
