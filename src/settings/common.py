@@ -3,7 +3,6 @@ from src.libs.python_utils.logging.rq_formatter import RqFormatter
 
 """Common settings and globals."""
 
-from src.domain.common import constants
 from os.path import abspath, dirname, basename
 
 # from src.libs.python_utils.logging.rq_formatter import RqFormatter
@@ -32,8 +31,6 @@ USE_L10N = True
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
-
-CONSTANTS = constants
 ########## END GENERAL CONFIGURATION
 
 ########## URL CONFIGURATION

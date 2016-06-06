@@ -1,6 +1,9 @@
 import logging
 
+from src.apps.engagement_discovery.engagement_discovery_objects import EngagementOpportunityDiscoveryObject
 from src.apps.engagement_discovery.providers.twitter import twitter_client_service
+from src.apps.engagement_discovery.signals import engagement_opportunity_discovered
+from src.libs.nlp_utils.services.enums import NamedEntityTypeEnum
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
@@ -22,20 +25,20 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     #   kwargs['screen_name'] = profile.profile_external_id
 
     # if we want to get additional parameters (like geocode, since, follower count)
-    geocode = subtopic.subtopic_attrs.get('geocode')
+    geocode = ta_topic_option.attrs.get('geocode')
     if geocode:
       kwargs['geocode'] = geocode
 
-    since = subtopic.subtopic_attrs.get('since', 'd')
+    since = ta_topic_option.attrs.get('since', 'd')
     kwargs['since'] = since
 
-    named_entity_type = subtopic.subtopic_attrs.get('named_entity_type')
+    named_entity_type = ta_topic_option.attrs.get('named_entity_type')
     if named_entity_type:
       named_entity_type = NamedEntityTypeEnum[named_entity_type]
     else:
       named_entity_type = NamedEntityTypeEnum.person
 
-    twitter_eos = _twitter_client_service.find_tweets_from_keyword(subtopic.subtopic_name, named_entity_type, **kwargs)
+    twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.name, named_entity_type, **kwargs)
 
     for twitter_eo in twitter_eos:
       discovery_object = EngagementOpportunityDiscoveryObject(
@@ -45,7 +48,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
           twitter_eo.created_date,
           twitter_eo.provider_type,
           twitter_eo.provider_action_type,
-          subtopic.topic_id
+          ta_topic_option.topic_id
       )
 
       logger.debug('sending discovery object. Username: %s. Tweet: %s', twitter_eo.username,

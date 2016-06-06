@@ -1,18 +1,13 @@
+import logging
 from itertools import groupby
 
-from src.domain.profile.models import Profile
-from src.apps.engagement_discovery import constants
 from src.apps.engagement_discovery.providers.twitter.twitter_engagement_discovery_objects import \
   TwitterEngagementOpportunityDiscoveryObject
-from src.libs.datetime_utils.parsers import datetime_parser
-from src.libs.nlp_utils.services import named_entity_service
+from src.domain.common import constants
+from src.libs.datetime_utils import datetime_parser
 from src.libs.nlp_utils.services.enums import NamedEntityTypeEnum
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 from src.libs.social_utils.providers.twitter import twitter_client_service
-
-from src.domain.profile.services.profile_service import get_profile_from_provider_info
-from src.apps.engagement_discovery.enums import ProviderEnum, ProviderActionEnum
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -59,10 +54,10 @@ def find_tweets_from_keyword(keyword, named_entity_type, _twitter_client_service
 
   with log_wrapper(logger.debug, *search_log_message):
     tweets_from_keywords = _twitter_client_service.search_twitter_by_keywords(
-      keyword,
-      include_entities=True,
-      exclude_retweets=True,
-      **kwargs
+        keyword,
+        include_entities=True,
+        exclude_retweets=True,
+        **kwargs
     )
 
   if kwargs.get('screen_name'):
@@ -103,22 +98,21 @@ def find_tweets_from_keyword(keyword, named_entity_type, _twitter_client_service
     if tweet_websites: tweet_data[constants.WEBSITES] = tweet_websites
 
     ret_val.append(
-      TwitterEngagementOpportunityDiscoveryObject(
-        username,
-        tweet_id,
-        ProviderEnum.twitter,
-        ProviderActionEnum.twitter_tweet,
-        tweet,
-        tweet_data,
-        datetime_parser.get_datetime(tweet_created_date)
-      )
+        TwitterEngagementOpportunityDiscoveryObject(
+            username,
+            tweet_id,
+            constants.Provider.TWITTER,
+            constants.ProviderAction.TWITTER_TWEET,
+            tweet,
+            tweet_data,
+            datetime_parser.get_datetime(tweet_created_date)
+        )
     )
 
   return ret_val
 
 
 def _get_valid_users_from_tweets(tweets_from_users, named_entity_type):
-
   ret_val = []
 
   name_key = lambda tweet: tweet['user']['screen_name']
@@ -135,7 +129,8 @@ def _get_valid_users_from_tweets(tweets_from_users, named_entity_type):
       valid_user = True
     else:
       try:
-        get_profile_from_provider_info(user, ProviderEnum.twitter)
+        # get_profile_from_provider_info(user, ProviderEnum.twitter)
+        # todo just assume a valid user for now until we fix this
         valid_user = True
       except Profile.DoesNotExist:
         name_for_user = tweets[0]['user']['name']
