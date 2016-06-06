@@ -3,7 +3,7 @@ from src.libs.python_utils.logging.rq_formatter import RqFormatter
 
 """Common settings and globals."""
 
-from src.settings import constants
+from src.domain.common import constants
 from os.path import abspath, dirname, basename
 
 # from src.libs.python_utils.logging.rq_formatter import RqFormatter
