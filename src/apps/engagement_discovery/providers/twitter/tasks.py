@@ -5,7 +5,7 @@ from django_rq import job
 from src.apps.engagement_discovery.providers.twitter.services import \
   discover_engagement_opportunities_from_twitter_ta_topic_option
 from src.domain.common import constants
-from src.domain.topic import services as topic_service
+from src.domain.client import services as topic_service
 
 logger = logging.getLogger(__name__)
 
