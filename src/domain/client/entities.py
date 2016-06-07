@@ -46,7 +46,11 @@ class Client(AggregateBase):
     if not ta_topic_id:
       raise TypeError("ta_topic_id is required")
 
-    self._raise_event(AddedTopicOption1(id, name, type, attrs, ta_topic_id, system_created_date))
+    ta_topic = self._get_ta_topic_by_id(ta_topic_id)
+
+    self._raise_event(
+        AddedTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id, system_created_date)
+    )
 
   def _handle_created_1_event(self, event):
     self.id = event.id
@@ -54,11 +58,15 @@ class Client(AggregateBase):
     self.system_created_date = event.system_created_date
 
   def _handle_associated_with_topic_1_event(self, event):
-    self._ta_topics_list.append(TargetAudienceTopic(event.id, event.topic_id, event.system_created_date))
+    self._ta_topics_list.append(TargetAudienceTopic(event.ta_topic_id, event.topic_id, event.system_created_date))
 
   def _handle_added_topic_option_1_event(self, event):
-    ta_topic = next(t for t in self._ta_topics_list if t.id == event.ta_topic_id)
+    ta_topic = self._get_ta_topic_by_id(event.ta_topic_id)
     ta_topic._add_topic_option(**event.data)
+
+  def _get_ta_topic_by_id(self, ta_topic_id):
+    ta_topic = next(t for t in self._ta_topics_list if t.id == ta_topic_id)
+    return ta_topic
 
   def __str__(self):
     return 'Client {id}: {name}'.format(id=self.id, name=self.name)
@@ -78,8 +86,8 @@ class TargetAudienceTopic:
     self.topic_id = topic_id
     self.system_created_date = system_created_date
 
-  def _add_topic_option(self, id, name, type, attrs, ta_topic_id, system_created_date):
-    option = TargetAudienceTopicOption(id, name, type, attrs, ta_topic_id, system_created_date)
+  def _add_topic_option(self, ta_topic_option_id, name, type, attrs, ta_topic_id, system_created_date, **kwargs):
+    option = TargetAudienceTopicOption(ta_topic_option_id, name, type, attrs, ta_topic_id, system_created_date)
     self._ta_topic_options_list.append(option)
 
   def __str__(self):

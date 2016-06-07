@@ -17,7 +17,7 @@ class AssociatedWithTopic1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, topic_id, system_created_date):
+  def __init__(self, ta_topic_id, topic_id, system_created_date):
     super().__init__()
 
 
@@ -26,5 +26,5 @@ class AddedTopicOption1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, name, type, attrs, ta_topic_id, system_created_date):
+  def __init__(self, ta_topic_option_id, name, type, attrs, ta_topic_id, topic_id, system_created_date):
     super().__init__()
