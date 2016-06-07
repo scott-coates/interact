@@ -25,20 +25,21 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     #   kwargs['screen_name'] = profile.profile_external_id
 
     # if we want to get additional parameters (like geocode, since, follower count)
-    geocode = ta_topic_option.attrs.get('geocode')
+    geocode = ta_topic_option.option_attrs.get('geocode')
     if geocode:
       kwargs['geocode'] = geocode
 
-    since = ta_topic_option.attrs.get('since', 'd')
+    since = ta_topic_option.option_attrs.get('since', 'd')
     kwargs['since'] = since
 
-    named_entity_type = ta_topic_option.attrs.get('named_entity_type')
+    named_entity_type = ta_topic_option.option_attrs.get('named_entity_type')
     if named_entity_type:
       named_entity_type = NamedEntityTypeEnum[named_entity_type]
     else:
       named_entity_type = NamedEntityTypeEnum.person
 
-    twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.name, named_entity_type, **kwargs)
+    twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, named_entity_type,
+                                                                   **kwargs)
 
     for twitter_eo in twitter_eos:
       discovery_object = EngagementOpportunityDiscoveryObject(

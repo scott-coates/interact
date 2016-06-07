@@ -2,7 +2,6 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from src.libs.social_utils.providers.twitter import twitter_client_provider
 
-
 _EXCLUDE_RT = '+exclude:retweets -"rt" -"mt"'
 
 
@@ -50,7 +49,7 @@ def search_twitter(query,
 
   if screen_name:
     search_params["from"] = screen_name
-    
+
   if geocode:
     search_params["geocode"] = geocode
 
@@ -59,4 +58,10 @@ def search_twitter(query,
   if since:
     search_params["since"] = get_time_period_back(since)
 
-  return client.search(**search_params)
+  try:
+    print('hi')
+    x = client.search(**search_params)
+    print('bye')
+    return x
+  except Exception as e:
+    print('oops', e)

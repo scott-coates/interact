@@ -51,11 +51,6 @@ CACHES = {
 }
 ########## END CACHE CONFIGURATION
 
-########## CACHE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
-
-########## END CACHE CONFIGURATION
-
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
 

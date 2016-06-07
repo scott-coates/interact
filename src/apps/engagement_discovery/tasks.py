@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 @job('default')
 def discover_engagement_opportunities_task():
-  log_message = ("Discover opportunity engagements.")
+  log_message = "Discover opportunity engagements."
 
-  with log_wrapper(logger.debug, *log_message):
+  with log_wrapper(logger.debug, log_message):
     return services.discover_engagement_opportunities()
