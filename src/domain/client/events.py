@@ -8,5 +8,5 @@ class ClientCreated1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, name, active, system_created_date):
+  def __init__(self, id, name, system_created_date):
     super().__init__()
