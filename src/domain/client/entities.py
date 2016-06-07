@@ -1,8 +1,12 @@
-from src.domain.client.events import ClientCreated1
+from src.domain.client.events import ClientCreated1, AssociatedWithTopic1, AddedTopicOption1
 from src.libs.common_domain.aggregate_base import AggregateBase
 
 
 class Client(AggregateBase):
+  def __init__(self):
+    super().__init__()
+    self._ta_topics_list = []
+
   @classmethod
   def from_attrs(cls, id, name, system_created_date):
     ret_val = cls()
@@ -17,51 +21,82 @@ class Client(AggregateBase):
 
     return ret_val
 
+  def associate_with_topic(self, id, topic_id, system_created_date):
+    if not id:
+      raise TypeError("id is required")
+
+    if not topic_id:
+      raise TypeError("topic_id is required")
+
+    self._raise_event(AssociatedWithTopic1(id, topic_id, system_created_date))
+
+  def add_topic_option(self, id, name, type, attrs, ta_topic_id, system_created_date):
+    if not id:
+      raise TypeError("id is required")
+
+    if not name:
+      raise TypeError("name is required")
+
+    if not type:
+      raise TypeError("type is required")
+
+    if not attrs:
+      raise TypeError("attrs is required")
+
+    if not ta_topic_id:
+      raise TypeError("ta_topic_id is required")
+
+    self._raise_event(AddedTopicOption1(id, name, type, attrs, ta_topic_id, system_created_date))
+
   def _handle_created_1_event(self, event):
     self.id = event.id
     self.name = event.name
     self.system_created_date = event.system_created_date
+
+  def _handle_associated_with_topic_1_event(self, event):
+    self._ta_topics_list.append(TargetAudienceTopic(event.id, event.topic_id, event.system_created_date))
+
+  def _handle_added_topic_option_1_event(self, event):
+    ta_topic = next(t for t in self._ta_topics_list if t.id == event.ta_topic_id)
+    ta_topic._add_topic_option(**event.data)
 
   def __str__(self):
     return 'Client {id}: {name}'.format(id=self.id, name=self.name)
 
 
 class TargetAudienceTopic:
-  def __init__(self, id, active, topic_id, client_id, system_created_date):
+  def __init__(self, id, topic_id, system_created_date):
+    self._ta_topic_options_list = []
 
     if not id:
       raise TypeError("id is required")
 
-    if not active:
-      raise TypeError("active is required")
-
     if not topic_id:
       raise TypeError("topic_id is required")
 
-    if not client_id:
-      raise TypeError("client_id is required")
-
     self.id = id
-    self.active = active
     self.topic_id = topic_id
-    self.client_id = client_id
     self.system_created_date = system_created_date
+
+  def _add_topic_option(self, id, name, type, attrs, ta_topic_id, system_created_date):
+    option = TargetAudienceTopicOption(id, name, type, attrs, ta_topic_id, system_created_date)
+    self._ta_topic_options_list.append(option)
 
   def __str__(self):
     return 'TATopic {id}'.format(id=self.id)
 
 
 class TargetAudienceTopicOption:
-  def __init__(self, id, option_name, option_type, attrs, ta_topic_id, system_created_date):
+  def __init__(self, id, name, type, attrs, ta_topic_id, system_created_date):
 
     if not id:
       raise TypeError("id is required")
 
-    if not option_name:
-      raise TypeError("option_name is required")
+    if not name:
+      raise TypeError("name is required")
 
-    if not option_type:
-      raise TypeError("option_type is required")
+    if not type:
+      raise TypeError("type is required")
 
     if not attrs:
       raise TypeError("attrs is required")
@@ -70,11 +105,11 @@ class TargetAudienceTopicOption:
       raise TypeError("ta_topic_id is required")
 
     self.id = id
-    self.option_name = option_name
-    self.option_type = option_type
+    self.name = name
+    self.type = type
     self.attrs = attrs
     self.ta_topic_id = ta_topic_id
     self.system_created_date = system_created_date
 
   def __str__(self):
-    return 'TATopicOption {id}'.format(id=self.id)
+    return 'TATopicOption {id}: {name}'.format(id=self.id, name=self.name)

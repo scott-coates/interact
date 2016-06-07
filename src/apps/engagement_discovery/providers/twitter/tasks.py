@@ -15,7 +15,7 @@ def discover_engagement_opportunities_from_twitter_ta_topics_task(**kwargs):
   discover = discover_engagement_opportunities_from_twitter_ta_topic_option_task
 
   ta_topic_options_to_run = topic_service.get_active_ta_topic_options(). \
-    filter(option_type=constants.TopicCategory.TWITTER_SEARCH)
+    filter(option_type=constants.TopicType.TWITTER_SEARCH)
 
   for ta_topic_option in ta_topic_options_to_run:
     discover.delay(ta_topic_option.id, **kwargs)

@@ -10,3 +10,21 @@ class ClientCreated1(DomainEvent):
   @initializer
   def __init__(self, id, name, system_created_date):
     super().__init__()
+
+
+class AssociatedWithTopic1(DomainEvent):
+  event_func_name = 'associated_with_topic_1'
+  event_signal = EventSignal()
+
+  @initializer
+  def __init__(self, id, topic_id, system_created_date):
+    super().__init__()
+
+
+class AddedTopicOption1(DomainEvent):
+  event_func_name = 'added_topic_option_1'
+  event_signal = EventSignal()
+
+  @initializer
+  def __init__(self, id, name, type, attrs, ta_topic_id, system_created_date):
+    super().__init__()

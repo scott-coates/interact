@@ -8,3 +8,19 @@ class CreateClient():
   @initializer
   def __init__(self, id, name):
     pass
+
+
+class AssociateWithTopic():
+  command_signal = CommandSignal()
+
+  @initializer
+  def __init__(self, id, topic_id,):
+    pass
+
+
+class AddTopicOption():
+  command_signal = CommandSignal()
+
+  @initializer
+  def __init__(self, id, name, type, attrs, ta_topic_id ):
+    pass

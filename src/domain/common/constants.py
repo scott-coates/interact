@@ -11,7 +11,7 @@ class ProviderAction:
   TWITTER_TWEET = 'twitter_tweet'
 
 
-class TopicCategory:
+class TopicType:
   TWITTER_SEARCH = 'twitter_search'
 
 # regarding enums, even without IntEnums they could be of value to us
