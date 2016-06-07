@@ -75,6 +75,7 @@ def find_tweets_from_keyword(keyword, named_entity_type, _twitter_client_service
 
       usernames_from_tweets = sorted(set(tweet['user']['screen_name'] for tweet in tweets_from_keywords))
 
+      # todo should this be fixed to a week?
       tweets_from_users = _twitter_client_service.search_by_users(*usernames_from_tweets, since="w")
 
       valid_usernames = _get_valid_users_from_tweets(tweets_from_users, named_entity_type)
@@ -120,6 +121,8 @@ def _get_valid_users_from_tweets(tweets_from_users, named_entity_type):
   tweets_from_users = sorted(tweets_from_users, key=name_key)
 
   user_grouped_tweets = dict((k, list(v)) for k, v in groupby(tweets_from_users, name_key))
+
+  # this ensures that the user has tweeted recently
   active_users = {key: value for key, value in user_grouped_tweets.items() if len(value) >= 2}
 
   for user, tweets in active_users.items():

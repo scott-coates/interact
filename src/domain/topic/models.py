@@ -13,4 +13,4 @@ class ActiveTATopicOption(ReadModel):
   client_id = models.CharField(max_length=8)
 
   def __str__(self):
-    return 'ActiveTATopicOption {id}: {option_name}'.format(id=self.id, name=self.option_name)
+    return 'ActiveTATopicOption {id}: {option_name}'.format(id=self.id, option_name=self.option_name)
