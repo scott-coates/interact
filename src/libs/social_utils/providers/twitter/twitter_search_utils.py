@@ -7,7 +7,10 @@ _EXCLUDE_RT = '+exclude:retweets -"rt" -"mt"'
 
 def get_time_period_back(since):
   since = since.lower()
-  if since == "w":
+
+  if since == "y":
+    relative_delta = {"years": 1}
+  elif since == "w":
     relative_delta = {"weeks": 1}
   elif since == "d":
     relative_delta = {"days": 1}
@@ -15,6 +18,7 @@ def get_time_period_back(since):
     raise ValueError("invalid since value")
 
   since_date_range = (datetime.datetime.utcnow() - relativedelta(**relative_delta)).strftime("%Y-%m-%d")
+
   return since_date_range
 
 
@@ -58,10 +62,4 @@ def search_twitter(query,
   if since:
     search_params["since"] = get_time_period_back(since)
 
-  try:
-    print('hi')
-    x = client.search(**search_params)
-    print('bye')
-    return x
-  except Exception as e:
-    print('oops', e)
+  return client.search(**search_params)

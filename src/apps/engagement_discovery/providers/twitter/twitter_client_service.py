@@ -73,14 +73,17 @@ def find_tweets_from_keyword(keyword, named_entity_type, _twitter_client_service
 
       tweets_from_keywords = [tweet for tweet in tweets_from_keywords if _is_valid_tweet(tweet)]
 
-      usernames_from_tweets = sorted(set(tweet['user']['screen_name'] for tweet in tweets_from_keywords))
-
-      # todo should this be fixed to a week?
-      tweets_from_users = _twitter_client_service.search_by_users(*usernames_from_tweets, since="w")
-
-      valid_usernames = _get_valid_users_from_tweets(tweets_from_users, named_entity_type)
-
-      valid_tweets = [tweet for tweet in tweets_from_keywords if tweet['user']['screen_name'] in valid_usernames]
+      valid_tweets = tweets_from_keywords
+      #todo should we even worry about filtering inactive users at this point?
+      # i just ran it and it appeared to be faylty - filtering out people who were indeed good quality
+      # usernames_from_tweets = sorted(set(tweet['user']['screen_name'] for tweet in tweets_from_keywords))
+      #
+      # # todo should this be fixed to a week?
+      # tweets_from_users = _twitter_client_service.search_by_users(*usernames_from_tweets, since='y')
+      #
+      # valid_usernames = _get_valid_users_from_tweets(tweets_from_users, named_entity_type)
+      #
+      # valid_tweets = [tweet for tweet in tweets_from_keywords if tweet['user']['screen_name'] in valid_usernames]
 
   for tweet in valid_tweets:
     username = tweet['user']['screen_name']
