@@ -29,8 +29,10 @@ def search_twitter_by_keywords(*keywords, **kwargs):
 def _search_chunks(*query_items, action, _search=twitter_search_utils, **kwargs):
   query_chunks = list(chunks(query_items, 10))
 
-  query_chunks = [action(chunk) for chunk in query_chunks]  
-  
+  query_chunks = [action(chunk) for chunk in query_chunks]
+
+  # ret_val will be a list of results [{statuses, metadata}]
+  # chain.from_iterable will flatten the statuses from these lists into one list
   ret_val = [_search.search_twitter(query, **kwargs) for query in query_chunks]
 
   return chain.from_iterable(x['statuses'] for x in ret_val)
