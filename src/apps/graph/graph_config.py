@@ -5,4 +5,5 @@ class GraphConfig(AppConfig):
 
   # noinspection PyUnresolvedReferences
   def ready(self):
-    pass
+    import src.apps.graph.topic.event_handlers
+
