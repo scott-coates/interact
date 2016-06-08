@@ -1,15 +1,25 @@
 from django.dispatch import receiver
 
 from src.apps.graph.client import tasks
-from src.domain.client.events import ClientCreated1
+from src.domain.client.events import ClientCreated1, AssociatedWithTopic1
 from src.libs.common_domain.decorators import event_idempotent
 
 
 @event_idempotent
 @receiver(ClientCreated1.event_signal)
-def execute_added_topic_option_1(**kwargs):
-  aggregate_id = kwargs['aggregate_id']
-  tasks.create_client_in_graphdb_task.delay(aggregate_id)
+def add_client(**kwargs):
+  client_id = kwargs['aggregate_id']
+  tasks.create_client_in_graphdb_task.delay(client_id)
+
+
+@event_idempotent
+@receiver(AssociatedWithTopic1.event_signal)
+def add_ta_topic(**kwargs):
+  client_id = kwargs['aggregate_id']
+  event = kwargs['event']
+  ta_topic_id = event.ta_topic_id
+  topic_id = event.topic_id
+  tasks.create_ta_topic_in_graphdb_task.delay(client_id, ta_topic_id, topic_id)
 
 #
 # @event_idempotent
