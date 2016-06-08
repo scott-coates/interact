@@ -5,17 +5,16 @@ from neo4jrestclient.client import Node, Relationship
 def write_client_to_graphdb(client_id, _graph_db_provider=graphdb_provider):
   gdb = _graph_db_provider.get_graph_client()
 
-  q = "MERGE (n:Client { props }) RETURN n"
-  client_id = client_id
+  q = '''
+      MERGE (n:Client {id: {client_id}})
+      RETURN n
+  '''
+
   params = {
-    'props':
-      {
-        'client_id': client_id,
-      }
+    'client_id': client_id,
   }
 
   ret_val = gdb.query(q, params=params, returns=(Node,))
-
   return ret_val[0][0]
 
 
