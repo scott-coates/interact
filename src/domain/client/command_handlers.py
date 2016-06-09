@@ -1,5 +1,4 @@
 from django.dispatch import receiver
-from django.utils import timezone
 
 from src.domain.client.commands import CreateClient, AssociateWithTopic, AddTopicOption
 from src.domain.client.entities import Client
@@ -11,8 +10,7 @@ def create_client(_aggregate_repository=None, **kwargs):
   if not _aggregate_repository: _aggregate_repository = aggregate_repository
   command = kwargs['command']
 
-  system_created_date = timezone.now()
-  data = dict({'system_created_date': system_created_date}, **command.__dict__)
+  data = command.__dict__
 
   client = Client.from_attrs(**data)
   _aggregate_repository.save(client, -1)
@@ -27,8 +25,7 @@ def associate_topic(_aggregate_repository=None, **kwargs):
   command = kwargs['command']
   id = kwargs['aggregate_id']
 
-  system_created_date = timezone.now()
-  data = dict({'system_created_date': system_created_date}, **command.__dict__)
+  data = command.__dict__
 
   client = _aggregate_repository.get(Client, id)
   version = client.version
@@ -43,8 +40,7 @@ def add_option(_aggregate_repository=None, **kwargs):
   command = kwargs['command']
   id = kwargs['aggregate_id']
 
-  system_created_date = timezone.now()
-  data = dict({'system_created_date': system_created_date}, **command.__dict__)
+  data = command.__dict__
 
   client = _aggregate_repository.get(Client, id)
   version = client.version

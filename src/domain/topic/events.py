@@ -8,5 +8,5 @@ class TopicCreated1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, name, system_created_date):
+  def __init__(self, id, name):
     super().__init__()
