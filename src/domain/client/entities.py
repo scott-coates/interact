@@ -84,6 +84,7 @@ class TargetAudienceTopic:
     self.id = id
     self.topic_id = topic_id
 
+  # noinspection PyUnusedLocal
   def _add_topic_option(self, id, name, type, attrs, ta_topic_id, **kwargs):
     option = TargetAudienceTopicOption(id, name, type, attrs, ta_topic_id)
     self._ta_topic_options.append(option)
@@ -94,7 +95,6 @@ class TargetAudienceTopic:
 
 class TargetAudienceTopicOption:
   def __init__(self, id, name, type, attrs, ta_topic_id):
-
     self.id = id
     self.name = name
     self.type = type

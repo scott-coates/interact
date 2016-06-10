@@ -47,16 +47,15 @@ def get_profile_id_from_provider_info(prospect_id, provider_external_id, provide
   return profile_id
 
 
+def save_profile_lookup_by_provider(profile_id, provider_external_id, provider_type, prospect_id):
+  profile, _ = ProfileLookupByProvider.objects.update_or_create(
+      id=profile_id, defaults=dict(
+          provider_external_id=provider_external_id, provider_type=provider_type, prospect_id=prospect_id
+      )
+  )
+
+  return profile
+
+
 def _get_profile_from_provider_info(provider_external_id, provider_type):
   return ProfileLookupByProvider.objects.get(provider_external_id=provider_external_id, provider_type=provider_type)
-
-
-def _clean_attrs(attrs):
-  websites = attrs.get(constants.WEBSITES)
-  # todo move to domain logic?
-  if websites:
-    # get unique urls from iterable
-    websites = list(set(websites))
-    attrs[constants.WEBSITES] = websites
-
-  return attrs

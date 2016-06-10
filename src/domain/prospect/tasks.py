@@ -35,3 +35,14 @@ def save_profile_from_provider_info_task(prospect_id, provider_external_id, prov
 
   with log_wrapper(logger.info, *log_message):
     return services.get_profile_id_from_provider_info(prospect_id, provider_external_id, provider_type)
+
+
+@job('high')
+def save_profile_lookup_by_provider_task(profile_id, provider_external_id, provider_type, prospect_id):
+  log_message = (
+    "profile_id: %s, provider_external_id: %s, provider_type: %s",
+    prospect_id, provider_external_id, provider_type
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    return services.save_profile_lookup_by_provider(profile_id, provider_external_id, provider_type, prospect_id)
