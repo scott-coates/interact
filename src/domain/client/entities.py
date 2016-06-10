@@ -57,7 +57,7 @@ class Client(AggregateBase):
     self.name = event.name
 
   def _handle_associated_with_topic_1_event(self, event):
-    self._ta_topics.append(TargetAudienceTopic(event.ta_topic_id, event.topic_id))
+    self._ta_topics.append(TargetAudienceTopic(event.id, event.topic_id))
 
   def _handle_added_target_audience_topic_option_1_event(self, event):
     ta_topic = self._get_ta_topic_by_id(event.ta_topic_id)

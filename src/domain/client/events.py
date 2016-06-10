@@ -17,7 +17,7 @@ class AssociatedWithTopic1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, ta_topic_id, topic_id):
+  def __init__(self, id, topic_id):
     super().__init__()
 
 
