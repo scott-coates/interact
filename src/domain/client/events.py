@@ -12,7 +12,7 @@ class ClientCreated1(DomainEvent):
     super().__init__()
 
 
-class AssociatedWithTopic1(DomainEvent):
+class ClientAssociatedWithTopic1(DomainEvent):
   event_func_name = 'associated_with_topic_1'
   event_signal = EventSignal()
 
@@ -21,7 +21,7 @@ class AssociatedWithTopic1(DomainEvent):
     super().__init__()
 
 
-class AddedTargetAudienceTopicOption1(DomainEvent):
+class ClientAddedTargetAudienceTopicOption1(DomainEvent):
   event_func_name = 'added_target_audience_topic_option_1'
   event_signal = EventSignal()
 

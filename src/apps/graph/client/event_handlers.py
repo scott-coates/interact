@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 
 from src.apps.graph.client import tasks
-from src.domain.client.events import ClientCreated1, AssociatedWithTopic1
+from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1
 from src.libs.common_domain.decorators import event_idempotent
 
 
@@ -13,7 +13,7 @@ def add_client(**kwargs):
 
 
 @event_idempotent
-@receiver(AssociatedWithTopic1.event_signal)
+@receiver(ClientAssociatedWithTopic1.event_signal)
 def add_ta_topic(**kwargs):
   client_id = kwargs['aggregate_id']
   event = kwargs['event']

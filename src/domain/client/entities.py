@@ -1,4 +1,4 @@
-from src.domain.client.events import ClientCreated1, AssociatedWithTopic1, AddedTargetAudienceTopicOption1
+from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, ClientAddedTargetAudienceTopicOption1
 from src.libs.common_domain.aggregate_base import AggregateBase
 
 
@@ -28,7 +28,7 @@ class Client(AggregateBase):
     if not topic_id:
       raise TypeError("topic_id is required")
 
-    self._raise_event(AssociatedWithTopic1(id, topic_id))
+    self._raise_event(ClientAssociatedWithTopic1(id, topic_id))
 
   def add_topic_option(self, id, name, type, attrs, ta_topic_id):
     if not id:
@@ -49,7 +49,7 @@ class Client(AggregateBase):
     ta_topic = self._get_ta_topic_by_id(ta_topic_id)
 
     self._raise_event(
-        AddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
+        ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
     )
 
   def _handle_created_1_event(self, event):

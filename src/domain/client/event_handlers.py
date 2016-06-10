@@ -1,12 +1,12 @@
 from django.dispatch import receiver
 
 from src.domain.client import tasks
-from src.domain.client.events import AddedTargetAudienceTopicOption1
+from src.domain.client.events import ClientAddedTargetAudienceTopicOption1
 from src.libs.common_domain.decorators import event_idempotent
 
 
 @event_idempotent
-@receiver(AddedTargetAudienceTopicOption1.event_signal)
+@receiver(ClientAddedTargetAudienceTopicOption1.event_signal)
 def execute_added_target_audience_topic_option_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']

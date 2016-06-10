@@ -1,4 +1,6 @@
-from src.domain.prospect.events import ProspectCreated1, ProfileAddedToProspect1
+from src.domain.prospect.engagement_opportunity import service  as eo_service
+from src.domain.prospect.events import ProspectCreated1, Prospect1AddedProfile, \
+  ProspectAddedEngagementOpportunityToProfile
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 
@@ -32,12 +34,12 @@ class Prospect(AggregateBase):
 
     attrs = _profile_service.get_profile_attrs_from_provider(profile_external_id, provider_type)
 
-    self._raise_event(ProfileAddedToProspect1(id, profile_external_id, provider_type, attrs))
+    self._raise_event(Prospect1AddedProfile(id, profile_external_id, provider_type, attrs))
 
   def add_eo(self, id, engagement_opportunity_external_id, engagement_opportunity_attrs, provider_type,
              provider_action_type, created_at, profile_id, _eo_service=None):
 
-    if not _eo_service: _eo_service = profile_service
+    if not _eo_service: _eo_service = eo_service
 
     if not id:
       raise TypeError("id is required")
@@ -56,13 +58,15 @@ class Prospect(AggregateBase):
 
     if not created_at:
       raise TypeError("created_at is required")
-    
+
     if not profile_id:
       raise TypeError("profile_id is required")
 
-    attrs = _eo_service.get_profile_attrs_from_provider(profile_external_id, provider_type)
+    engagement_opportunity_attrs = _eo_service.prepare_attrs_from_engagement_opportunity(engagement_opportunity_attrs)
 
-    self._raise_event(ProfileAddedToProspect1(id, profile_external_id, provider_type, attrs))
+    self._raise_event(ProspectAddedEngagementOpportunityToProfile(id, engagement_opportunity_external_id,
+                                                                  engagement_opportunity_attrs, provider_type,
+                                                                  provider_action_type, created_at, profile_id))
 
   def _handle_created_1_event(self, event):
     self.id = event.id
