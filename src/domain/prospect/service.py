@@ -1,9 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from src.domain.common import constants
-from src.domain.prospect.commands import CreateProspect, AddProfile
+from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO
 from src.domain.prospect.models import ProfileLookupByProvider, EngagementOpportunityLookupByProvider
-from src.domain.prospect.profile.providers.twitter import twitter_profile_service
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
 
@@ -42,7 +40,7 @@ def populate_profile_id_from_provider_info(prospect_id, profile_external_id, pro
   return profile_id
 
 
-def populate_engagement_opportunity_id_from_engagement_discovery(eo_id, engagement_opportunity_discovery_object,
+def populate_engagement_opportunity_id_from_engagement_discovery(profile_id, engagement_opportunity_discovery_object,
                                                                  _dispatcher=None):
   if not _dispatcher: _dispatcher = dispatcher
 
@@ -56,16 +54,16 @@ def populate_engagement_opportunity_id_from_engagement_discovery(eo_id, engageme
 
   except ObjectDoesNotExist:
 
+    profile = _get_profile_from_provider_info(profile_id, provider_type)
+
     eo_id = generate_id()
 
-    if provider_type == constants.Provider.TWITTER:
-      attrs = twitter_profile_service.get_twitter_profile_attrs(profile_external_id)
-      create_profile = AddProfile(eo_id, profile_external_id, provider_type, attrs)
+    create_eo = AddEO(eo_id, discovery.engagement_opportunity_external_id,
+                      discovery.engagement_opportunity_attrs,
+                      provider_type, discovery.provider_action_type, discovery.created_at,
+                      profile_id)
 
-    else:
-      raise Exception('Invalid provider type')
-
-    _dispatcher.send_command(prospect_id, create_profile)
+    _dispatcher.send_command(profile.prospect_id, create_eo)
 
   return eo_id
 
