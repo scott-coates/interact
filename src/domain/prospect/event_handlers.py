@@ -12,11 +12,9 @@ def created_from_engagement_opportunity_callback(sender, **kwargs):
 
   prospect_task = tasks.save_prospect_from_provider_info_task.delay(eo.profile_external_id, eo.provider_type)
 
-  profile_task = tasks.save_profile_from_provider_info_task.delay(
+  profile_task = tasks.save_profile_from_provider_info_chain.delay(
       eo.profile_external_id, eo.provider_type, depends_on=prospect_task
   )
-
-
 
   # (
   #   prospect_tasks.save_prospect_from_provider_info_task.s(
