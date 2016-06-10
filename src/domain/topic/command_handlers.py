@@ -10,9 +10,7 @@ def create_user(_aggregate_repository=None, **kwargs):
   if not _aggregate_repository: _aggregate_repository = aggregate_repository
   command = kwargs['command']
 
-  data = command.__dict__
-
-  topic = Topic.from_attrs(**data)
+  topic = Topic.from_attrs(**command.data)
   _aggregate_repository.save(topic, -1)
 
   return topic

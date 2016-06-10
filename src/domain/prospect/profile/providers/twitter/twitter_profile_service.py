@@ -26,7 +26,7 @@ def _get_twitter_profile_data(provider_external_id, _search=twitter_search_utils
   with log_wrapper(logger.debug, *log_message):
 
     with log_wrapper(logger.debug, *twitter_search_log_message):
-      user_data = _search.search_twitter_by_user(provider_external_id, **kwargs)
+      user_data = _search.search_twitter_by_user(provider_external_id, count=1, **kwargs)
 
     profile_data = user_data[0]['user']
 

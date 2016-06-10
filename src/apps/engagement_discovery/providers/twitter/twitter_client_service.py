@@ -34,8 +34,10 @@ def _is_valid_tweet(tweet):
     following_count = tweet['user']['friends_count']
 
     if following_count >= 30 and followers_count >= 30:
+      # if not true, they're probably not active on twitter, maybe just trying it out and not really engaged yet
       if followers_count > 500:
         ret_val = (following_count / followers_count) >= .65
+        # if less than this number, they have a big following and don't follow as many people as who follow them
     else:
       ret_val = False
 
@@ -74,7 +76,7 @@ def find_tweets_from_keyword(keyword, named_entity_type, _twitter_client_service
       tweets_from_keywords = [tweet for tweet in tweets_from_keywords if _is_valid_tweet(tweet)]
 
       valid_tweets = tweets_from_keywords
-      #todo should we even worry about filtering inactive users at this point?
+      # todo should we even worry about filtering inactive users at this point?
       # i just ran it and it appeared to be faylty - filtering out people who were indeed good quality
       # usernames_from_tweets = sorted(set(tweet['user']['screen_name'] for tweet in tweets_from_keywords))
       #

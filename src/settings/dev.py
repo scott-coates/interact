@@ -131,9 +131,3 @@ SENDGRID_PASSWORD = "Password"
 ########### EXTERNAL API CONFIGURATION
 MASHAPE_API_KEY = "Mashape Api Key"
 ########## END EXTERNAL API CONFIGURATION
-
-# Get a developer's local overrides (if they exist)
-try:
-  from .dev_override import *
-except:
-  pass

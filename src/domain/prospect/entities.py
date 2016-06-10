@@ -54,7 +54,7 @@ class Prospect(AggregateBase):
     self.attrs = event.attrs
 
   def _handle_profile_added_to_prospect_1_event(self, event):
-    self._profiles.append(Profile(event.ta_topic_id, event.topic_id))
+    self._profiles.append(Profile(**event.data))
 
   def __str__(self):
     return 'Prospect {id}'.format(id=self.id)

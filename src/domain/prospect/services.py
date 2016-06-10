@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from src.domain.common import constants
-from src.domain.prospect.commands import CreateProspect, CreateProfile
+from src.domain.prospect.commands import CreateProspect, AddProfile
 from src.domain.prospect.models import ProfileLookupByProvider
 from src.domain.prospect.profile.providers.twitter import twitter_profile_service
 from src.libs.common_domain import dispatcher
@@ -37,12 +37,12 @@ def get_profile_id_from_provider_info(prospect_id, provider_external_id, provide
 
     if provider_type == constants.Provider.TWITTER:
       attrs = twitter_profile_service.get_twitter_attrs(provider_external_id)
-      create_profile = CreateProfile(profile_id, prospect_id, provider_external_id, provider_type, attrs)
+      create_profile = AddProfile(profile_id, provider_external_id, provider_type, attrs)
 
     else:
       raise Exception('Invalid provider type')
 
-    _dispatcher.send_command(-1, create_profile)
+    _dispatcher.send_command(prospect_id, create_profile)
 
   return profile_id
 

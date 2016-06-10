@@ -1,8 +1,9 @@
 from src.libs.common_domain.command_signal import CommandSignal
+from src.libs.common_domain.domain_command import DomainCommand
 from src.libs.python_utils.objects.object_utils import initializer
 
 
-class CreateClient():
+class CreateClient(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
@@ -10,17 +11,17 @@ class CreateClient():
     pass
 
 
-class AssociateWithTopic():
+class AssociateWithTopic(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, topic_id,):
+  def __init__(self, id, topic_id, ):
     pass
 
 
-class AddTopicOption():
+class AddTopicOption(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, name, type, attrs, ta_topic_id ):
+  def __init__(self, id, name, type, attrs, ta_topic_id):
     pass

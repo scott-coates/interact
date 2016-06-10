@@ -10,9 +10,7 @@ def create_client(_aggregate_repository=None, **kwargs):
   if not _aggregate_repository: _aggregate_repository = aggregate_repository
   command = kwargs['command']
 
-  data = command.__dict__
-
-  client = Client.from_attrs(**data)
+  client = Client.from_attrs(**command.data)
   _aggregate_repository.save(client, -1)
 
   return client
@@ -25,11 +23,9 @@ def associate_topic(_aggregate_repository=None, **kwargs):
   command = kwargs['command']
   id = kwargs['aggregate_id']
 
-  data = command.__dict__
-
   client = _aggregate_repository.get(Client, id)
   version = client.version
-  client.associate_with_topic(**data)
+  client.associate_with_topic(**command.data)
   _aggregate_repository.save(client, version)
 
 
@@ -40,9 +36,7 @@ def add_option(_aggregate_repository=None, **kwargs):
   command = kwargs['command']
   id = kwargs['aggregate_id']
 
-  data = command.__dict__
-
   client = _aggregate_repository.get(Client, id)
   version = client.version
-  client.add_topic_option(**data)
+  client.add_topic_option(**command.data)
   _aggregate_repository.save(client, version)
