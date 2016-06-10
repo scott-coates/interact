@@ -8,11 +8,7 @@ logger = logging.getLogger(__name__)
 _twitter_url_prefix = "https://twitter.com/{0}"
 
 
-def get_twitter_attrs(provider_external_id):
-  return _get_twitter_profile_data(provider_external_id)
-
-
-def _get_twitter_profile_data(provider_external_id, _search=twitter_search_utils, **kwargs):
+def get_twitter_profile_data(provider_external_id, _search=twitter_search_utils, **kwargs):
   log_message = (
     "Get twitter profile data. twitter_id: %s",
     provider_external_id

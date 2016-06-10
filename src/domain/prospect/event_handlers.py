@@ -12,11 +12,13 @@ from src.libs.common_domain.decorators import event_idempotent
 def created_from_engagement_opportunity_callback(sender, **kwargs):
   eo = kwargs['engagement_opportunity_discovery_object']
 
-  prospect_task = tasks.save_prospect_from_provider_info_task.delay(eo.provider_external_id, eo.provider_type)
+  prospect_task = tasks.save_prospect_from_engagement_discovery_task.delay(eo.provider_external_id, eo.provider_type)
 
-  profile_task = tasks.save_profile_from_provider_info_chain.delay(
+  profile_task = tasks.save_profile_from_engagement_discovery_chain.delay(
       eo.provider_external_id, eo.provider_type, depends_on=prospect_task
   )
+
+  tasks.save_engagement_opportunity_from_engagement_discovery_chain.delay(eo, depends_on=profile_task)
 
 
   # (

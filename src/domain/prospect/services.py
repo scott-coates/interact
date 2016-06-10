@@ -36,7 +36,7 @@ def get_profile_id_from_provider_info(prospect_id, provider_external_id, provide
     profile_id = generate_id()
 
     if provider_type == constants.Provider.TWITTER:
-      attrs = twitter_profile_service.get_twitter_attrs(provider_external_id)
+      attrs = twitter_profile_service.get_twitter_profile_data(provider_external_id)
       create_profile = AddProfile(profile_id, provider_external_id, provider_type, attrs)
 
     else:
