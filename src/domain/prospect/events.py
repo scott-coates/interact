@@ -10,3 +10,12 @@ class ProspectCreated1(DomainEvent):
   @initializer
   def __init__(self, id, attrs):
     super().__init__()
+
+
+class ProfileAddedToProspect1(DomainEvent):
+  event_func_name = 'profile_added_to_prospect_1'
+  event_signal = EventSignal()
+
+  @initializer
+  def __init__(self, id, attrs):
+    super().__init__()

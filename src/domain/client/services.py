@@ -1,6 +1,6 @@
 from src.domain.client.models import ActiveTATopicOption
 
-# todo should this model be in the topics aggregate?
+
 def get_active_ta_topic_options():
   active_topics = ActiveTATopicOption.objects.all()
   return active_topics

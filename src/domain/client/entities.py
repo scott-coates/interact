@@ -5,7 +5,7 @@ from src.libs.common_domain.aggregate_base import AggregateBase
 class Client(AggregateBase):
   def __init__(self):
     super().__init__()
-    self._ta_topics_list = []
+    self._ta_topics = []
 
   @classmethod
   def from_attrs(cls, id, name):
@@ -57,14 +57,14 @@ class Client(AggregateBase):
     self.name = event.name
 
   def _handle_associated_with_topic_1_event(self, event):
-    self._ta_topics_list.append(TargetAudienceTopic(event.ta_topic_id, event.topic_id))
+    self._ta_topics.append(TargetAudienceTopic(event.ta_topic_id, event.topic_id))
 
   def _handle_added_topic_option_1_event(self, event):
     ta_topic = self._get_ta_topic_by_id(event.ta_topic_id)
     ta_topic._add_topic_option(**event.data)
 
   def _get_ta_topic_by_id(self, ta_topic_id):
-    ta_topic = next(t for t in self._ta_topics_list if t.id == ta_topic_id)
+    ta_topic = next(t for t in self._ta_topics if t.id == ta_topic_id)
     return ta_topic
 
   def __str__(self):
@@ -73,7 +73,7 @@ class Client(AggregateBase):
 
 class TargetAudienceTopic:
   def __init__(self, id, topic_id):
-    self._ta_topic_options_list = []
+    self._ta_topic_options = []
 
     if not id:
       raise TypeError("id is required")
@@ -86,7 +86,7 @@ class TargetAudienceTopic:
 
   def _add_topic_option(self, ta_topic_option_id, name, type, attrs, ta_topic_id, **kwargs):
     option = TargetAudienceTopicOption(ta_topic_option_id, name, type, attrs, ta_topic_id)
-    self._ta_topic_options_list.append(option)
+    self._ta_topic_options.append(option)
 
   def __str__(self):
     return 'TATopic {id}'.format(id=self.id)

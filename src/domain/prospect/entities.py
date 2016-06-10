@@ -3,6 +3,10 @@ from src.libs.common_domain.aggregate_base import AggregateBase
 
 
 class Prospect(AggregateBase):
+  def __init__(self):
+    super().__init__()
+    self._profiles = []
+
   @classmethod
   def from_attrs(cls, id, attrs):
     ret_val = cls()
@@ -16,7 +20,7 @@ class Prospect(AggregateBase):
 
   def _handle_created_1_event(self, event):
     self.id = event.id
-    self.name = event.name
+    self.attrs = event.attrs
 
   def __str__(self):
-    return 'Topic {id}: {name}'.format(id=self.id, name=self.name)
+    return 'Prospect {id}'.format(id=self.id)
