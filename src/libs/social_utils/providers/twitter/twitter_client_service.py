@@ -38,6 +38,6 @@ def _search_chunks(*query_items, action, _search=twitter_search_utils, **kwargs)
   return chain.from_iterable(x['statuses'] for x in ret_val)
 
 
-def get_twitter_provider_external_id(url):
+def get_twitter_profile_external_id(url):
   # for now, just assume it's a normal twitter url - i.e. it doesn't contain a status
   return url.rsplit('/', 1)[-1]

@@ -8,25 +8,25 @@ logger = logging.getLogger(__name__)
 _twitter_url_prefix = "https://twitter.com/{0}"
 
 
-def get_twitter_profile_data(provider_external_id, _search=twitter_search_utils, **kwargs):
+def get_twitter_profile_attrs(profile_external_id, _search=twitter_search_utils, **kwargs):
   log_message = (
     "Get twitter profile data. twitter_id: %s",
-    provider_external_id
+    profile_external_id
   )
 
   twitter_search_log_message = (
     "Performing twitter search. twitter_id: %s",
-    provider_external_id
+    profile_external_id
   )
 
   with log_wrapper(logger.debug, *log_message):
 
     with log_wrapper(logger.debug, *twitter_search_log_message):
-      user_data = _search.search_twitter_by_user(provider_external_id, count=1, **kwargs)
+      user_data = _search.search_twitter_by_user(profile_external_id, count=1, **kwargs)
 
     profile_data = user_data[0]['user']
 
-    profile_url = _twitter_url_prefix.format(provider_external_id)
+    profile_url = _twitter_url_prefix.format(profile_external_id)
     name = profile_data['name']
     bio = profile_data['description']
     followers_count = profile_data['followers_count']

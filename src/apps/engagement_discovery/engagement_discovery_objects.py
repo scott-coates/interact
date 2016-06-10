@@ -4,7 +4,7 @@ from src.libs.datetime_utils.datetime_parser import get_datetime
 
 EngagementOpportunityDiscoveryObject = namedtuple(
     'EngagementOpportunityDiscoveryObject',
-    'provider_external_id engagement_opportunity_external_id engagement_opportunity_attrs created_date '
+    'profile_external_id engagement_opportunity_external_id engagement_opportunity_attrs created_date '
     'provider_type provider_action_type topic_type'
 )
 

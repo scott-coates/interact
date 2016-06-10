@@ -18,13 +18,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('primary_key', models.AutoField(primary_key=True, serialize=False)),
                 ('id', models.CharField(max_length=8, unique=True)),
-                ('provider_external_id', models.CharField(max_length=2400)),
+                ('profile_external_id', models.CharField(max_length=2400)),
                 ('provider_type', models.CharField(max_length=2400)),
                 ('prospect_id', models.CharField(max_length=8)),
             ],
         ),
         migrations.AlterUniqueTogether(
             name='profilelookupbyprovider',
-            unique_together=set([('provider_external_id', 'provider_type')]),
+            unique_together=set([('profile_external_id', 'provider_type')]),
         ),
     ]

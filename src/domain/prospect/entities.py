@@ -1,5 +1,5 @@
-from src.domain.common import constants
 from src.domain.prospect.events import ProspectCreated1, ProfileAddedToProspect1
+from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 
 
@@ -19,35 +19,20 @@ class Prospect(AggregateBase):
 
     return ret_val
 
-  def add_profile(self, id, provider_external_id, provider_type, attrs):
+  def add_profile(self, id, profile_external_id, provider_type, _profile_service=None):
+    if not _profile_service: _profile_service = profile_service
     if not id:
       raise TypeError("id is required")
 
-    if not provider_external_id:
-      raise TypeError("provider_external_id is required")
+    if not profile_external_id:
+      raise TypeError("profile_external_id is required")
 
     if not provider_type:
       raise TypeError("provider_type is required")
 
-    if not attrs:
-      raise TypeError("attrs_type is required")
-    else:
-      attrs = self._clean_attrs(attrs)
+    attrs = _profile_service.get_profile_attrs_from_provider(profile_external_id, provider_type)
 
-    self._raise_event(ProfileAddedToProspect1(id, provider_external_id, provider_type, attrs))
-
-  def _clean_attrs(self, attrs):
-    websites = attrs.get(constants.WEBSITES)
-
-    if websites:
-      # get unique urls from iterable
-      websites = list(set(websites))
-      ret_val = dict(attrs, **{constants.WEBSITES: websites})
-
-    else:
-      ret_val = attrs
-
-    return ret_val
+    self._raise_event(ProfileAddedToProspect1(id, profile_external_id, provider_type, attrs))
 
   def _handle_created_1_event(self, event):
     self.id = event.id
@@ -61,11 +46,11 @@ class Prospect(AggregateBase):
 
 
 class Profile:
-  def __init__(self, id, provider_external_id, provider_type, attrs):
+  def __init__(self, id, profile_external_id, provider_type, attrs):
     self.id = id
-    self.provider_external_id = provider_external_id
+    self.profile_external_id = profile_external_id
     self.provider_type = provider_type
     self.attrs = attrs
 
   def __str__(self):
-    return 'Profile {id}: {provider_external_id}'.format(id=self.id, provider_external_id=self.provider_external_id)
+    return 'Profile {id}: {profile_external_id}'.format(id=self.id, profile_external_id=self.profile_external_id)

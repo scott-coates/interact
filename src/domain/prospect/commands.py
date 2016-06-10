@@ -15,5 +15,5 @@ class AddProfile(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, provider_external_id, provider_type, attrs):
+  def __init__(self, id, profile_external_id, provider_type):
     pass
