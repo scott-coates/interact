@@ -3,7 +3,6 @@ import logging
 from src.apps.engagement_discovery.engagement_discovery_objects import EngagementOpportunityDiscoveryObject
 from src.apps.engagement_discovery.providers.twitter import twitter_client_service
 from src.apps.engagement_discovery.signals import engagement_opportunity_discovered
-from src.libs.nlp_utils.services.enums import NamedEntityTypeEnum
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
@@ -17,29 +16,15 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
 
   with log_wrapper(logger.debug, *log_message):
 
-    # this is if we want to limit eo discover by username
-    # todo
-    # profile_id = kwargs.pop('profile_id', None)
-    # if profile_id:
-    #   profile = profile_service.get_profile(profile_id)
-    #   kwargs['screen_name'] = profile.provider_external_id
-
     # if we want to get additional parameters (like geocode, since, follower count)
     geocode = ta_topic_option.option_attrs.get('geocode')
     if geocode:
       kwargs['geocode'] = geocode
 
-    since = ta_topic_option.option_attrs.get('since', 'q')
+    since = ta_topic_option.option_attrs.get('since', 'd')
     kwargs['since'] = since
 
-    named_entity_type = ta_topic_option.option_attrs.get('named_entity_type')
-    if named_entity_type:
-      named_entity_type = NamedEntityTypeEnum[named_entity_type]
-    else:
-      named_entity_type = NamedEntityTypeEnum.person
-
-    twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, named_entity_type,
-                                                                   **kwargs)
+    twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)
 
     for twitter_eo in twitter_eos:
       discovery_object = EngagementOpportunityDiscoveryObject(
