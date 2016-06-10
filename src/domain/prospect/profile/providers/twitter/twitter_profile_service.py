@@ -8,36 +8,29 @@ logger = logging.getLogger(__name__)
 _twitter_url_prefix = "https://twitter.com/{0}"
 
 
-def get_twitter_profile_attrs(profile_external_id):
-  return _get_twitter_profile_data(profile_external_id)
+def get_twitter_attrs(provider_external_id):
+  return _get_twitter_profile_data(provider_external_id)
 
 
-def _get_recent_tweets(user_data):
-  recent_tweets = []
-  for tweet in user_data:
-    recent_tweets.append(tweet[constants.TEXT])
-  return recent_tweets
-
-
-def _get_twitter_profile_data(profile_external_id, _search=twitter_search_utils, **kwargs):
+def _get_twitter_profile_data(provider_external_id, _search=twitter_search_utils, **kwargs):
   log_message = (
     "Get twitter profile data. twitter_id: %s",
-    profile_external_id
+    provider_external_id
   )
 
   twitter_search_log_message = (
     "Performing twitter search. twitter_id: %s",
-    profile_external_id
+    provider_external_id
   )
 
   with log_wrapper(logger.debug, *log_message):
 
     with log_wrapper(logger.debug, *twitter_search_log_message):
-      user_data = _search.search_twitter_by_user(profile_external_id, **kwargs)
+      user_data = _search.search_twitter_by_user(provider_external_id, **kwargs)
 
     profile_data = user_data[0]['user']
 
-    profile_url = _twitter_url_prefix.format(profile_external_id)
+    profile_url = _twitter_url_prefix.format(provider_external_id)
     name = profile_data['name']
     bio = profile_data['description']
     followers_count = profile_data['followers_count']
@@ -46,12 +39,9 @@ def _get_twitter_profile_data(profile_external_id, _search=twitter_search_utils,
 
     user_websites = _get_twitter_profile_websites(profile_data)
 
-    recent_tweets = _get_recent_tweets(user_data)
-
     twitter_profile_data = {
-      constants.PROFILE_URL: profile_url,
-      constants.NAME: name, constants.FOLLOWERS_COUNT: followers_count, constants.FOLLOWING_COUNT: following_count,
-      constants.RECENT_TWEETS: recent_tweets,
+      constants.URL: profile_url, constants.NAME: name,
+      constants.Profile.FOLLOWERS_COUNT: followers_count, constants.Profile.FOLLOWING_COUNT: following_count
     }
 
     if bio: twitter_profile_data[constants.BIO] = bio

@@ -1,4 +1,4 @@
-from src.domain.client.events import ClientCreated1, AssociatedWithTopic1, AddedTopicOption1
+from src.domain.client.events import ClientCreated1, AssociatedWithTopic1, AddedTargetAudienceTopicOption1
 from src.libs.common_domain.aggregate_base import AggregateBase
 
 
@@ -49,7 +49,7 @@ class Client(AggregateBase):
     ta_topic = self._get_ta_topic_by_id(ta_topic_id)
 
     self._raise_event(
-        AddedTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
+        AddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
     )
 
   def _handle_created_1_event(self, event):
@@ -59,7 +59,7 @@ class Client(AggregateBase):
   def _handle_associated_with_topic_1_event(self, event):
     self._ta_topics.append(TargetAudienceTopic(event.ta_topic_id, event.topic_id))
 
-  def _handle_added_topic_option_1_event(self, event):
+  def _handle_added_target_audience_topic_option_1_event(self, event):
     ta_topic = self._get_ta_topic_by_id(event.ta_topic_id)
     ta_topic._add_topic_option(**event.data)
 
@@ -94,21 +94,6 @@ class TargetAudienceTopic:
 
 class TargetAudienceTopicOption:
   def __init__(self, id, name, type, attrs, ta_topic_id):
-
-    if not id:
-      raise TypeError("id is required")
-
-    if not name:
-      raise TypeError("name is required")
-
-    if not type:
-      raise TypeError("type is required")
-
-    if not attrs:
-      raise TypeError("attrs is required")
-
-    if not ta_topic_id:
-      raise TypeError("ta_topic_id is required")
 
     self.id = id
     self.name = name

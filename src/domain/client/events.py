@@ -21,8 +21,8 @@ class AssociatedWithTopic1(DomainEvent):
     super().__init__()
 
 
-class AddedTopicOption1(DomainEvent):
-  event_func_name = 'added_topic_option_1'
+class AddedTargetAudienceTopicOption1(DomainEvent):
+  event_func_name = 'added_target_audience_topic_option_1'
   event_signal = EventSignal()
 
   @initializer

@@ -22,7 +22,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     # profile_id = kwargs.pop('profile_id', None)
     # if profile_id:
     #   profile = profile_service.get_profile(profile_id)
-    #   kwargs['screen_name'] = profile.profile_external_id
+    #   kwargs['screen_name'] = profile.provider_external_id
 
     # if we want to get additional parameters (like geocode, since, follower count)
     geocode = ta_topic_option.option_attrs.get('geocode')

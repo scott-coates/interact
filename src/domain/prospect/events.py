@@ -17,5 +17,5 @@ class ProfileAddedToProspect1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, attrs):
+  def __init__(self, id, provider_external_id, provider_type, attrs):
     super().__init__()

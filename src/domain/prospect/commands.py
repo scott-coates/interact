@@ -8,3 +8,11 @@ class CreateProspect():
   @initializer
   def __init__(self, id, attrs):
     pass
+
+
+class CreateProfile():
+  command_signal = CommandSignal()
+
+  @initializer
+  def __init__(self, id, prospect_id, provider_external_id, provider_type, attrs):
+    pass

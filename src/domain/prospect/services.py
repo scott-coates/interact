@@ -1,45 +1,62 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from src.domain.common import constants
-from src.domain.prospect.models import ProfileProspectLookup
+from src.domain.prospect.commands import CreateProspect, CreateProfile
+from src.domain.prospect.models import ProfileLookupByProvider
 from src.domain.prospect.profile.providers.twitter import twitter_profile_service
+from src.libs.common_domain import dispatcher
+from src.libs.python_utils.id.id_utils import generate_id
 
 
-def save_prospect_from_provider_info_(profile_external_id, provider_type):
+def get_prospect_id_from_provider_info_(provider_external_id, provider_type, _dispatcher=None):
+  if not _dispatcher: _dispatcher = dispatcher
+
   try:
-    profile = _get_profile_from_provider_info(profile_external_id, provider_type)
+    profile = _get_profile_from_provider_info(provider_external_id, provider_type)
+    prospect_id = profile.prospect_id
   except ObjectDoesNotExist:
     # at some point in the future,  we could get initial prospect info from a 3rd party api. We could get email
     # addresses, etc.
-    # todo
-    pass
-  return None
+    prospect_id = generate_id()
+    create_prospect = CreateProspect(prospect_id, None)
+    _dispatcher.send_command(-1, create_prospect)
+
+  return prospect_id
 
 
-def save_profile_from_provider_info(prospect_id, profile_external_id, provider_type):
+def get_profile_id_from_provider_info(prospect_id, provider_external_id, provider_type, _dispatcher=None):
+  if not _dispatcher: _dispatcher = dispatcher
+
   try:
-    profile = _get_profile_from_provider_info(profile_external_id, provider_type)
+    profile = _get_profile_from_provider_info(provider_external_id, provider_type)
+    profile_id = profile.id
+
   except ObjectDoesNotExist:
+
+    profile_id = generate_id()
+
     if provider_type == constants.Provider.TWITTER:
-      profile_attrs = twitter_profile_service.get_twitter_profile_attrs(profile_external_id)
-      profile_attrs = _clean_profile_attrs(profile_attrs)
+      attrs = twitter_profile_service.get_twitter_attrs(provider_external_id)
+      create_profile = CreateProfile(profile_id, prospect_id, provider_external_id, provider_type, attrs)
 
-  else:
-    raise Exception('Invalid provider type')
+    else:
+      raise Exception('Invalid provider type')
 
-  return None
+    _dispatcher.send_command(-1, create_profile)
 
-
-def _get_profile_from_provider_info(profile_external_id, provider_type):
-  return ProfileProspectLookup.objects.get(profile_external_id=profile_external_id, provider_type=provider_type)
+  return profile_id
 
 
-def _clean_profile_attrs(profile_attrs):
-  websites = profile_attrs.get(constants.WEBSITES)
+def _get_profile_from_provider_info(provider_external_id, provider_type):
+  return ProfileLookupByProvider.objects.get(provider_external_id=provider_external_id, provider_type=provider_type)
 
+
+def _clean_attrs(attrs):
+  websites = attrs.get(constants.WEBSITES)
+  # todo move to domain logic?
   if websites:
     # get unique urls from iterable
     websites = list(set(websites))
-    profile_attrs[constants.WEBSITES] = websites
+    attrs[constants.WEBSITES] = websites
 
-  return profile_attrs
+  return attrs

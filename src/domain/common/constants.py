@@ -1,6 +1,14 @@
+NAME = 'name'
 URL = 'url'
 TEXT = 'text'
 WEBSITES = 'websites'
+LOCATION = 'location'
+BIO = 'bio'
+
+
+class Profile:
+  FOLLOWERS_COUNT = 'followers_count'
+  FOLLOWING_COUNT = 'following_count'
 
 
 class Provider:
