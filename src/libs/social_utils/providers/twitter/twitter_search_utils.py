@@ -10,6 +10,8 @@ def get_time_period_back(since):
 
   if since == "y":
     relative_delta = {"years": 1}
+  elif since == "q":
+    relative_delta = {"months": 3}
   elif since == "w":
     relative_delta = {"weeks": 1}
   elif since == "d":

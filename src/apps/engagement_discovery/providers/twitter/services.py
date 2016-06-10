@@ -29,7 +29,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     if geocode:
       kwargs['geocode'] = geocode
 
-    since = ta_topic_option.option_attrs.get('since', 'd')
+    since = ta_topic_option.option_attrs.get('since', 'q')
     kwargs['since'] = since
 
     named_entity_type = ta_topic_option.option_attrs.get('named_entity_type')
