@@ -21,22 +21,22 @@ class Prospect(AggregateBase):
 
     return ret_val
 
-  def add_profile(self, id, profile_external_id, provider_type, _profile_service=None):
+  def add_profile(self, id, external_id, provider_type, _profile_service=None):
     if not _profile_service: _profile_service = profile_service
     if not id:
       raise TypeError("id is required")
 
-    if not profile_external_id:
-      raise TypeError("profile_external_id is required")
+    if not external_id:
+      raise TypeError("external_id is required")
 
     if not provider_type:
       raise TypeError("provider_type is required")
 
-    attrs = _profile_service.get_profile_attrs_from_provider(profile_external_id, provider_type)
+    attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
 
-    self._raise_event(Prospect1AddedProfile(id, profile_external_id, provider_type, attrs))
+    self._raise_event(Prospect1AddedProfile(id, external_id, provider_type, attrs))
 
-  def add_eo(self, id, engagement_opportunity_external_id, engagement_opportunity_attrs, provider_type,
+  def add_eo(self, id, external_id, engagement_opportunity_attrs, provider_type,
              provider_action_type, created_at, profile_id, _eo_service=None):
 
     if not _eo_service: _eo_service = eo_service
@@ -44,8 +44,8 @@ class Prospect(AggregateBase):
     if not id:
       raise TypeError("id is required")
 
-    if not engagement_opportunity_external_id:
-      raise TypeError("engagement_opportunity_external_id is required")
+    if not external_id:
+      raise TypeError("external_id is required")
 
     if not engagement_opportunity_attrs:
       raise TypeError("engagement_opportunity_attrs is required")
@@ -64,7 +64,7 @@ class Prospect(AggregateBase):
 
     engagement_opportunity_attrs = _eo_service.prepare_attrs_from_engagement_opportunity(engagement_opportunity_attrs)
 
-    self._raise_event(ProspectAddedEngagementOpportunityToProfile(id, engagement_opportunity_external_id,
+    self._raise_event(ProspectAddedEngagementOpportunityToProfile(id, external_id,
                                                                   engagement_opportunity_attrs, provider_type,
                                                                   provider_action_type, created_at, profile_id))
 
@@ -80,27 +80,27 @@ class Prospect(AggregateBase):
 
 
 class Profile:
-  def __init__(self, id, profile_external_id, provider_type, attrs):
+  def __init__(self, id, external_id, provider_type, attrs):
     self._engagement_opportunities = []
 
     self.id = id
-    self.profile_external_id = profile_external_id
+    self.external_id = external_id
     self.provider_type = provider_type
     self.attrs = attrs
 
   def __str__(self):
-    return 'Profile {id}: {profile_external_id}'.format(id=self.id, profile_external_id=self.profile_external_id)
+    return 'Profile {id}: {external_id}'.format(id=self.id, external_id=self.external_id)
 
 
 class EngagementOpportunity:
-  def __init__(self, id, engagement_opportunity_external_id, provider_type, attrs):
+  def __init__(self, id, external_id, provider_type, attrs):
     self._engagement_opportunities = []
 
     self.id = id
-    self.profile_external_id = profile_external_id
+    self.external_id = external_id
     self.provider_type = provider_type
     self.attrs = attrs
 
   def __str__(self):
-    return 'EngagementOpportunity {id}: {profile_external_id}'.format(id=self.id,
-                                                                      profile_external_id=self.profile_external_id)
+    return 'EngagementOpportunity {id}: {external_id}'.format(id=self.id,
+                                                                      external_id=self.external_id)

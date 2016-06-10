@@ -23,12 +23,12 @@ def created_from_engagement_opportunity_callback(sender, **kwargs):
 
   # (
   #   prospect_tasks.save_prospect_from_provider_info_task.s(
-  #       eo.profile_external_id,
+  #       eo.external_id,
   #       eo.provider_type
   #   )
   #   |
   #   profile_tasks.save_profile_from_provider_info_task.s(
-  #       eo.profile_external_id,
+  #       eo.external_id,
   #       eo.provider_type
   #   )
   #   |
@@ -47,7 +47,7 @@ def execute_added_profile_1(**kwargs):
   event = kwargs['event']
 
   tasks.save_profile_lookup_by_provider_task.delay(
-      event.id, event.profile_external_id,
+      event.id, event.external_id,
       event.provider_type, aggregate_id
   )
 
@@ -58,6 +58,6 @@ def execute_added_profile_1(**kwargs):
   event = kwargs['event']
 
   tasks.save_profile_lookup_by_provider_task.delay(
-      event.id, event.profile_external_id,
+      event.id, event.external_id,
       event.provider_type, aggregate_id
   )

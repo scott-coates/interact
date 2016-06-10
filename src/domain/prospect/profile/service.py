@@ -3,9 +3,9 @@ from src.domain.prospect.profile.providers.twitter import twitter_profile_servic
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 
-def get_profile_attrs_from_provider(profile_external_id, provider_type):
+def get_profile_attrs_from_provider(external_id, provider_type):
   if provider_type == constants.Provider.TWITTER:
-    ret_val = twitter_profile_service.get_twitter_profile_attrs(profile_external_id)
+    ret_val = twitter_profile_service.get_twitter_profile_attrs(external_id)
   else:
     raise Exception('Invalid provider type')
 

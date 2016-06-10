@@ -6,11 +6,11 @@ from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
 
 
-def populate_prospect_id_from_provider_info_(profile_external_id, provider_type, _dispatcher=None):
+def populate_prospect_id_from_provider_info_(external_id, provider_type, _dispatcher=None):
   if not _dispatcher: _dispatcher = dispatcher
 
   try:
-    profile = _get_profile_from_provider_info(profile_external_id, provider_type)
+    profile = _get_profile_from_provider_info(external_id, provider_type)
     prospect_id = profile.prospect_id
   except ObjectDoesNotExist:
     # at some point in the future,  we could get initial prospect info from a 3rd party api. We could get email
@@ -22,18 +22,18 @@ def populate_prospect_id_from_provider_info_(profile_external_id, provider_type,
   return prospect_id
 
 
-def populate_profile_id_from_provider_info(prospect_id, profile_external_id, provider_type, _dispatcher=None):
+def populate_profile_id_from_provider_info(prospect_id, external_id, provider_type, _dispatcher=None):
   if not _dispatcher: _dispatcher = dispatcher
 
   try:
-    profile = _get_profile_from_provider_info(profile_external_id, provider_type)
+    profile = _get_profile_from_provider_info(external_id, provider_type)
     profile_id = profile.id
 
   except ObjectDoesNotExist:
 
     profile_id = generate_id()
 
-    create_profile = AddProfile(profile_id, profile_external_id, provider_type)
+    create_profile = AddProfile(profile_id, external_id, provider_type)
 
     _dispatcher.send_command(prospect_id, create_profile)
 
@@ -68,20 +68,20 @@ def populate_engagement_opportunity_id_from_engagement_discovery(profile_id, eng
   return eo_id
 
 
-def save_profile_lookup_by_provider(profile_id, profile_external_id, provider_type, prospect_id):
+def save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id):
   profile, _ = ProfileLookupByProvider.objects.update_or_create(
       id=profile_id, defaults=dict(
-          profile_external_id=profile_external_id, provider_type=provider_type, prospect_id=prospect_id
+          external_id=external_id, provider_type=provider_type, prospect_id=prospect_id
       )
   )
 
   return profile
 
 
-def _get_profile_from_provider_info(profile_external_id, provider_type):
-  return ProfileLookupByProvider.objects.get(profile_external_id=profile_external_id, provider_type=provider_type)
+def _get_profile_from_provider_info(external_id, provider_type):
+  return ProfileLookupByProvider.objects.get(external_id=external_id, provider_type=provider_type)
 
 
-def _get_engagement_opportunity_from_provider_info(engagement_opportunity_external_id, provider_type):
+def _get_engagement_opportunity_from_provider_info(external_id, provider_type):
   return EngagementOpportunityLookupByProvider.objects.get(
-      engagement_opportunity_external_id=engagement_opportunity_external_id, provider_type=provider_type)
+      external_id=external_id, provider_type=provider_type)
