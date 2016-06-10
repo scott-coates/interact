@@ -18,7 +18,6 @@ class ProfileLookupByProvider(ReadModel):
 class EngagementOpportunityLookupByProvider(ReadModel):
   external_id = models.CharField(max_length=2400)
   provider_type = models.CharField(max_length=2400)
-  prospect_id = models.CharField(max_length=8)
 
   class Meta:
     unique_together = ("external_id", "provider_type")

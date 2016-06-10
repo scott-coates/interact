@@ -78,6 +78,16 @@ def save_profile_lookup_by_provider(profile_id, external_id, provider_type, pros
   return profile
 
 
+def save_eo_lookup_by_provider(eo_id, external_id, provider_type):
+  eo, _ = EngagementOpportunityLookupByProvider.objects.update_or_create(
+      id=eo_id, defaults=dict(
+          external_id=external_id, provider_type=provider_type
+      )
+  )
+
+  return eo
+
+
 def _get_profile_from_provider_info(external_id, provider_type):
   return ProfileLookupByProvider.objects.get(external_id=external_id, provider_type=provider_type)
 

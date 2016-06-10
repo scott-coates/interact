@@ -36,7 +36,7 @@ class Prospect(AggregateBase):
 
     self._raise_event(Prospect1AddedProfile(id, external_id, provider_type, attrs))
 
-  def add_eo(self, id, external_id, engagement_opportunity_attrs, provider_type,
+  def add_eo(self, id, external_id, attrs, provider_type,
              provider_action_type, created_at, profile_id, _eo_service=None):
 
     if not _eo_service: _eo_service = eo_service
@@ -47,8 +47,8 @@ class Prospect(AggregateBase):
     if not external_id:
       raise TypeError("external_id is required")
 
-    if not engagement_opportunity_attrs:
-      raise TypeError("engagement_opportunity_attrs is required")
+    if not attrs:
+      raise TypeError("attrs is required")
 
     if not provider_type:
       raise TypeError("provider_type is required")
@@ -62,10 +62,10 @@ class Prospect(AggregateBase):
     if not profile_id:
       raise TypeError("profile_id is required")
 
-    engagement_opportunity_attrs = _eo_service.prepare_attrs_from_engagement_opportunity(engagement_opportunity_attrs)
+    attrs = _eo_service.prepare_attrs_from_engagement_opportunity(attrs)
 
     self._raise_event(ProspectAddedEngagementOpportunityToProfile(id, external_id,
-                                                                  engagement_opportunity_attrs, provider_type,
+                                                                  attrs, provider_type,
                                                                   provider_action_type, created_at, profile_id))
 
   def _handle_created_1_event(self, event):
@@ -103,4 +103,4 @@ class EngagementOpportunity:
 
   def __str__(self):
     return 'EngagementOpportunity {id}: {external_id}'.format(id=self.id,
-                                                                      external_id=self.external_id)
+                                                              external_id=self.external_id)

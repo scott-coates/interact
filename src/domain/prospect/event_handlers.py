@@ -4,7 +4,7 @@ from src.apps.engagement_discovery.signals import engagement_opportunity_discove
 
 # note: this is not a typical domain event. it is called in real-time and will not be persisted to the event store.
 from src.domain.prospect import tasks
-from src.domain.prospect.events import Prospect1AddedProfile
+from src.domain.prospect.events import Prospect1AddedProfile, ProspectAddedEngagementOpportunityToProfile
 from src.libs.common_domain.decorators import event_idempotent
 
 
@@ -51,9 +51,10 @@ def execute_added_profile_1(**kwargs):
       event.provider_type, aggregate_id
   )
 
+
 @event_idempotent
-@receiver(Prospect1AddedProfile.event_signal)
-def execute_added_profile_1(**kwargs):
+@receiver(ProspectAddedEngagementOpportunityToProfile.event_signal)
+def execute_added_eo_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
 
