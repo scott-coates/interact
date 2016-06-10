@@ -26,5 +26,5 @@ class AddedTargetAudienceTopicOption1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, ta_topic_option_id, name, type, attrs, ta_topic_id, topic_id):
+  def __init__(self, id, name, type, attrs, ta_topic_id, topic_id):
     super().__init__()

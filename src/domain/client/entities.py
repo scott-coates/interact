@@ -84,8 +84,8 @@ class TargetAudienceTopic:
     self.id = id
     self.topic_id = topic_id
 
-  def _add_topic_option(self, ta_topic_option_id, name, type, attrs, ta_topic_id, **kwargs):
-    option = TargetAudienceTopicOption(ta_topic_option_id, name, type, attrs, ta_topic_id)
+  def _add_topic_option(self, id, name, type, attrs, ta_topic_id, **kwargs):
+    option = TargetAudienceTopicOption(id, name, type, attrs, ta_topic_id)
     self._ta_topic_options.append(option)
 
   def __str__(self):
