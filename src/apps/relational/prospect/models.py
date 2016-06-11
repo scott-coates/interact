@@ -1,6 +1,6 @@
 from django.db import models
 
-from src.domain.common.models import ReadModel
+from src.apps.relational.models import ReadModel
 
 
 class ProfileLookupByProvider(ReadModel):

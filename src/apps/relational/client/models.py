@@ -1,7 +1,7 @@
 from django.db import models
 from jsonfield import JSONField
 
-from src.domain.common.models import ReadModel
+from src.apps.relational.models import ReadModel
 
 
 class ActiveTATopicOption(ReadModel):
