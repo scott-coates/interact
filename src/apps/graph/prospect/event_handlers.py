@@ -1,7 +1,8 @@
 from django.dispatch import receiver
 
 from src.apps.graph.prospect import tasks
-from src.domain.prospect.events import ProspectCreated1, Prospect1AddedProfile
+from src.domain.prospect.events import ProspectCreated1, Prospect1AddedProfile, \
+  EngagementOpportunityAddedToProfile1
 from src.libs.common_domain.decorators import event_idempotent
 
 
@@ -19,3 +20,12 @@ def add_profile(**kwargs):
   event = kwargs['event']
   profile_id = event.id
   tasks.create_profile_in_graphdb_task.delay(prospect_id, profile_id)
+
+
+@event_idempotent
+@receiver(EngagementOpportunityAddedToProfile1.event_signal)
+def add_eo(**kwargs):
+  event = kwargs['event']
+  eo_id = event.id
+  profile_id = event.profile_id
+  tasks.create_eo_in_graphdb_task.delay(profile_id, eo_id)

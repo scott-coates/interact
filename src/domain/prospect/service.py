@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO
+from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO
 from src.domain.prospect.models import ProfileLookupByProvider, EngagementOpportunityLookupByProvider
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
@@ -68,6 +68,18 @@ def populate_engagement_opportunity_id_from_engagement_discovery(profile_id, eng
   return eo_id
 
 
+def add_topic_to_eo(eo_id, topic_id):
+  eo = _get_engagement_opportunity(eo_id)
+
+  prospect_id = eo.prospect_id
+
+  add_topic = AddTopicToEO(eo_id, topic_id)
+
+  dispatcher.send_command(prospect_id, add_topic)
+
+  return eo_id
+
+
 def save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id):
   profile, _ = ProfileLookupByProvider.objects.update_or_create(
       id=profile_id, defaults=dict(
@@ -78,10 +90,10 @@ def save_profile_lookup_by_provider(profile_id, external_id, provider_type, pros
   return profile
 
 
-def save_eo_lookup_by_provider(eo_id, external_id, provider_type):
+def save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id):
   eo, _ = EngagementOpportunityLookupByProvider.objects.update_or_create(
       id=eo_id, defaults=dict(
-          external_id=external_id, provider_type=provider_type
+          external_id=external_id, provider_type=provider_type, prospect_id=prospect_id
       )
   )
 
@@ -95,3 +107,7 @@ def _get_profile_from_provider_info(external_id, provider_type):
 def _get_engagement_opportunity_from_provider_info(external_id, provider_type):
   return EngagementOpportunityLookupByProvider.objects.get(
       external_id=external_id, provider_type=provider_type)
+
+
+def _get_engagement_opportunity(eo_id):
+  return EngagementOpportunityLookupByProvider.objects.get(id=eo_id)

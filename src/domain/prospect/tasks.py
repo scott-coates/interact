@@ -43,11 +43,13 @@ def populate_engagement_opportunity_id_from_engagement_discovery_chain(engagemen
   profile_id = job.dependency.result
   # queue up this job now because we want to store the prospect id (result of previous job) before that job's TTL
   # expires
-  populate_engagement_opportunity_id_from_engagement_discovery_task.delay(profile_id, engagement_opportunity_discovery_object)
+  populate_engagement_opportunity_id_from_engagement_discovery_task.delay(profile_id,
+                                                                          engagement_opportunity_discovery_object)
 
 
 @job('default')
-def populate_engagement_opportunity_id_from_engagement_discovery_task(profile_id, engagement_opportunity_discovery_object):
+def populate_engagement_opportunity_id_from_engagement_discovery_task(profile_id,
+                                                                      engagement_opportunity_discovery_object):
   log_message = (
     "Begin add eo. profile_id: %s, eo_external_id: %s",
     profile_id, engagement_opportunity_discovery_object.engagement_opportunity_external_id
@@ -56,6 +58,27 @@ def populate_engagement_opportunity_id_from_engagement_discovery_task(profile_id
   with log_wrapper(logger.info, *log_message):
     return service.populate_engagement_opportunity_id_from_engagement_discovery(profile_id,
                                                                                 engagement_opportunity_discovery_object)
+
+
+@job('default')
+def add_topic_to_eo_chain(topic_id):
+  job = get_current_job()
+  eo_id = job.dependency.result
+  # queue up this job now because we want to store the prospect id (result of previous job) before that job's TTL
+  # expires
+  add_topic_to_eo_task.delay(eo_id, topic_id)
+
+
+@job('default')
+def add_topic_to_eo_task(eo_id, topic_id):
+  log_message = (
+    "eo_id: %s, topic_id: %s",
+    eo_id, topic_id
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    # todo check if topic -> eo connected already
+    return service.add_topic_to_eo(eo_id, topic_id)
 
 
 @job('high')
@@ -68,12 +91,13 @@ def save_profile_lookup_by_provider_task(profile_id, external_id, provider_type,
   with log_wrapper(logger.info, *log_message):
     return service.save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id)
 
+
 @job('high')
-def save_eo_lookup_by_provider_task(eo_id, external_id, provider_type):
+def save_eo_lookup_by_provider_task(eo_id, external_id, provider_type, prospect_id):
   log_message = (
     "eo_id: %s, external_id: %s, provider_type: %s",
     eo_id, external_id, provider_type
   )
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_eo_lookup_by_provider(eo_id, external_id, provider_type)
+    return service.save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id)
