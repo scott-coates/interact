@@ -24,7 +24,7 @@ class AddEO(DomainCommand):
 
   @initializer
   def __init__(self, id, external_id, attrs, provider_type,
-               provider_action_type, created_at, profile_id, ):
+               provider_action_type, created_date, profile_id, ):
     pass
 
 

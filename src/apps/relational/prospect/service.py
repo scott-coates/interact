@@ -25,6 +25,10 @@ def get_profile_lookup_from_provider_info(external_id, provider_type):
   return ProfileLookupByProvider.objects.get(external_id=external_id, provider_type=provider_type)
 
 
+def get_profile_lookup(profile_id):
+  return ProfileLookupByProvider.objects.get(id=profile_id)
+
+
 def get_engagement_opportunity_lookup_from_provider_info(external_id, provider_type):
   return EngagementOpportunityLookupByProvider.objects.get(
       external_id=external_id, provider_type=provider_type)

@@ -1,5 +1,5 @@
 from src.apps.graph.prospect.repositories import write_prospect_to_graphdb, write_profile_to_graphdb, \
-  write_eo_to_graphdb
+  write_eo_to_graphdb, write_topic_to_eo_in_graphdb
 
 
 def create_prospect_in_graphdb(profile_id):
@@ -15,4 +15,4 @@ def create_eo_in_graphdb(profile_id, eo_id):
 
 
 def add_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id):
-  return add_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id).properties
+  return write_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id).properties

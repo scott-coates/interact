@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from src.apps.relational.prospect.service import get_profile_lookup_from_provider_info, \
-  get_engagement_opportunity_lookup_from_provider_info, get_engagement_opportunity_lookup
+  get_engagement_opportunity_lookup_from_provider_info, get_engagement_opportunity_lookup, get_profile_lookup
 from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
@@ -56,13 +56,13 @@ def populate_engagement_opportunity_id_from_engagement_discovery(profile_id, eng
 
   except ObjectDoesNotExist:
 
-    profile = get_profile_lookup_from_provider_info(profile_id, provider_type)
+    profile = get_profile_lookup(profile_id)
 
     eo_id = generate_id()
 
     create_eo = AddEO(eo_id, discovery.engagement_opportunity_external_id,
                       discovery.engagement_opportunity_attrs,
-                      provider_type, discovery.provider_action_type, discovery.created_at,
+                      provider_type, discovery.provider_action_type, discovery.created_date,
                       profile_id)
 
     _dispatcher.send_command(profile.prospect_id, create_eo)

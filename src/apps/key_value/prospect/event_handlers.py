@@ -11,5 +11,5 @@ def execute_topic_added_eo_1(**kwargs):
   event = kwargs['event']
 
   tasks.save_eo_topic_set_task.delay(
-      event.id, event.topic_id
+      event.engagement_opportunity_id, event.topic_id
   )

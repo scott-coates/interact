@@ -59,7 +59,7 @@ def write_eo_to_graphdb(profile_id, eo_id, _graph_db_provider=graphdb_provider):
   return ret_val[0][0]
 
 
-def add_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id, _graph_db_provider=graphdb_provider):
+def write_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id, _graph_db_provider=graphdb_provider):
   gdb = _graph_db_provider.get_graph_client()
 
   q = '''

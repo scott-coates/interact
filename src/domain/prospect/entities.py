@@ -39,7 +39,7 @@ class Prospect(AggregateBase):
     self._raise_event(Prospect1AddedProfile(id, external_id, provider_type, attrs))
 
   def add_eo(self, id, external_id, attrs, provider_type,
-             provider_action_type, created_at, profile_id, _eo_service=None):
+             provider_action_type, created_date, profile_id, _eo_service=None):
 
     if not _eo_service: _eo_service = eo_service
 
@@ -58,8 +58,8 @@ class Prospect(AggregateBase):
     if not provider_action_type:
       raise TypeError("provider_action_type is required")
 
-    if not created_at:
-      raise TypeError("created_at is required")
+    if not created_date:
+      raise TypeError("created_date is required")
 
     if not profile_id:
       raise TypeError("profile_id is required")
@@ -68,7 +68,7 @@ class Prospect(AggregateBase):
 
     self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
                                                            attrs, provider_type,
-                                                           provider_action_type, created_at, profile_id))
+                                                           provider_action_type, created_date, profile_id))
 
   def add_topic_to_eo(self, eo_id, topic_id):
 
@@ -96,8 +96,8 @@ class Prospect(AggregateBase):
     profile._add_eo(**event.data)
 
   def _handle_topic_added_to_eo_1_event(self, event):
-    profile = self._get_profile_by_id(event.profile_id)
-    profile._add_topic_to_eo(event.engagement_opportunity_id, event.topic_id)
+    eo = self._get_eo_by_id(event.engagement_opportunity_id)
+    eo._add_topic_id(event.topic_id)
 
   def _get_profile_by_id(self, profile_id):
     profile = next(p for p in self._profiles if p.id == profile_id)
@@ -128,10 +128,6 @@ class Profile:
   def _add_eo(self, id, external_id, provider_type, attrs, **kwargs):
     eo = EngagementOpportunity(id, external_id, provider_type, attrs)
     self._engagement_opportunities.append(eo)
-
-  def _add_topic_to_eo(self, eo_id, topic_id):
-    eo = self._get_eo_by_id(eo_id)
-    eo._add_topic_id(topic_id)
 
   def _get_eo_by_id(self, eo_id):
     eo = next(eo for eo in self._engagement_opportunities if eo.id == eo_id)
