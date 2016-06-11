@@ -20,3 +20,8 @@ def create_profile_in_graphdb_task(prospect_id, profile_id):
 @job('high')
 def create_eo_in_graphdb_task(profile_id, eo_id):
   return service.create_eo_in_graphdb(profile_id, eo_id)['id']
+
+
+@job('high')
+def add_topic_to_eo_in_graphdb_task(engagement_opportunity_id, topic_id):
+  return service.add_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id)

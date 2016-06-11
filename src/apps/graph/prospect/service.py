@@ -12,3 +12,7 @@ def create_profile_in_graphdb(prospect_id, profile_id):
 
 def create_eo_in_graphdb(profile_id, eo_id):
   return write_eo_to_graphdb(profile_id, eo_id).properties
+
+
+def add_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id):
+  return add_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id).properties
