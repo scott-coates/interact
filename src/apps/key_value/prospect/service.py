@@ -1,14 +1,34 @@
-from src.apps.graph.prospect.repositories import write_prospect_to_graphdb, write_profile_to_graphdb, \
-  write_eo_to_graphdb
+from src.apps.relational.prospect.models import ProfileLookupByProvider, EngagementOpportunityLookupByProvider
 
 
-def create_prospect_in_graphdb(profile_id):
-  return write_prospect_to_graphdb(profile_id).properties
+def save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id):
+  profile, _ = ProfileLookupByProvider.objects.update_or_create(
+      id=profile_id, defaults=dict(
+          external_id=external_id, provider_type=provider_type, prospect_id=prospect_id
+      )
+  )
+
+  return profile
 
 
-def create_profile_in_graphdb(prospect_id, profile_id):
-  return write_profile_to_graphdb(prospect_id, profile_id).properties
+def save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id):
+  eo, _ = EngagementOpportunityLookupByProvider.objects.update_or_create(
+      id=eo_id, defaults=dict(
+          external_id=external_id, provider_type=provider_type, prospect_id=prospect_id
+      )
+  )
+
+  return eo
 
 
-def create_eo_in_graphdb(profile_id, eo_id):
-  return write_eo_to_graphdb(profile_id, eo_id).properties
+def get_profile_lookup_from_provider_info(external_id, provider_type):
+  return ProfileLookupByProvider.objects.get(external_id=external_id, provider_type=provider_type)
+
+
+def get_engagement_opportunity_lookup_from_provider_info(external_id, provider_type):
+  return EngagementOpportunityLookupByProvider.objects.get(
+      external_id=external_id, provider_type=provider_type)
+
+
+def get_engagement_opportunity_lookup(eo_id):
+  return EngagementOpportunityLookupByProvider.objects.get(id=eo_id)

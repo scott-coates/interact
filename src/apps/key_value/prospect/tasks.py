@@ -2,21 +2,29 @@ import logging
 
 from django_rq import job
 
-from src.apps.graph.prospect import service
+from src.apps.relational.prospect import service
+from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
 
 
 @job('high')
-def create_prospect_in_graphdb_task(prospect_id):
-  return service.create_prospect_in_graphdb(prospect_id)['id']
+def save_profile_lookup_by_provider_task(profile_id, external_id, provider_type, prospect_id):
+  log_message = (
+    "profile_id: %s, external_id: %s, provider_type: %s",
+    prospect_id, external_id, provider_type
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    return service.save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id)
 
 
 @job('high')
-def create_profile_in_graphdb_task(prospect_id, profile_id):
-  return service.create_profile_in_graphdb(prospect_id, profile_id)['id']
+def save_eo_lookup_by_provider_task(eo_id, external_id, provider_type, prospect_id):
+  log_message = (
+    "eo_id: %s, external_id: %s, provider_type: %s",
+    eo_id, external_id, provider_type
+  )
 
-
-@job('high')
-def create_eo_in_graphdb_task(profile_id, eo_id):
-  return service.create_eo_in_graphdb(profile_id, eo_id)['id']
+  with log_wrapper(logger.info, *log_message):
+    return service.save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id)

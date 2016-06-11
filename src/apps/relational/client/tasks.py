@@ -2,7 +2,7 @@ import logging
 
 from django_rq import job
 
-from src.domain.client import service
+from src.apps.relational.client import service
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
