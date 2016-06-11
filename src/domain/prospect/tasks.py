@@ -3,6 +3,7 @@ import logging
 from django_rq import job
 from rq import get_current_job
 
+from src.apps.key_value.prospect.service import eo_contains_topic
 from src.domain.prospect import service
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
@@ -77,6 +78,5 @@ def add_topic_to_eo_task(eo_id, topic_id):
   )
 
   with log_wrapper(logger.info, *log_message):
-    # todo check if topic -> eo connected already
-    return service.add_topic_to_eo(eo_id, topic_id)
-
+    if not eo_contains_topic(eo_id, topic_id):
+      return service.add_topic_to_eo(eo_id, topic_id)

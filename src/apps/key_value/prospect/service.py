@@ -1,34 +1,17 @@
-from src.apps.relational.prospect.models import ProfileLookupByProvider, EngagementOpportunityLookupByProvider
+from src.libs.key_value_utils.key_value_provider import get_key_value_client
 
 
-def save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id):
-  profile, _ = ProfileLookupByProvider.objects.update_or_create(
-      id=profile_id, defaults=dict(
-          external_id=external_id, provider_type=provider_type, prospect_id=prospect_id
-      )
-  )
+def save_eo_topic_set(eo_id, topic_id):
+  kdb = get_key_value_client()
 
-  return profile
+  ret_val = kdb.sadd('eo_topics:{0}'.format(eo_id), topic_id)
+
+  return ret_val
 
 
-def save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id):
-  eo, _ = EngagementOpportunityLookupByProvider.objects.update_or_create(
-      id=eo_id, defaults=dict(
-          external_id=external_id, provider_type=provider_type, prospect_id=prospect_id
-      )
-  )
+def eo_contains_topic(eo_id, topic_id):
+  kdb = get_key_value_client()
 
-  return eo
+  ret_val = kdb.sismember('eo_topics:{0}'.format(eo_id), topic_id)
 
-
-def get_profile_lookup_from_provider_info(external_id, provider_type):
-  return ProfileLookupByProvider.objects.get(external_id=external_id, provider_type=provider_type)
-
-
-def get_engagement_opportunity_lookup_from_provider_info(external_id, provider_type):
-  return EngagementOpportunityLookupByProvider.objects.get(
-      external_id=external_id, provider_type=provider_type)
-
-
-def get_engagement_opportunity_lookup(eo_id):
-  return EngagementOpportunityLookupByProvider.objects.get(id=eo_id)
+  return ret_val
