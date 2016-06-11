@@ -108,6 +108,8 @@ LOCAL_APPS = (
   # APPS
   'src.apps.engagement_discovery',
   'src.apps.graph',
+  'src.apps.key_value',
+  'src.apps.relational',
 
   # LIBS
   'src.libs.common_domain',

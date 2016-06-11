@@ -21,26 +21,3 @@ def created_from_engagement_opportunity_callback(sender, **kwargs):
 
   tasks.add_topic_to_eo_chain.delay(eo.topic_id, depends_on=eo_task)
 
-
-@event_idempotent
-@receiver(Prospect1AddedProfile.event_signal)
-def execute_added_profile_1(**kwargs):
-  aggregate_id = kwargs['aggregate_id']
-  event = kwargs['event']
-
-  tasks.save_profile_lookup_by_provider_task.delay(
-      event.id, event.external_id,
-      event.provider_type, aggregate_id
-  )
-
-
-@event_idempotent
-@receiver(EngagementOpportunityAddedToProfile1.event_signal)
-def execute_added_eo_1(**kwargs):
-  aggregate_id = kwargs['aggregate_id']
-  event = kwargs['event']
-
-  tasks.save_eo_lookup_by_provider_task.delay(
-      event.id, event.external_id,
-      event.provider_type, aggregate_id
-  )

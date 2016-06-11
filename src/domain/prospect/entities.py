@@ -80,8 +80,6 @@ class Prospect(AggregateBase):
 
     eo = self._get_eo_by_id(eo_id)
     if topic_id in eo._topic_ids:
-    if topic_id in eo._topic_ids:
-    if topic_id in eo._topic_ids:
       raise Exception("eo: {0} already has topic: {1}".format(eo_id, topic_id))
 
     self._raise_event(TopicAddedToEngagementOpportunity1(eo_id, topic_id))
