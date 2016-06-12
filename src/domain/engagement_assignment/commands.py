@@ -3,9 +3,9 @@ from src.libs.common_domain.domain_command import DomainCommand
 from src.libs.python_utils.objects.object_utils import initializer
 
 
-class CreateTopic(DomainCommand):
+class CreateEA(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, name):
+  def __init__(self, id, attrs, client_id):
     pass

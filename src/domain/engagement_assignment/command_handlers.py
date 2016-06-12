@@ -1,16 +1,16 @@
 from django.dispatch import receiver
 
-from src.domain.topic.commands import CreateTopic
-from src.domain.topic.entities import Topic
+from src.domain.engagement_assignment.commands import CreateEA
+from src.domain.engagement_assignment.entities import EngagementAssignment
 from src.libs.common_domain import aggregate_repository
 
 
-@receiver(CreateTopic.command_signal)
-def create_user(_aggregate_repository=None, **kwargs):
+@receiver(CreateEA.command_signal)
+def create_ea(_aggregate_repository=None, **kwargs):
   if not _aggregate_repository: _aggregate_repository = aggregate_repository
   command = kwargs['command']
 
-  topic = Topic.from_attrs(**command.data)
-  _aggregate_repository.save(topic, -1)
+  ea = EngagementAssignment.from_attrs(**command.data)
+  _aggregate_repository.save(ea, -1)
 
-  return topic
+  return ea
