@@ -14,3 +14,8 @@ class ActiveTATopicOption(ReadModel):
 
   def __str__(self):
     return 'ActiveTATopicOption {id}: {option_name}'.format(id=self.id, option_name=self.option_name)
+
+
+class ActiveClient(ReadModel):
+  def __str__(self):
+    return 'ActiveClient {id}'.format(id=self.id)

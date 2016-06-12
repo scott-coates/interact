@@ -34,6 +34,7 @@ class Client(AggregateBase):
     self._raise_event(ClientAssociatedWithTopic1(id, topic_id))
 
   def add_topic_option(self, id, name, type, attrs, ta_topic_id):
+    #todo move this logic to own class - SRP
     if not id:
       raise TypeError("id is required")
 

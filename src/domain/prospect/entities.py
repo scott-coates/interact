@@ -28,6 +28,8 @@ class Prospect(AggregateBase):
     if not id:
       raise TypeError("id is required")
 
+    # todo move this logic to own class - SRP
+
     if not external_id:
       raise TypeError("external_id is required")
 
@@ -42,6 +44,8 @@ class Prospect(AggregateBase):
              provider_action_type, created_date, profile_id, _eo_service=None):
 
     if not _eo_service: _eo_service = eo_service
+
+    # todo move this logic to own class - SRP
 
     if not id:
       raise TypeError("id is required")
