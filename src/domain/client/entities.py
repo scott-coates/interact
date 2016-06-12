@@ -25,31 +25,9 @@ class Client(AggregateBase):
     return ret_val
 
   def associate_with_topic(self, id, topic_id):
-    if not id:
-      raise TypeError("id is required")
-
-    if not topic_id:
-      raise TypeError("topic_id is required")
-
     self._raise_event(ClientAssociatedWithTopic1(id, topic_id))
 
   def add_topic_option(self, id, name, type, attrs, ta_topic_id):
-    #todo move this logic to own class - SRP
-    if not id:
-      raise TypeError("id is required")
-
-    if not name:
-      raise TypeError("name is required")
-
-    if not type:
-      raise TypeError("type is required")
-
-    if not attrs:
-      raise TypeError("attrs is required")
-
-    if not ta_topic_id:
-      raise TypeError("ta_topic_id is required")
-
     ta_topic = self._get_ta_topic_by_id(ta_topic_id)
 
     self._raise_event(
@@ -57,11 +35,6 @@ class Client(AggregateBase):
     )
 
   def add_ea(self, id, attrs):
-    if not id:
-      raise TypeError("id is required")
-
-    if not attrs:
-      raise TypeError("attrs is required")
 
     score = 0
     score_attrs = None
@@ -116,6 +89,21 @@ class TargetAudienceTopic:
 
 class TargetAudienceTopicOption:
   def __init__(self, id, name, type, attrs, ta_topic_id):
+    if not id:
+      raise TypeError("id is required")
+
+    if not name:
+      raise TypeError("name is required")
+
+    if not type:
+      raise TypeError("type is required")
+
+    if not attrs:
+      raise TypeError("attrs is required")
+
+    if not ta_topic_id:
+      raise TypeError("ta_topic_id is required")
+
     self.id = id
     self.name = name
     self.type = type
@@ -128,6 +116,18 @@ class TargetAudienceTopicOption:
 
 class EngagementAssignment:
   def __init__(self, id, attrs, score, score_attrs):
+    if not id:
+      raise TypeError("id is required")
+
+    if not attrs:
+      raise TypeError("attrs is required")
+
+    if not score:
+      raise TypeError("score is required")
+
+    if not score_attrs:
+      raise TypeError("score_attrs is required")
+
     self.id = id
     self.attrs = attrs
     self.score = score
