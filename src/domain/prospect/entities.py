@@ -26,6 +26,7 @@ class Prospect(AggregateBase):
   def add_profile(self, id, external_id, provider_type, _profile_service=None):
     if not _profile_service: _profile_service = profile_service
 
+    # todo how can we move this to the profile class?
     attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
 
     self._raise_event(Prospect1AddedProfile(id, external_id, provider_type, attrs))
