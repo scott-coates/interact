@@ -8,5 +8,5 @@ class EngagementAssignmentCreated1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id,attrs, score, score_attrs, client_id):
+  def __init__(self, id, attrs, score, score_attrs, client_id):
     super().__init__()
