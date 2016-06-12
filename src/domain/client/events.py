@@ -28,3 +28,12 @@ class ClientAddedTargetAudienceTopicOption1(DomainEvent):
   @initializer
   def __init__(self, id, name, type, attrs, ta_topic_id, topic_id):
     super().__init__()
+
+
+class ClientAddedEngagementAssignment1(DomainEvent):
+  event_func_name = 'added_ea_1'
+  event_signal = EventSignal()
+
+  @initializer
+  def __init__(self, id, attrs, score, score_attrs):
+    super().__init__()

@@ -1,4 +1,6 @@
-from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, ClientAddedTargetAudienceTopicOption1
+from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
+  ClientAddedTargetAudienceTopicOption1, \
+  ClientAddedEngagementAssignment1
 from src.libs.common_domain.aggregate_base import AggregateBase
 
 
@@ -6,6 +8,7 @@ class Client(AggregateBase):
   def __init__(self):
     super().__init__()
     self._ta_topics = []
+    self._eas = []
 
   @classmethod
   def from_attrs(cls, id, name):
@@ -52,6 +55,20 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
     )
 
+  def add_ea(self, id, attrs):
+    if not id:
+      raise TypeError("id is required")
+
+    if not attrs:
+      raise TypeError("attrs is required")
+
+    score = 0
+    score_attrs = None
+
+    self._raise_event(
+        ClientAddedEngagementAssignment1(id, attrs, score, score_attrs)
+    )
+
   def _handle_created_1_event(self, event):
     self.id = event.id
     self.name = event.name
@@ -62,6 +79,9 @@ class Client(AggregateBase):
   def _handle_added_target_audience_topic_option_1_event(self, event):
     ta_topic = self._get_ta_topic_by_id(event.ta_topic_id)
     ta_topic._add_topic_option(**event.data)
+
+  def _handle_added_ea_1_event(self, event):
+    self._eas.append(EngagementAssignment(event.id, event.attrs, event.score, event.score_attrs))
 
   def _get_ta_topic_by_id(self, ta_topic_id):
     ta_topic = next(t for t in self._ta_topics if t.id == ta_topic_id)
@@ -103,3 +123,14 @@ class TargetAudienceTopicOption:
 
   def __str__(self):
     return 'TATopicOption {id}: {name}'.format(id=self.id, name=self.name)
+
+
+class EngagementAssignment:
+  def __init__(self, id, attrs, score, score_attrs):
+    self.id = id
+    self.attrs = attrs
+    self.score = score
+    self.score_attrs = score_attrs
+
+  def __str__(self):
+    return 'EA {id}: {score}'.format(id=self.id, score=self.score)

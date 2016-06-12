@@ -25,3 +25,11 @@ class AddTopicOption(DomainCommand):
   @initializer
   def __init__(self, id, name, type, attrs, ta_topic_id):
     pass
+
+
+class AddEA(DomainCommand):
+  command_signal = CommandSignal()
+
+  @initializer
+  def __init__(self, id, attrs, client_id):
+    pass
