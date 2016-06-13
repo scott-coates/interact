@@ -35,12 +35,3 @@ def get_active_clients():
   active_clients = ActiveClient.objects.all()
   return active_clients
 
-
-def refresh_assignments(client_id):
-  method_log_message = (
-    "Refresh assignments for client: %s",
-    client_id
-  )
-
-  with log_wrapper(logger.debug, *method_log_message):
-    counter = 1

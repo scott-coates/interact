@@ -76,3 +76,37 @@ def write_ea_to_graphdb(id, attrs, client_id, _graph_db_provider=graphdb_provide
 
   ret_val = gdb.query(q, params=params, returns=(Node,))
   return ret_val[0][0]
+
+
+def retrieve_unassigned_grouped_entities_for_client_from_graphdb(client_id, _graph_db_provider=graphdb_provider):
+  gdb = _graph_db_provider.get_graph_client()
+
+  q = '''
+      // start by limit the client and its topics
+      MATCH (client:Client {id: {client_id}})-[rel_client_has_topic:TA_TOPIC]->(topic:Topic),
+
+      // start query for getting potential eos
+      (eo:EngagementOpportunity)-[rel_eo_topic:ENGAGEMENT_OPPORTUNITY_TOPIC]->(topic),
+      (eo)-[rel_eo_belongs_to_profile:BELONGS_TO]-(profile:Profile),
+      (profile)-[rel_profile_belongs_to_prospect:BELONGS_TO]->(prospect:Prospect)
+
+      // do the filtering
+      WHERE NOT (eo)-[:ASSIGNED_TO]->(:EngagementAssignment)
+
+      // make sure to call distinct because when a prospect has multiple profiles, a row will be returned for each
+      // profile
+      WITH
+        collect(distinct(eo.id)) as eos,
+        collect(distinct(profile.id)) as profiles,
+        prospect.id as prospect
+
+      RETURN prospect, eos, profiles
+  '''
+
+  params = {
+    'client_id': client_id,
+  }
+
+  query_val = gdb.query(q, params=params, returns=(str, list, list))
+
+  return query_val

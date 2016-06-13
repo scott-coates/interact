@@ -4,7 +4,9 @@ TEXT = 'text'
 WEBSITES = 'websites'
 LOCATION = 'location'
 BIO = 'bio'
+PROFILE_IDS = 'profile_ids'
 EO_IDS = 'eo_ids'
+PROSPECT_ID = 'prospect_id'
 
 
 class Profile:
