@@ -1,5 +1,6 @@
 from src.apps.relational.client.service import get_eo_ea_lookup
 from src.domain.client.calculation import score_processor, rules_data_provider
+from src.domain.client.calculation.calculation_objects import CalculationAssignedEntityObject
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
 from src.domain.common import constants
 
@@ -106,14 +107,16 @@ def _get_assigned_calc_objects(assignment_attrs):
     for id in assigned_entity_ids:
 
       if assignment_attr == constants.EO_IDS:
-        assigned_entity = get_eo_ea_lookup(id)
-        provider_type = assigned_entity.provider_type
+        eo_ea_lookup = get_eo_ea_lookup(id)
+        assigned_entity_attrs = eo_ea_lookup.eo_attrs
+        provider_type = eo_ea_lookup.provider_type
+        prospect_id = eo_ea_lookup.prospect_id
         entity_type = constants.EO
       else:
         raise ValueError("Invalid assignment attrs")
 
       assigned_entities.append(
-          CalculationAssignedEntityObject(assigned_entity, assigned_entity.id, entity_type, provider_type)
+          CalculationAssignedEntityObject(assigned_entity_attrs, id, entity_type, provider_type, prospect_id)
       )
 
   return assigned_entities
