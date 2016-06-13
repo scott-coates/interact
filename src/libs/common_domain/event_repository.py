@@ -3,8 +3,13 @@ from django.db import transaction
 from src.libs.common_domain.models import Event
 
 
-def get_events():
-  return Event.objects.order_by('event_sequence', 'id')
+def get_events(event_names=None):
+  ret_val = Event.objects.order_by('event_sequence', 'id')
+
+  if event_names:
+    ret_val = ret_val.filter(event_name__in=event_names)
+    
+  return ret_val
 
 
 def get_events_for_stream(event_type, stream_id):
