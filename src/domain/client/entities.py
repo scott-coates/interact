@@ -1,3 +1,4 @@
+from src.domain.client.calculation import calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientAddedEngagementAssignment1
@@ -34,10 +35,16 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
     )
 
-  def add_ea(self, id, attrs):
+  def add_ea(self, id, attrs, _calculator=None):
+    if not _calculator: _calculator = calculator
+    if not isinstance(attrs, dict):
+      raise TypeError("attrs must be a dict")
 
-    score = 0
-    score_attrs = {}
+    for v in attrs.values():
+      if not isinstance(v, (list, tuple)):
+        raise TypeError("Each value must be an iterable")
+
+    score, score_attrs = _calculator.calculate_engagement_assignment_score(self.id, attrs)
 
     self._raise_event(
         ClientAddedEngagementAssignment1(id, attrs, score, score_attrs)
