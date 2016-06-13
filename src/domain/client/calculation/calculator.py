@@ -1,22 +1,6 @@
 from src.apps.relational.prospect.service import get_engagement_opportunity_lookup
-from src.domain.client.calculation.calculation_objects import CalculationAssignedEntityObject
+from src.domain.client.calculation import score_processor, calculation_data_provider
 from src.domain.common import constants
-
-
-def _get_calc_data(assigned_calc_objects, client, _calc_data_provider=None):
-  if not _calc_data_provider:
-    _calc_data_provider = calculate_data_provider
-  ret_val = {}
-
-  stemmed_keywords = _calc_data_provider.provide_stemmed_keywords(client, assigned_calc_objects)
-  ret_val[constants.STEMMED_TA_TOPIC_KEYWORDS] = stemmed_keywords
-
-  client_uid = _calc_data_provider.provide_client_uid(client)
-  ret_val[constants.CLIENT_UID] = client_uid
-
-  ret_val[constants.PROFANITY_FILTER_WORDS] = _calc_data_provider.provide_profanity_word_list()
-
-  return ret_val
 
 
 def _get_profiles(assigned_calc_objects, prospect):
@@ -29,15 +13,13 @@ def _get_profiles(assigned_calc_objects, prospect):
   return profiles
 
 
-def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_processor=None):
+def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_processor=None, _calc_data_provider=None):
   if not _score_processor: _score_processor = score_processor
+  if not _calc_data_provider: _calc_data_provider = calculation_data_provider
+
+  calc_data = _calc_data_provider.provide_calculation_data()
 
   score_attrs = {}
-
-  assigned_calc_objects = _get_assigned_calc_objects(assignment_attrs)
-  prospect = assigned_calc_objects[0].prospect
-
-  calc_data = _get_calc_data(assigned_calc_objects, client_id)
 
   rules_engine = RulesEngine(client_id)
 

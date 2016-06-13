@@ -8,6 +8,7 @@ PROFILE_IDS = 'profile_ids'
 EO_IDS = 'eo_ids'
 PROSPECT_ID = 'prospect_id'
 EO = 'engagement_opportunity'
+PROFANITY_FILTER_WORDS = 'profanity_filter_words'
 
 
 class Profile:

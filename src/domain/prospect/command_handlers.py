@@ -10,10 +10,10 @@ def create_prospect(_aggregate_repository=None, **kwargs):
   if not _aggregate_repository: _aggregate_repository = aggregate_repository
   command = kwargs['command']
 
-  topic = Prospect.from_attrs(**command.data)
-  _aggregate_repository.save(topic, -1)
+  prospect = Prospect.from_attrs(**command.data)
+  _aggregate_repository.save(prospect, -1)
 
-  return topic
+  return prospect
 
 
 @receiver(AddProfile.command_signal)
