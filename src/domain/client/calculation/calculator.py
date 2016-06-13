@@ -1,4 +1,4 @@
-from src.apps.relational.prospect.service import get_engagement_opportunity_lookup
+from src.apps.relational.client.service import get_eo_ea_lookup
 from src.domain.client.calculation import score_processor, rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
 from src.domain.common import constants
@@ -22,6 +22,8 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
   rules_data = _rules_data_provider.provide_rules_data(client_id, assignment_attrs)
 
   score_attrs = {}
+
+  assigned_calc_objects = _get_assigned_calc_objects(assignment_attrs)
 
   rules_engine = RulesEngine(client_id)
 
@@ -104,7 +106,7 @@ def _get_assigned_calc_objects(assignment_attrs):
     for id in assigned_entity_ids:
 
       if assignment_attr == constants.EO_IDS:
-        assigned_entity = get_engagement_opportunity_lookup(id)
+        assigned_entity = get_eo_ea_lookup(id)
         provider_type = assigned_entity.provider_type
         entity_type = constants.EO
       else:

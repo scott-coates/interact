@@ -27,16 +27,16 @@ def save_prospect_ea_lookup_task(id, attrs):
 
 
 @job('high')
-def save_profile_ea_lookup_task(id, profile_attrs, prospect_id):
+def save_profile_ea_lookup_task(id, profile_attrs, provider_type, prospect_id):
   log_message = ("id: %s", id)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_profile_ea_lookup_(id, profile_attrs, prospect_id).id
+    return service.save_profile_ea_lookup_(id, profile_attrs, provider_type, prospect_id).id
 
 
 @job('high')
-def save_eo_ea_lookup_task(id, eo_attrs, profile_id, prospect_id):
+def save_eo_ea_lookup_task(id, eo_attrs, provider_type, profile_id, prospect_id):
   log_message = ("id: %s", id)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_eo_ea_lookup_(id, eo_attrs, profile_id, prospect_id).id
+    return service.save_eo_ea_lookup_(id, eo_attrs, provider_type, profile_id, prospect_id).id

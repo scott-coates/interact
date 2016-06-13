@@ -34,7 +34,7 @@ def execute_added_profile_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
 
-  tasks.save_profile_ea_lookup_task.delay(event.id, event.attrs, aggregate_id)
+  tasks.save_profile_ea_lookup_task.delay(event.id, event.attrs, event.provider_type, aggregate_id)
 
 
 @event_idempotent
@@ -43,4 +43,4 @@ def execute_added_eo_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
 
-  tasks.save_eo_ea_lookup_task.delay(event.id, event.attrs, event.profile_id, aggregate_id)
+  tasks.save_eo_ea_lookup_task.delay(event.id, event.attrs, event.provider_type, event.profile_id, aggregate_id)
