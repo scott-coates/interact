@@ -39,15 +39,15 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
 
   rules_engine = RulesEngine(client_id)
 
-  # prospect_score_object = rules_engine.get_prospect_score(prospect, rules_data)
-  # score_attrs[constants.PROSPECT] = {
-  #   constants.BASE_SCORE: prospect_score_object.base_score,
-  #   constants.BASE_SCORE_ATTRS: prospect_score_object.base_score_attrs,
-  #   constants.INTERNAL_SCORE: prospect_score_object.internal_score,
-  #   constants.INTERNAL_SCORE_ATTRS: prospect_score_object.internal_score_attrs,
-  #   constants.UID: prospect.prospect_uid
-  # }
-  #
+  prospect_score_object = rules_engine.get_prospect_score(prospect, rules_data)
+  score_attrs[constants.PROSPECT] = {
+    # constants.BASE_SCORE: prospect_score_object.base_score,
+    # constants.BASE_SCORE_ATTRS: prospect_score_object.base_score_attrs,
+    # constants.INTERNAL_SCORE: prospect_score_object.internal_score,
+    # constants.INTERNAL_SCORE_ATTRS: prospect_score_object.internal_score_attrs,
+    constants.ID: prospect.prospect_uid
+  }
+
   # profiles = _get_profiles(assigned_calc_objects, prospect)
   #
   # score_attrs[constants.PROFILES] = []

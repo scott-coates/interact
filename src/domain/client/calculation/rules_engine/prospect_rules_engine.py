@@ -1,17 +1,11 @@
-from abc import abstractmethod
-from dateutil.relativedelta import relativedelta
-from django.utils import timezone
 import logging
 
-from src.domain.engagement_assignment import constants
-from src.domain.engagement_assignment.calculation.calculation_objects import RulesEngineScoredObject
-from src.domain.engagement_assignment.calculation.rules_engine.base_rules_engine import BaseRulesEngine
-from src.apps.domain.engagement_assignment.services import assigned_prospect_service
-from src.libs.datetime_utils.parsers import datetime_parser
-from src.libs.geo_utils.services import geo_location_service
+from dateutil.relativedelta import relativedelta
+from django.utils import timezone
+
+from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.libs.nlp_utils.services.enums import GenderEnum
 from src.libs.python_utils.collections import iter_utils
-
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +35,8 @@ class ProspectRulesEngine(BaseRulesEngine):
     prospect_base_score, prospect_base_score_attrs = self._apply_base_score()
 
     ret_val = RulesEngineScoredObject(
-      prospect_internal_score, prospect_internal_score_attrs,
-      prospect_base_score, prospect_base_score_attrs
+        prospect_internal_score, prospect_internal_score_attrs,
+        prospect_base_score, prospect_base_score_attrs
     )
 
     return ret_val
@@ -261,7 +255,6 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     return score, score_attrs
 
-
   def _apply_prospect_assignment_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
@@ -281,10 +274,6 @@ class ProspectRulesEngine(BaseRulesEngine):
     return score, score_attrs
 
   # endregion apply score logic
-
-  @abstractmethod
-  def _get_internal_score(self):
-    """Get the client_id-specific rules"""
 
   # region define prospect scoring attrs
 

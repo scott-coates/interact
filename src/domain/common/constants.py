@@ -9,7 +9,9 @@ EO_IDS = 'eo_ids'
 PROSPECT_ID = 'prospect_id'
 EO = 'engagement_opportunity'
 PROFILE = 'profile'
+PROSPECT = 'prospect'
 PROFANITY_FILTER_WORDS = 'profanity_filter_words'
+ID = 'id'
 
 
 class Profile:
@@ -21,16 +23,27 @@ class Provider:
   TWITTER = 'twitter'
 
 
+ProspectDict = {
+  PROSPECT: "Prospect",
+  PROFILE: "Profile",
+  EO: "EngagementOpportunity",
+}
+
+
 class ProviderAction:
   TWITTER_TWEET = 'twitter_tweet'
+
+
+ProviderDict = {Provider.TWITTER: 'Twitter'}
 
 
 class TopicOptionType:
   TWITTER_SEARCH = 'twitter_search'
 
-# regarding enums, even without IntEnums they could be of value to us
-# class Test(Enum):
-#   twitter = 'twitter'
-#
-# >>> Test.twitter == Test.twitter
-# True
+
+  # regarding enums, even without IntEnums they could be of value to us
+  # class Test(Enum):
+  #   twitter = 'twitter'
+  #
+  # >>> Test.twitter == Test.twitter
+  # True
