@@ -3,6 +3,7 @@ import logging
 from src.domain.common import constants
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 from src.libs.social_utils.providers.twitter import twitter_search_utils
+from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 logger = logging.getLogger(__name__)
 _twitter_url_prefix = "https://twitter.com/{0}"
@@ -37,7 +38,8 @@ def get_twitter_profile_attrs(external_id, _search=twitter_search_utils, **kwarg
 
     twitter_profile_data = {
       constants.URL: profile_url, constants.NAME: name,
-      constants.Profile.FOLLOWERS_COUNT: followers_count, constants.Profile.FOLLOWING_COUNT: following_count
+      constants.Profile.FOLLOWERS_COUNT: followers_count,
+      constants.Profile.FOLLOWING_COUNT: following_count
     }
 
     if bio: twitter_profile_data[constants.BIO] = bio
@@ -66,7 +68,7 @@ def _get_twitter_profile_websites(profile_data):
       user_websites.extend(x['expanded_url'] for x in urls)
 
     # sometimes twitter can return null expanded_urls
-    user_websites = [x for x in user_websites if x]
+    user_websites = get_unique_urls_from_iterable(user_websites)
   except KeyError as e:
     logger.debug(e)
   return user_websites
