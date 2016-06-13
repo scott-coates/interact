@@ -16,45 +16,35 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
     self.calc_data = calc_data
 
   def score_it(self):
-    engagement_opportunity_internal_score, engagement_opportunity_internal_score_attrs = self._get_internal_score()
-    engagement_opportunity_base_score, engagement_opportunity_base_score_attrs = self._apply_base_score()
+    score, score_attrs = self._apply_score()
 
-    ret_val = RulesEngineScoredObject(
-        engagement_opportunity_internal_score, engagement_opportunity_internal_score_attrs,
-        engagement_opportunity_base_score, engagement_opportunity_base_score_attrs
-    )
-
-    return ret_val
+    return score, score_attrs
 
   @abstractmethod
-  def _apply_base_score(self):
-    """Get the client_id-specific rules"""
-
-  @abstractmethod
-  def _get_internal_score(self):
-    """Get the client_id-specific rules"""
+  def _apply_score(self):
+    pass
 
 
 class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
   def __init__(self, engagement_opportunity, calc_data, _iter_utils=None, _scraper_utils=None, _text_parser=None):
-    if not _scraper_utils: _scraper_utils = scraper_utils
-    self._scraper_utils = _scraper_utils
-
-    if not _text_parser: _text_parser = text_parser
-    self._text_parser = _text_parser
+    # if not _scraper_utils: _scraper_utils = scraper_utils
+    # self._scraper_utils = _scraper_utils
+    #
+    # if not _text_parser: _text_parser = text_parser
+    # self._text_parser = _text_parser
 
     super().__init__(engagement_opportunity, calc_data, _iter_utils)
 
-  def _apply_base_score(self):
+  def _apply_score(self):
     score, score_attrs = 0, {}
 
-    tweet_score, tweet_score_attrs = self._apply_tweet_score()
-    score += tweet_score
-    score_attrs.update(tweet_score_attrs)
-
-    website_score, website_score_attrs = self._apply_tweet_score()
-    score += website_score
-    score_attrs.update(website_score_attrs)
+    # tweet_score, tweet_score_attrs = self._apply_tweet_score()
+    # score += tweet_score
+    # score_attrs.update(tweet_score_attrs)
+    #
+    # website_score, website_score_attrs = self._apply_tweet_score()
+    # score += website_score
+    # score_attrs.update(website_score_attrs)
 
     return score, score_attrs
 

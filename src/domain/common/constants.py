@@ -8,10 +8,15 @@ PROFILE_IDS = 'profile_ids'
 EO_IDS = 'eo_ids'
 PROSPECT_ID = 'prospect_id'
 EO = 'engagement_opportunity'
+PROFILES = 'profiles'
 PROFILE = 'profile'
 PROSPECT = 'prospect'
 PROFANITY_FILTER_WORDS = 'profanity_filter_words'
 ID = 'id'
+SCORE = 'score'
+SCORE_ATTRS = 'score_attrs'
+ASSIGNED_ENTITIES = 'assigned_entities'
+ASSIGNED_ENTITY_TYPE = 'assigned_entity_type'
 
 
 class Profile:

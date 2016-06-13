@@ -5,7 +5,6 @@ from django.utils import timezone
 
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.libs.nlp_utils.services.enums import GenderEnum
-from src.libs.python_utils.collections import iter_utils
 
 logger = logging.getLogger(__name__)
 
@@ -18,59 +17,53 @@ class ProspectRulesEngine(BaseRulesEngine):
     self.prospect = prospect
     self.calc_data = calc_data
 
-    if not _geo_location_service: _geo_location_service = geo_location_service
-    self._geo_location_service = _geo_location_service
-
-    if not _iter_utils: _iter_utils = iter_utils
-    self._iter_utils = _iter_utils
-
-    if not _assigned_prospect_service: _assigned_prospect_service = assigned_prospect_service
-    self._assigned_prospect_service = _assigned_prospect_service
-
-    if not _datetime_parser: _datetime_parser = datetime_parser
-    self._datetime_parser = _datetime_parser
+    # if not _geo_location_service: _geo_location_service = geo_location_service
+    # self._geo_location_service = _geo_location_service
+    #
+    # if not _iter_utils: _iter_utils = iter_utils
+    # self._iter_utils = _iter_utils
+    #
+    # if not _assigned_prospect_service: _assigned_prospect_service = assigned_prospect_service
+    # self._assigned_prospect_service = _assigned_prospect_service
+    #
+    # if not _datetime_parser: _datetime_parser = datetime_parser
+    # self._datetime_parser = _datetime_parser
 
   def score_it(self):
-    prospect_internal_score, prospect_internal_score_attrs = self._get_internal_score()
-    prospect_base_score, prospect_base_score_attrs = self._apply_base_score()
+    score, score_attrs = self._apply_score()
 
-    ret_val = RulesEngineScoredObject(
-        prospect_internal_score, prospect_internal_score_attrs,
-        prospect_base_score, prospect_base_score_attrs
-    )
+    return score, score_attrs
 
-    return ret_val
-
-  def _apply_base_score(self):
+  def _apply_score(self):
     score, score_attrs = 0, {}
 
-    location_score, location_score_attrs = self._apply_location_score()
-    score += location_score
-    score_attrs.update(location_score_attrs)
-
-    age_score, age_score_attrs = self._apply_age_score()
-    score += age_score
-    score_attrs.update(age_score_attrs)
-
-    gender_score, gender_score_attrs = self._apply_gender_score()
-    score += gender_score
-    score_attrs.update(gender_score_attrs)
-
-    bio_score, bio_score_attrs = self._apply_bio_score()
-    score += bio_score
-    score_attrs.update(bio_score_attrs)
-
-    website_score, website_score_attrs = self._apply_website_score()
-    score += website_score
-    score_attrs.update(website_score_attrs)
-
-    email_score, email_score_attrs = self._apply_email_score()
-    score += email_score
-    score_attrs.update(email_score_attrs)
-
-    prospect_assignment_score, prospect_assignment_score_attrs = self._apply_prospect_assignment_score()
-    score += prospect_assignment_score
-    score_attrs.update(prospect_assignment_score_attrs)
+    # location_score, location_score_attrs = self._apply_location_score()
+    # score += location_score
+    # score_attrs.update(location_score_attrs)
+    #
+    # age_score, age_score_attrs = self._apply_age_score()
+    # score += age_score
+    # score_attrs.update(age_score_attrs)
+    #
+    # gender_score, gender_score_attrs = self._apply_gender_score()
+    # score += gender_score
+    # score_attrs.update(gender_score_attrs)
+    #
+    # bio_score, bio_score_attrs = self._apply_bio_score()
+    # score += bio_score
+    # score_attrs.update(bio_score_attrs)
+    #
+    # website_score, website_score_attrs = self._apply_website_score()
+    # score += website_score
+    # score_attrs.update(website_score_attrs)
+    #
+    # email_score, email_score_attrs = self._apply_email_score()
+    # score += email_score
+    # score_attrs.update(email_score_attrs)
+    #
+    # prospect_assignment_score, prospect_assignment_score_attrs = self._apply_prospect_assignment_score()
+    # score += prospect_assignment_score
+    # score_attrs.update(prospect_assignment_score_attrs)
 
     return score, score_attrs
 

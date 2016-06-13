@@ -17,36 +17,26 @@ class ProfileRulesEngine(BaseRulesEngine):
     self.calc_data = calc_data
 
   def score_it(self):
-    profile_internal_score, profile_internal_score_attrs = self._get_internal_score()
-    profile_base_score, profile_base_score_attrs = self._apply_base_score()
+    score, score_attrs = self._apply_score()
 
-    ret_val = RulesEngineScoredObject(
-        profile_internal_score, profile_internal_score_attrs,
-        profile_base_score, profile_base_score_attrs
-    )
-
-    return ret_val
+    return score, score_attrs
 
   @abstractmethod
-  def _apply_base_score(self):
-    """Get the client_id-specific rules"""
-
-  @abstractmethod
-  def _get_internal_score(self):
-    """Get the client_id-specific rules"""
+  def _apply_score(self):
+    pass
 
 
 class TwitterProfileRulesEngine(ProfileRulesEngine):
-  def _apply_base_score(self):
+  def _apply_score(self):
     score, score_attrs = 0, {}
-
-    recent_tweet_score, recent_tweet_score_attrs = self._apply_recent_tweets_score()
-    score += recent_tweet_score
-    score_attrs.update(recent_tweet_score_attrs)
-
-    followers_score, followers_score_attrs = self._apply_followers_score()
-    score += followers_score
-    score_attrs.update(followers_score_attrs)
+    #
+    # recent_tweet_score, recent_tweet_score_attrs = self._apply_recent_tweets_score()
+    # score += recent_tweet_score
+    # score_attrs.update(recent_tweet_score_attrs)
+    #
+    # followers_score, followers_score_attrs = self._apply_followers_score()
+    # score += followers_score
+    # score_attrs.update(followers_score_attrs)
 
     return score, score_attrs
 
