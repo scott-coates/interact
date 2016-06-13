@@ -25,5 +25,11 @@ def add_ta_topic(**kwargs):
 @event_idempotent
 @receiver(ClientAddedEngagementAssignment1.event_signal)
 def execute_ea_created_1(**kwargs):
-  aggregate_id = kwargs['aggregate_id']
-  tasks.create_ea_in_graphdb_task.delay(aggregate_id)
+  client_id = kwargs['aggregate_id']
+
+  event = kwargs['event']
+
+  attrs = event.attrs
+  id = event.id
+
+  tasks.create_ea_in_graphdb_task.delay(id, attrs, client_id)

@@ -52,6 +52,7 @@ def write_ea_to_graphdb(id, attrs, client_id, _graph_db_provider=graphdb_provide
 
   q = '''
       MERGE (ea:EngagementAssignment {id: {engagement_assignment_id}})
+      WITH ea
       MATCH (client:Client {id: {client_id}})
       MERGE (client)-[:HAS_ASSIGNMENT]->(ea)
   '''
@@ -62,17 +63,18 @@ def write_ea_to_graphdb(id, attrs, client_id, _graph_db_provider=graphdb_provide
   }
 
   if constants.EO_IDS in attrs:
+    params['eo_ids'] = attrs[constants.EO_IDS]
+
     q += '''
-        FOREACH (eo IN { eos } |
-          MATCH (eo:EngagementOpportunity {id: eo.id})
-          MERGE (eo)-[:ASSIGNED_TO]->(ea))
+    WITH ea
+    MATCH (eo:EngagementOpportunity)
+    WHERE eo.id IN {eo_ids}
+    MERGE (eo)-[:ASSIGNED_TO]->(ea)
     '''
 
   q += '''
     RETURN ea
   '''
-
-  params['eos'] = [{'id': eo_id} for eo_id in attrs[constants.EO_IDS]]
 
   ret_val = gdb.query(q, params=params, returns=(Node,))
   return ret_val[0][0]

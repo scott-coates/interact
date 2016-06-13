@@ -37,7 +37,7 @@ class Client(AggregateBase):
   def add_ea(self, id, attrs):
 
     score = 0
-    score_attrs = None
+    score_attrs = {}
 
     self._raise_event(
         ClientAddedEngagementAssignment1(id, attrs, score, score_attrs)
@@ -122,10 +122,10 @@ class EngagementAssignment:
     if not attrs:
       raise TypeError("attrs is required")
 
-    if not score:
+    if score is None:
       raise TypeError("score is required")
 
-    if not score_attrs:
+    if score_attrs is None:
       raise TypeError("score_attrs is required")
 
     self.id = id

@@ -2,7 +2,7 @@ import logging
 
 from django_rq import job
 
-from src.apps.relational.client import service as relational_client_service
+from src.apps.key_value.client import service as kv_client_service
 from src.domain.client import service as client_service
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 @job('default')
 def refresh_assignments_for_clients_task():
-  active_clients = relational_client_service.get_active_clients()
+  active_clients_ids = kv_client_service.get_active_client_ids()
 
-  for client in active_clients:
-    refresh_assignments_for_client_task.delay(client.id)
+  for client_ids in active_clients_ids:
+    refresh_assignments_for_client_task.delay(client_ids)
 
 
 @job('default')

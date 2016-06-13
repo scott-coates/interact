@@ -6,4 +6,5 @@ class KeyValueConfig(AppConfig):
 
   # noinspection PyUnresolvedReferences
   def ready(self):
+    import src.apps.key_value.client.event_handlers
     import src.apps.key_value.prospect.event_handlers

@@ -1,7 +1,6 @@
 import logging
 
-from src.apps.relational.client.models import ActiveTATopicOption, ActiveClient
-from src.libs.python_utils.logging.logging_utils import log_wrapper
+from src.apps.relational.client.models import ActiveTATopicOption
 
 logger = logging.getLogger(__name__)
 
@@ -24,14 +23,3 @@ def save_active_ta_topic_option(id, option_name, option_type, option_attrs, ta_t
       )
   )
   return at
-
-
-def save_active_client(id):
-  ac, _ = ActiveClient.objects.update_or_create(id=id)
-  return ac
-
-
-def get_active_clients():
-  active_clients = ActiveClient.objects.all()
-  return active_clients
-

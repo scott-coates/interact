@@ -16,11 +16,3 @@ def save_active_ta_topic_option_task(id, option_name, option_type, option_attrs,
     return service.save_active_ta_topic_option(
         id, option_name, option_type, option_attrs, ta_topic_id, topic_id, client_id
     ).id
-
-
-@job('high')
-def save_active_client_task(id):
-  log_message = ("client_id: %s", id)
-
-  with log_wrapper(logger.info, *log_message):
-    return service.save_active_client(id).id
