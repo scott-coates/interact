@@ -109,6 +109,6 @@ def retrieve_unassigned_grouped_entities_for_client_from_graphdb(client_id, _gra
     'client_id': client_id,
   }
 
-  query_val = gdb.query(q, params=params, returns=(str, list, list))
+  query_val = gdb.query(q, params=params, returns=(list,))
 
   return query_val

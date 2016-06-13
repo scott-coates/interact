@@ -22,6 +22,6 @@ def get_unassigned_grouped_entities_for_client_from_graphdb(client_id):
   query_val = retrieve_unassigned_grouped_entities_for_client_from_graphdb(client_id)
 
   for row in query_val:
-    ret_val.append({constants.PROSPECT_ID: row[0], constants.EO_IDS: row[1], constants.PROFILE_IDS: row[2]})
+    ret_val.append({constants.PROSPECT_ID: row[0], constants.EO_IDS: row[1]})
 
   return ret_val

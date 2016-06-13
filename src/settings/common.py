@@ -109,6 +109,7 @@ LOCAL_APPS = (
   'src.apps.engagement_discovery',
   'src.apps.graph',
   'src.apps.key_value',
+  'src.apps.maintenance',
   'src.apps.relational',
 
   # LIBS
