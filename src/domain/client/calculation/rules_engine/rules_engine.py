@@ -5,11 +5,6 @@ from src.domain.common import constants
 
 logger = logging.getLogger(__name__)
 
-_assigned_entity_names = {
-  constants.EO: "EngagementOpportunity",
-  constants.PROFILE: "Profile",
-}
-
 
 class RulesEngine():
   def __init__(self, client_id):
@@ -31,10 +26,10 @@ class RulesEngine():
 
   def get_assigned_entity_score(self, assigned_entity_object, calc_data):
     rules_class = self._get_rules_engine_by_type_and_name(
-        _assigned_entity_names[assigned_entity_object.entity_type], assigned_entity_object.provider_type
+        assigned_entity_object.assigned_entity_type, assigned_entity_object.provider_type
     )
 
-    rules_instance = rules_class(assigned_entity_object.assigned_entity, calc_data)
+    rules_instance = rules_class(assigned_entity_object.assigned_entity_attrs, calc_data)
 
     return rules_instance.score_it()
 

@@ -47,7 +47,7 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
     score_attrs[constants.ASSIGNED_ENTITIES].append({
       constants.SCORE: ae_score,
       constants.SCORE_ATTRS: ae_score_attrs,
-      constants.ID: ae.id,
+      constants.ID: ae.assigned_entity_id,
       constants.ASSIGNED_ENTITY_TYPE: ae.assigned_entity_type
     })
 
