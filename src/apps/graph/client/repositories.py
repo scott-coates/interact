@@ -99,16 +99,15 @@ def retrieve_unassigned_grouped_entities_for_client_from_graphdb(client_id, _gra
       // profile
       WITH
         collect(distinct(eo.id)) as eos,
-        collect(distinct(profile.id)) as profiles,
         prospect.id as prospect
 
-      RETURN prospect, eos, profiles
+      RETURN prospect, eos
   '''
 
   params = {
     'client_id': client_id,
   }
 
-  query_val = gdb.query(q, params=params, returns=(list,))
+  query_val = gdb.query(q, params=params, returns=(str, list))
 
   return query_val
