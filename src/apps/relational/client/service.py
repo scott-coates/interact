@@ -53,5 +53,13 @@ def save_eo_ea_lookup_(id, eo_attrs, provider_type, profile_id, prospect_id):
   return eo
 
 
+def get_prospect_ea_lookup(id):
+  return ProspectLookupForEA.objects.get(id=id)
+
+
+def get_profile_ea_lookups_by_prospect_id(prospect_id):
+  return ProfileLookupForEA.objects.filter(prospect_id=prospect_id)
+
+
 def get_eo_ea_lookup(id):
   return EOLookupForEA.objects.get(id=id)
