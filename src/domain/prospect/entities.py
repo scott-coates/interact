@@ -19,6 +19,9 @@ class Prospect(AggregateBase):
     if not id:
       raise TypeError("id is required")
 
+    if not attrs:
+      raise TypeError("attrs is required")
+
     ret_val._raise_event(ProspectCreated1(id, attrs))
 
     return ret_val
