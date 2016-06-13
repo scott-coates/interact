@@ -1,6 +1,7 @@
 import logging
 
-from src.apps.relational.client.models import ActiveTATopicOption
+from src.apps.relational.client.models import ActiveTATopicOption, ProspectLookupForEA, ProfileLookupForEA, \
+  EOLookupForEA
 
 logger = logging.getLogger(__name__)
 
@@ -23,3 +24,30 @@ def save_active_ta_topic_option(id, option_name, option_type, option_attrs, ta_t
       )
   )
   return at
+
+
+def save_prospect_ea_lookup_(id, attrs):
+  prospect, _ = ProspectLookupForEA.objects.update_or_create(
+      id=id, defaults=dict(
+          attrs=attrs
+      )
+  )
+  return prospect
+
+
+def save_profile_ea_lookup_(id, profile_attrs, prospect_id):
+  profile, _ = ProfileLookupForEA.objects.update_or_create(
+      id=id, defaults=dict(
+          profile_attrs=profile_attrs, prospect_id=prospect_id
+      )
+  )
+  return profile
+
+
+def save_eo_ea_lookup_(id, eo_attrs, profile_id, prospect_id):
+  eo, _ = EOLookupForEA.objects.update_or_create(
+      id=id, defaults=dict(
+          eo_attrs=eo_attrs, profile_id=profile_id, prospect_id=prospect_id
+      )
+  )
+  return eo

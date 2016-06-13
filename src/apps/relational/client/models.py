@@ -14,3 +14,27 @@ class ActiveTATopicOption(ReadModel):
 
   def __str__(self):
     return 'ActiveTATopicOption {id}: {option_name}'.format(id=self.id, option_name=self.option_name)
+
+
+class ProspectLookupForEA(ReadModel):
+  attrs = JSONField()
+
+  def __str__(self):
+    return 'ProspectLookupForEA {id}'.format(id=self.id)
+
+
+class ProfileLookupForEA(ReadModel):
+  profile_attrs = JSONField()
+  prospect_id = models.CharField(max_length=8)
+
+  def __str__(self):
+    return 'ProfileLookupForEA {id}'.format(id=self.id)
+
+
+class EOLookupForEA(ReadModel):
+  eo_attrs = JSONField()
+  profile_id = models.CharField(max_length=8)
+  prospect_id = models.CharField(max_length=8)
+
+  def __str__(self):
+    return 'EOLookupForEA {id}'.format(id=self.id)

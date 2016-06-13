@@ -1,5 +1,5 @@
 from src.apps.relational.prospect.service import get_engagement_opportunity_lookup
-from src.domain.client.calculation import score_processor, calculation_data_provider
+from src.domain.client.calculation import score_processor, rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
 from src.domain.common import constants
 
@@ -14,17 +14,18 @@ def _get_profiles(assigned_calc_objects, prospect):
   return profiles
 
 
-def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_processor=None, _calc_data_provider=None):
+def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_processor=None,
+                                          _rules_data_provider=None):
   if not _score_processor: _score_processor = score_processor
-  if not _calc_data_provider: _calc_data_provider = calculation_data_provider
+  if not _rules_data_provider: _rules_data_provider = rules_data_provider
 
-  calc_data = _calc_data_provider.provide_calculation_data(client_id, assignment_attrs)
+  rules_data = _rules_data_provider.provide_rules_data(client_id, assignment_attrs)
 
   score_attrs = {}
 
   rules_engine = RulesEngine(client_id)
 
-  # prospect_score_object = rules_engine.get_prospect_score(prospect, calc_data)
+  # prospect_score_object = rules_engine.get_prospect_score(prospect, rules_data)
   # score_attrs[constants.PROSPECT] = {
   #   constants.BASE_SCORE: prospect_score_object.base_score,
   #   constants.BASE_SCORE_ATTRS: prospect_score_object.base_score_attrs,
@@ -37,7 +38,7 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
   #
   # score_attrs[constants.PROFILES] = []
   # for profile in profiles:
-  #   profile_score_object = rules_engine.get_profile_score(profile, calc_data)
+  #   profile_score_object = rules_engine.get_profile_score(profile, rules_data)
   #   score_attrs[constants.PROFILES].append({
   #     constants.BASE_SCORE: profile_score_object.base_score,
   #     constants.BASE_SCORE_ATTRS: profile_score_object.base_score_attrs,
@@ -50,7 +51,7 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
   # # loop through ae's
   # score_attrs[constants.ASSIGNED_ENTITIES] = []
   # for ae in assigned_calc_objects:
-  #   ae_score_object = rules_engine.get_assigned_entity_score(ae, calc_data)
+  #   ae_score_object = rules_engine.get_assigned_entity_score(ae, rules_data)
   #   score_attrs[constants.ASSIGNED_ENTITIES].append({
   #     constants.BASE_SCORE: ae_score_object.base_score,
   #     constants.BASE_SCORE_ATTRS: ae_score_object.base_score_attrs,
