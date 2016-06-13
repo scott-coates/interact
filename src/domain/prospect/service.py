@@ -28,6 +28,8 @@ def populate_profile_id_from_provider_info(prospect_id, external_id, provider_ty
 
   try:
     profile = get_profile_lookup_from_provider_info(external_id, provider_type)
+    # todo i think this is the time to refresh their profile data
+    # every tmie we come across their profile, we can see what's new.
     profile_id = profile.id
 
   except ObjectDoesNotExist:
