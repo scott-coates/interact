@@ -24,10 +24,10 @@ def write_ta_topic_to_graphdb(client_id, ta_topic_id, topic_id, _graph_db_provid
   gdb = _graph_db_provider.get_graph_client()
 
   q = '''
-    MATCH (client:Client), (topic:Topic)
-    WHERE client.id = { client_id }
+    MATCH (client_id:Client), (topic:Topic)
+    WHERE client_id.id = { client_id }
     AND topic.id = { topic_id }
-    MERGE (client)-[r:TA_TOPIC]->(topic)
+    MERGE (client_id)-[r:TA_TOPIC]->(topic)
     SET r.id = { ta_topic_id }
     RETURN r
   '''
@@ -53,8 +53,8 @@ def write_ea_to_graphdb(id, attrs, client_id, _graph_db_provider=graphdb_provide
   q = '''
       MERGE (ea:EngagementAssignment {id: {engagement_assignment_id}})
       WITH ea
-      MATCH (client:Client {id: {client_id}})
-      MERGE (client)-[:HAS_ASSIGNMENT]->(ea)
+      MATCH (client_id:Client {id: {client_id}})
+      MERGE (client_id)-[:HAS_ASSIGNMENT]->(ea)
   '''
 
   params = {
@@ -84,8 +84,8 @@ def retrieve_unassigned_grouped_entities_for_client_from_graphdb(client_id, _gra
   gdb = _graph_db_provider.get_graph_client()
 
   q = '''
-      // start by limit the client and its topics
-      MATCH (client:Client {id: {client_id}})-[rel_client_has_topic:TA_TOPIC]->(topic:Topic),
+      // start by limit the client_id and its topics
+      MATCH (client_id:Client {id: {client_id}})-[rel_client_has_topic:TA_TOPIC]->(topic:Topic),
 
       // start query for getting potential eos
       (eo:EngagementOpportunity)-[rel_eo_topic:ENGAGEMENT_OPPORTUNITY_TOPIC]->(topic),

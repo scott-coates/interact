@@ -14,7 +14,7 @@ def refresh_assignments(client_id, _dispatcher=None):
   if not _dispatcher: _dispatcher = dispatcher
 
   method_log_message = (
-    "Refresh assignments for client: %s",
+    "Refresh assignments for client_id: %s",
     client_id
   )
 
@@ -25,10 +25,10 @@ def refresh_assignments(client_id, _dispatcher=None):
 
     total_assignments_count = len(entities_to_add)
 
-    logger.debug("Assignments to create for client: %s: %i", client_id, total_assignments_count)
+    logger.debug("Assignments to create for client_id: %s: %i", client_id, total_assignments_count)
 
     for group in entities_to_add:
-      group_log_message = ("Assignment: %i out of %i for client: %s", counter, total_assignments_count, client_id)
+      group_log_message = ("Assignment: %i out of %i for client_id: %s", counter, total_assignments_count, client_id)
 
       with log_wrapper(logger.debug, *group_log_message):
 

@@ -1,5 +1,6 @@
 from src.apps.relational.prospect.service import get_engagement_opportunity_lookup
 from src.domain.client.calculation import score_processor, calculation_data_provider
+from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
 from src.domain.common import constants
 
 
@@ -17,52 +18,53 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
   if not _score_processor: _score_processor = score_processor
   if not _calc_data_provider: _calc_data_provider = calculation_data_provider
 
-  calc_data = _calc_data_provider.provide_calculation_data()
+  calc_data = _calc_data_provider.provide_calculation_data(client_id, assignment_attrs)
 
   score_attrs = {}
 
   rules_engine = RulesEngine(client_id)
 
-  prospect_score_object = rules_engine.get_prospect_score(prospect, calc_data)
-  score_attrs[constants.PROSPECT] = {
-    constants.BASE_SCORE: prospect_score_object.base_score,
-    constants.BASE_SCORE_ATTRS: prospect_score_object.base_score_attrs,
-    constants.INTERNAL_SCORE: prospect_score_object.internal_score,
-    constants.INTERNAL_SCORE_ATTRS: prospect_score_object.internal_score_attrs,
-    constants.UID: prospect.prospect_uid
-  }
+  # prospect_score_object = rules_engine.get_prospect_score(prospect, calc_data)
+  # score_attrs[constants.PROSPECT] = {
+  #   constants.BASE_SCORE: prospect_score_object.base_score,
+  #   constants.BASE_SCORE_ATTRS: prospect_score_object.base_score_attrs,
+  #   constants.INTERNAL_SCORE: prospect_score_object.internal_score,
+  #   constants.INTERNAL_SCORE_ATTRS: prospect_score_object.internal_score_attrs,
+  #   constants.UID: prospect.prospect_uid
+  # }
+  #
+  # profiles = _get_profiles(assigned_calc_objects, prospect)
+  #
+  # score_attrs[constants.PROFILES] = []
+  # for profile in profiles:
+  #   profile_score_object = rules_engine.get_profile_score(profile, calc_data)
+  #   score_attrs[constants.PROFILES].append({
+  #     constants.BASE_SCORE: profile_score_object.base_score,
+  #     constants.BASE_SCORE_ATTRS: profile_score_object.base_score_attrs,
+  #     constants.INTERNAL_SCORE: profile_score_object.internal_score,
+  #     constants.INTERNAL_SCORE_ATTRS: profile_score_object.internal_score_attrs,
+  #     constants.UID: profile.profile_uid,
+  #     'provider_type': profile.provider_type,
+  #   })
+  #
+  # # loop through ae's
+  # score_attrs[constants.ASSIGNED_ENTITIES] = []
+  # for ae in assigned_calc_objects:
+  #   ae_score_object = rules_engine.get_assigned_entity_score(ae, calc_data)
+  #   score_attrs[constants.ASSIGNED_ENTITIES].append({
+  #     constants.BASE_SCORE: ae_score_object.base_score,
+  #     constants.BASE_SCORE_ATTRS: ae_score_object.base_score_attrs,
+  #     constants.INTERNAL_SCORE: ae_score_object.internal_score,
+  #     constants.INTERNAL_SCORE_ATTRS: ae_score_object.internal_score_attrs,
+  #     constants.UID: ae.assigned_entity_uid,
+  #     constants.ENTITY_TYPE: ae.entity_type,
+  #     constants.PROVIDER_TYPE: ae.provider_type
+  #   })
+  #
+  # score, score_attrs = _score_processor.process_score(client_id, score_attrs)
 
-  profiles = _get_profiles(assigned_calc_objects, prospect)
-
-  score_attrs[constants.PROFILES] = []
-  for profile in profiles:
-    profile_score_object = rules_engine.get_profile_score(profile, calc_data)
-    score_attrs[constants.PROFILES].append({
-      constants.BASE_SCORE: profile_score_object.base_score,
-      constants.BASE_SCORE_ATTRS: profile_score_object.base_score_attrs,
-      constants.INTERNAL_SCORE: profile_score_object.internal_score,
-      constants.INTERNAL_SCORE_ATTRS: profile_score_object.internal_score_attrs,
-      constants.UID: profile.profile_uid,
-      'provider_type': profile.provider_type,
-    })
-
-  # loop through ae's
-  score_attrs[constants.ASSIGNED_ENTITIES] = []
-  for ae in assigned_calc_objects:
-    ae_score_object = rules_engine.get_assigned_entity_score(ae, calc_data)
-    score_attrs[constants.ASSIGNED_ENTITIES].append({
-      constants.BASE_SCORE: ae_score_object.base_score,
-      constants.BASE_SCORE_ATTRS: ae_score_object.base_score_attrs,
-      constants.INTERNAL_SCORE: ae_score_object.internal_score,
-      constants.INTERNAL_SCORE_ATTRS: ae_score_object.internal_score_attrs,
-      constants.UID: ae.assigned_entity_uid,
-      constants.ENTITY_TYPE: ae.entity_type,
-      constants.PROVIDER_TYPE: ae.provider_type
-    })
-
-  score, score_attrs = _score_processor.process_score(client_id, score_attrs)
-
-  return score, score_attrs
+  # return score, score_attrs
+  return 0, {}
 
 
 def get_rules_engine(client):
@@ -87,7 +89,7 @@ def get_rules_engine(client):
   elif client.client_type == ClientTypeEnum.food_lover_startup_rules_engine:
     return FoodLoverTechStartupRulesEngine()
 
-  raise ValueError("No rules exist for this client")
+  raise ValueError("No rules exist for this client_id")
 
 
 def _get_assigned_calc_objects(assignment_attrs):

@@ -6,7 +6,7 @@ from src.libs.graphdb_utils.services import graphdb_provider
 
 def add_neo_index(models, schema_editor):
   graph_db = graphdb_provider.get_graph_client()
-  graph_db.query("CREATE CONSTRAINT ON (client:Client) ASSERT client.id IS UNIQUE")
+  graph_db.query("CREATE CONSTRAINT ON (client_id:Client) ASSERT client_id.id IS UNIQUE")
   graph_db.query("CREATE CONSTRAINT ON (topic:Topic) ASSERT topic.id IS UNIQUE")
   graph_db.query("CREATE CONSTRAINT ON (ea:EngagementAssignment) ASSERT ea.id IS UNIQUE")
   graph_db.query("CREATE CONSTRAINT ON (eo:EngagementOpportunity) ASSERT eo.id IS UNIQUE")
@@ -16,7 +16,7 @@ def add_neo_index(models, schema_editor):
 
 def drop_neo_index(models, schema_editor):
   graph_db = graphdb_provider.get_graph_client()
-  graph_db.query("DROP CONSTRAINT ON (client:Client) ASSERT client.id IS UNIQUE")
+  graph_db.query("DROP CONSTRAINT ON (client_id:Client) ASSERT client_id.id IS UNIQUE")
   graph_db.query("DROP CONSTRAINT ON (topic:Topic) ASSERT topic.id IS UNIQUE")
   graph_db.query("DROP CONSTRAINT ON (ea:EngagementAssignment) ASSERT ea.id IS UNIQUE")
   graph_db.query("DROP CONSTRAINT ON (eo:EngagementOpportunity) ASSERT eo.id IS UNIQUE")
