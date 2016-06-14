@@ -78,15 +78,15 @@ class Prospect(AggregateBase):
 
     bio = attrs.get(constants.BIO)
     if bio:
-      self.attrs[constants.BIO].append(bio)
+      self.attrs[constants.BIOS].append(bio)
 
     location = attrs.get(constants.LOCATION)
     if location:
-      self.attrs[constants.LOCATION].append(location)
+      self.attrs[constants.LOCATIONS].append(location)
 
     name = attrs.get(constants.NAME)
     if name:
-      self.attrs[constants.NAME].append(name)
+      self.attrs[constants.NAMES].append(name)
 
     websites = attrs.get(constants.WEBSITES)
     if websites:

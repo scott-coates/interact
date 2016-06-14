@@ -37,10 +37,10 @@ class ProspectRulesEngine(BaseRulesEngine):
   def _apply_score(self):
     score, score_attrs = 0, {}
 
-    # location_score, location_score_attrs = self._apply_location_score()
-    # score += location_score
-    # score_attrs.update(location_score_attrs)
-    #
+    location_score, location_score_attrs = self._apply_location_score()
+    score += location_score
+    score_attrs.update(location_score_attrs)
+
     # age_score, age_score_attrs = self._apply_age_score()
     # score += age_score
     # score_attrs.update(age_score_attrs)

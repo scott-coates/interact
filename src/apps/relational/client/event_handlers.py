@@ -2,7 +2,8 @@ from django.dispatch import receiver
 
 from src.apps.relational.client import tasks
 from src.domain.client.events import ClientAddedTargetAudienceTopicOption1
-from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, EngagementOpportunityAddedToProfile1
+from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, EngagementOpportunityAddedToProfile1, \
+  ProspectUpdatedAttrsFromProfile1
 from src.libs.common_domain.decorators import event_idempotent
 
 
@@ -21,6 +22,7 @@ def execute_added_target_audience_topic_option_1(**kwargs):
 
 @event_idempotent
 @receiver(ProspectCreated1.event_signal)
+@receiver(ProspectUpdatedAttrsFromProfile1.event_signal)
 def execute_added_prospect_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
