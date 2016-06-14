@@ -17,11 +17,8 @@ SCORE = 'score'
 SCORE_ATTRS = 'score_attrs'
 ASSIGNED_ENTITIES = 'assigned_entities'
 ASSIGNED_ENTITY_TYPE = 'assigned_entity_type'
-
-
-class Profile:
-  FOLLOWERS_COUNT = 'followers_count'
-  FOLLOWING_COUNT = 'following_count'
+FOLLOWERS_COUNT = 'followers_count'
+FOLLOWING_COUNT = 'following_count'
 
 
 class Provider:

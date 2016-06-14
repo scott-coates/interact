@@ -38,8 +38,8 @@ def get_twitter_profile_attrs(external_id, _search=twitter_search_utils, **kwarg
 
     twitter_profile_data = {
       constants.URL: profile_url, constants.NAME: name,
-      constants.Profile.FOLLOWERS_COUNT: followers_count,
-      constants.Profile.FOLLOWING_COUNT: following_count
+      constants.FOLLOWERS_COUNT: followers_count,
+      constants.FOLLOWING_COUNT: following_count
     }
 
     if bio: twitter_profile_data[constants.BIO] = bio

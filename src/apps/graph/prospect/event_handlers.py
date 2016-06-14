@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 
 from src.apps.graph.prospect import tasks
-from src.domain.prospect.events import ProspectCreated1, Prospect1AddedProfile, \
+from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
   EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1
 from src.libs.common_domain.decorators import event_idempotent
 
@@ -14,7 +14,7 @@ def add_client(**kwargs):
 
 
 @event_idempotent
-@receiver(Prospect1AddedProfile.event_signal)
+@receiver(ProspectAddedProfile1.event_signal)
 def add_profile(**kwargs):
   prospect_id = kwargs['aggregate_id']
   event = kwargs['event']

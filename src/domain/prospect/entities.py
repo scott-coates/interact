@@ -1,10 +1,14 @@
+from collections import defaultdict
 from itertools import chain
 
+from src.domain.common import constants
 from src.domain.prospect.engagement_opportunity import service  as eo_service
-from src.domain.prospect.events import ProspectCreated1, Prospect1AddedProfile, \
-  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1
+from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
+  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1, ProspectUpdatedAttrsFromProfile1
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
+from src.libs.geo_utils.services import geo_location_service
+from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 
 class Prospect(AggregateBase):
@@ -19,20 +23,33 @@ class Prospect(AggregateBase):
     if not id:
       raise TypeError("id is required")
 
-    if not attrs:
+    if attrs is None:
       raise TypeError("attrs is required")
 
     ret_val._raise_event(ProspectCreated1(id, attrs))
 
     return ret_val
 
-  def add_profile(self, id, external_id, provider_type, _profile_service=None):
+  def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
+    if not _geo_service: _geo_service = geo_location_service
 
     # todo how can we move this to the profile class?
     attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
 
-    self._raise_event(Prospect1AddedProfile(id, external_id, provider_type, attrs))
+    profile_attrs = {
+      constants.URL: attrs.pop(constants.URL),
+      constants.FOLLOWERS_COUNT: attrs.pop(constants.FOLLOWERS_COUNT),
+      constants.FOLLOWING_COUNT: attrs.pop(constants.FOLLOWING_COUNT),
+    }
+
+    location = attrs.get(constants.LOCATION)
+    if location:
+      location = dict(_geo_service.get_geocoded_address(location)._asdict())
+      attrs[constants.LOCATION] = location
+
+    self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))
+    self._raise_event(ProspectUpdatedAttrsFromProfile1(attrs, id))
 
   def add_eo(self, id, external_id, attrs, provider_type,
              provider_action_type, created_date, profile_id, _eo_service=None):
@@ -50,10 +67,32 @@ class Prospect(AggregateBase):
 
   def _handle_created_1_event(self, event):
     self.id = event.id
-    self.attrs = event.attrs
+    # noinspection PyArgumentList
+    self.attrs = defaultdict(list, event.attrs)
 
   def _handle_profile_added_to_prospect_1_event(self, event):
     self._profiles.append(Profile(**event.data))
+
+  def _handle_attrs_updated_from_profile_1_event(self, event):
+    attrs = event.attrs
+
+    bio = attrs.get(constants.BIO)
+    if bio:
+      self.attrs[constants.BIO].append(bio)
+
+    location = attrs.get(constants.LOCATION)
+    if location:
+      self.attrs[constants.LOCATION].append(location)
+
+    name = attrs.get(constants.NAME)
+    if name:
+      self.attrs[constants.NAME].append(name)
+
+    websites = attrs.get(constants.WEBSITES)
+    if websites:
+      combined_sites = self.attrs[constants.WEBSITES] + websites
+      websites = get_unique_urls_from_iterable(combined_sites)
+      self.attrs[constants.WEBSITES].append(websites)
 
   def _handle_eo_added_to_profile_1_event(self, event):
     profile = self._get_profile_by_id(event.profile_id)

@@ -1,12 +1,12 @@
 from django.dispatch import receiver
 
 from src.apps.relational.prospect import tasks
-from src.domain.prospect.events import EngagementOpportunityAddedToProfile1, Prospect1AddedProfile
+from src.domain.prospect.events import EngagementOpportunityAddedToProfile1, ProspectAddedProfile1
 from src.libs.common_domain.decorators import event_idempotent
 
 
 @event_idempotent
-@receiver(Prospect1AddedProfile.event_signal)
+@receiver(ProspectAddedProfile1.event_signal)
 def execute_added_profile_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
