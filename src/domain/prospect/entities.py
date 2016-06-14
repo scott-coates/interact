@@ -36,7 +36,7 @@ class Prospect(AggregateBase):
 
     profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
 
-    p_attrs = {}
+    p_attrs = defaultdict(list)
 
     bio = profile_attrs.pop(constants.BIO, None)
     if bio:
@@ -45,8 +45,7 @@ class Prospect(AggregateBase):
     location = profile_attrs.pop(constants.LOCATION, None)
     if location:
       location = _geo_service.get_geocoded_address_dict(location)
-      p_locations = self.attrs[constants.LOCATIONS] + [location]
-      p_attrs[constants.LOCATION] = p_locations
+      p_attrs[constants.LOCATIONS].append(location)
 
     name = profile_attrs.pop(constants.NAME, None)
     if name:
@@ -56,7 +55,7 @@ class Prospect(AggregateBase):
     if websites:
       combined_sites = self.attrs[constants.WEBSITES] + websites
       websites = get_unique_urls_from_iterable(combined_sites)
-      p_attrs[constants.WEBSITES].append(websites)
+      p_attrs[constants.WEBSITES].extend(websites)
 
     self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))
     self._raise_event(ProspectUpdatedAttrsFromProfile1(p_attrs, id))
