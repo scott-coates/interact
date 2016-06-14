@@ -41,7 +41,8 @@ def replay_events(event_names, _event_repository=None, _event_service=None, _eve
 
   events = _event_repository.get_events(event_names)
 
-  logger.debug("Replay %i events", events.count())
+  total = events.count()
+  logger.debug("Replay %i events", total)
 
   for event_batch in batch_qs(events):
     logger.debug("starting batch : %s", event_batch[0])
@@ -62,4 +63,4 @@ def replay_events(event_names, _event_repository=None, _event_service=None, _eve
         logger.warn("Error sending signal for: %s Data: %s", event_name, event_data, exc_info=True)
 
       counter += 1
-      logger.debug("Sending signal #%i: %s : %s", counter, event_name, event.stream_id)
+      logger.debug("Sending signal #%i of %i: %s : %s", counter, total, event_name, event.stream_id)
