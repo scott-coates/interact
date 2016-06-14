@@ -19,6 +19,15 @@ def save_active_ta_topic_option_task(id, option_name, option_type, option_attrs,
 
 
 @job('high')
+def save_client_ea_lookup_task(id, ta_attrs):
+  log_message = ("id: %s", id)
+
+  with log_wrapper(logger.info, *log_message):
+    return service.save_client_ea_lookup(id, ta_attrs).id
+
+
+
+@job('high')
 def save_prospect_ea_lookup_task(id, attrs):
   log_message = ("id: %s", id)
 

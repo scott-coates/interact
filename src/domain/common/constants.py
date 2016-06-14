@@ -5,6 +5,8 @@ TEXT = 'text'
 WEBSITES = 'websites'
 LOCATION = 'location'
 LOCATIONS = 'locations'
+LAT = 'lat'
+LNG = 'lng'
 BIO = 'bio'
 BIOS = 'bios'
 PROFILE_IDS = 'profile_ids'
@@ -22,6 +24,8 @@ ASSIGNED_ENTITIES = 'assigned_entities'
 ASSIGNED_ENTITY_TYPE = 'assigned_entity_type'
 FOLLOWERS_COUNT = 'followers_count'
 FOLLOWING_COUNT = 'following_count'
+
+LOCATION_SCORE = 'location_score'
 
 
 class Provider:

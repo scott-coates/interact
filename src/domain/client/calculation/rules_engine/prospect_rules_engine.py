@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.domain.common import constants
+from src.libs.geo_utils.services.geo_distance_service import mi_distance
 from src.libs.nlp_utils.services.enums import GenderEnum
 
 logger = logging.getLogger(__name__)
@@ -12,11 +13,11 @@ logger = logging.getLogger(__name__)
 
 class ProspectRulesEngine(BaseRulesEngine):
   def __init__(
-      self, prospect, calc_data,
+      self, prospect, rules_data,
       _geo_location_service=None, _iter_utils=None, _assigned_prospect_service=None, _datetime_parser=None):
 
     self.prospect = prospect
-    self.calc_data = calc_data
+    self.rules_data = rules_data
 
     # if not _geo_location_service: _geo_location_service = geo_location_service
     # self._geo_location_service = _geo_location_service
@@ -73,28 +74,16 @@ class ProspectRulesEngine(BaseRulesEngine):
   def _apply_location_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    locations = self.prospect.attrs.get(constants.LOCATIONS)
+    p_locations = self.prospect.attrs.get(constants.LOCATIONS)
+    c_locations = self.rules_data.get(constants.LOCATIONS)
 
-    if locations:
+    if p_locations and c_locations:
       location_score = 1
-
-      try:
-        country = self._geo_location_service.get_country(locations)
-      except:
-        country = None
-
-      if country:
-        country = country.lower()
-        for home_country in self._important_home_countries:
-          if country in home_country:
-            score += location_score
-            counter[constants.LOCATION_SCORE] += location_score
-
-      locations = locations.lower()
-
-      if any(loc in location for loc in self._important_locations):
-        score += location_score
-        counter[constants.LOCATION_SCORE] += location_score
+      for p_loc in p_locations:
+        dest = (p_loc[constants.LAT], p_loc[constants.LNG])
+        if any(mi_distance((c_loc[constants.LAT], c_loc[constants.LNG]), dest) < 35 for c_loc in c_locations):
+          score += location_score
+          counter[constants.LOCATION_SCORE] += location_score
 
       if counter[constants.LOCATION_SCORE]: score_attrs[constants.LOCATION_SCORE] = counter[constants.LOCATION_SCORE]
 
@@ -151,7 +140,7 @@ class ProspectRulesEngine(BaseRulesEngine):
       bio = self._iter_utils.stemmify_string(bio)
 
       # region client_id topic
-      client_topics = self.calc_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
+      client_topics = self.rules_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
       if client_topics:
         bio_client_topic_score = self._bio_client_topic_score
 
@@ -193,7 +182,7 @@ class ProspectRulesEngine(BaseRulesEngine):
 
         bio_score = self._bio_important_keyword_score
 
-        avoid_words = self.calc_data[constants.PROFANITY_FILTER_WORDS]
+        avoid_words = self.rules_data[constants.PROFANITY_FILTER_WORDS]
 
         avoid_words += self._bio_avoid_keywords
 
@@ -252,7 +241,7 @@ class ProspectRulesEngine(BaseRulesEngine):
   def _apply_prospect_assignment_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    client_uid = self.calc_data[constants.CLIENT_UID]
+    client_uid = self.rules_data[constants.CLIENT_UID]
     prospect_uid = self.prospect.prospect_uid
 
     try:

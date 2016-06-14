@@ -16,6 +16,10 @@ class ActiveTATopicOption(ReadModel):
     return 'ActiveTATopicOption {id}: {option_name}'.format(id=self.id, option_name=self.option_name)
 
 
+class ClientLookupForEA(ReadModel):
+  ta_attrs = JSONField()
+
+
 class ProspectLookupForEA(ReadModel):
   attrs = JSONField()
 
