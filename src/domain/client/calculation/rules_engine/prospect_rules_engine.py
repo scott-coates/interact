@@ -13,10 +13,10 @@ logger = logging.getLogger(__name__)
 
 class ProspectRulesEngine(BaseRulesEngine):
   def __init__(
-      self, prospect, rules_data,
+      self, prospect_attrs, rules_data,
       _geo_location_service=None, _iter_utils=None, _assigned_prospect_service=None, _datetime_parser=None):
 
-    self.prospect = prospect
+    self.prospect_attrs= prospect_attrs
     self.rules_data = rules_data
 
     # if not _geo_location_service: _geo_location_service = geo_location_service
@@ -43,14 +43,6 @@ class ProspectRulesEngine(BaseRulesEngine):
     score += location_score
     score_attrs.update(location_score_attrs)
 
-    # age_score, age_score_attrs = self._apply_age_score()
-    # score += age_score
-    # score_attrs.update(age_score_attrs)
-    #
-    # gender_score, gender_score_attrs = self._apply_gender_score()
-    # score += gender_score
-    # score_attrs.update(gender_score_attrs)
-    #
     # bio_score, bio_score_attrs = self._apply_bio_score()
     # score += bio_score
     # score_attrs.update(bio_score_attrs)
@@ -74,14 +66,16 @@ class ProspectRulesEngine(BaseRulesEngine):
   def _apply_location_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    p_locations = self.prospect.attrs.get(constants.LOCATIONS)
-    c_locations = self.rules_data.get(constants.LOCATIONS)
+    p_locations = self.prospect_attrs.get(constants.LOCATIONS)
+    r_locations = self.rules_data.get(constants.LOCATIONS)
 
-    if p_locations and c_locations:
+    if p_locations and r_locations:
       location_score = 1
+      # iterate through all rules_locations
+      # if there is any intersection within 35 miles, award the score
       for p_loc in p_locations:
         dest = (p_loc[constants.LAT], p_loc[constants.LNG])
-        if any(mi_distance((c_loc[constants.LAT], c_loc[constants.LNG]), dest) < 35 for c_loc in c_locations):
+        if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
           score += location_score
           counter[constants.LOCATION_SCORE] += location_score
 
@@ -89,54 +83,12 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     return score, score_attrs
 
-  def _apply_age_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
-    age = self.prospect.prospect_attrs.get(constants.RELATIVE_DOB)
-
-    age_min, age_max = self._age_range
-
-    if age_min and age_max:
-      if age:
-        age = self._datetime_parser.get_datetime(age)
-
-        age_years = relativedelta(timezone.now(), age).years
-
-        if age_min <= age_years <= age_max:
-          age_score = self._age_score
-          score += age_score
-
-          counter[constants.RELATIVE_DOB_SCORE] += age_score
-
-          if counter[constants.RELATIVE_DOB_SCORE]:
-            score_attrs[constants.RELATIVE_DOB_SCORE] = counter[constants.RELATIVE_DOB_SCORE]
-
-    return score, score_attrs
-
-  def _apply_gender_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
-
-    gender = self.prospect.prospect_attrs.get(constants.GENDER)
-
-    preferred_gender = self._preferred_gender
-
-    if preferred_gender:
-      if gender:
-
-        gender = GenderEnum[gender.lower()]
-
-        if gender == preferred_gender:
-          gender_score = self._gender_score
-          score += gender_score
-          score_attrs[constants.GENDER_SCORE] = gender_score
-
-    return score, score_attrs
-
   def _apply_bio_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    bio = self.prospect.prospect_attrs.get(constants.BIO)
+    bios = self.prospect_attrs.get(constants.BIOS)
 
-    if bio:
+    if bios:
       bio = self._iter_utils.stemmify_string(bio)
 
       # region client_id topic

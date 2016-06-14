@@ -8,5 +8,5 @@ class TopicCreated1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, name):
+  def __init__(self, id, name, snowball_stem):
     super().__init__()
