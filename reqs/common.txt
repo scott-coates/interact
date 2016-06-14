@@ -13,3 +13,4 @@ rq==0.6.0
 pygeocoder==1.2.5
 django-rq==0.9.1
 shortuuid==0.4.3
+keen==0.3.23

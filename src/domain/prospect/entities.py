@@ -34,22 +34,32 @@ class Prospect(AggregateBase):
     if not _profile_service: _profile_service = profile_service
     if not _geo_service: _geo_service = geo_location_service
 
-    # todo how can we move this to the profile class?
-    attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
+    profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
 
-    profile_attrs = {
-      constants.URL: attrs.pop(constants.URL),
-      constants.FOLLOWERS_COUNT: attrs.pop(constants.FOLLOWERS_COUNT),
-      constants.FOLLOWING_COUNT: attrs.pop(constants.FOLLOWING_COUNT),
-    }
+    p_attrs = {}
 
-    location = attrs.get(constants.LOCATION)
+    bio = profile_attrs.pop(constants.BIO, None)
+    if bio:
+      p_attrs[constants.BIOS].append(bio)
+
+    location = profile_attrs.pop(constants.LOCATION, None)
     if location:
       location = _geo_service.get_geocoded_address_dict(location)
-      attrs[constants.LOCATION] = location
+      p_locations = self.attrs[constants.LOCATIONS] + [location]
+      p_attrs[constants.LOCATION] = p_locations
+
+    name = profile_attrs.pop(constants.NAME, None)
+    if name:
+      p_attrs[constants.NAMES].append(name)
+
+    websites = profile_attrs.pop(constants.WEBSITES, None)
+    if websites:
+      combined_sites = self.attrs[constants.WEBSITES] + websites
+      websites = get_unique_urls_from_iterable(combined_sites)
+      p_attrs[constants.WEBSITES].append(websites)
 
     self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))
-    self._raise_event(ProspectUpdatedAttrsFromProfile1(attrs, id))
+    self._raise_event(ProspectUpdatedAttrsFromProfile1(p_attrs, id))
 
   def add_eo(self, id, external_id, attrs, provider_type,
              provider_action_type, created_date, profile_id, _eo_service=None):
@@ -75,24 +85,7 @@ class Prospect(AggregateBase):
 
   def _handle_attrs_updated_from_profile_1_event(self, event):
     attrs = event.attrs
-
-    bio = attrs.get(constants.BIO)
-    if bio:
-      self.attrs[constants.BIOS].append(bio)
-
-    location = attrs.get(constants.LOCATION)
-    if location:
-      self.attrs[constants.LOCATIONS].append(location)
-
-    name = attrs.get(constants.NAME)
-    if name:
-      self.attrs[constants.NAMES].append(name)
-
-    websites = attrs.get(constants.WEBSITES)
-    if websites:
-      combined_sites = self.attrs[constants.WEBSITES] + websites
-      websites = get_unique_urls_from_iterable(combined_sites)
-      self.attrs[constants.WEBSITES].append(websites)
+    self.attrs = attrs
 
   def _handle_eo_added_to_profile_1_event(self, event):
     profile = self._get_profile_by_id(event.profile_id)
