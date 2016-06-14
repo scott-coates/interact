@@ -2,7 +2,9 @@ from src.domain.client.calculation import calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientAddedEngagementAssignment1
+from src.domain.common import constants
 from src.libs.common_domain.aggregate_base import AggregateBase
+from src.libs.geo_utils.services import geo_location_service
 
 
 class Client(AggregateBase):
@@ -12,7 +14,9 @@ class Client(AggregateBase):
     self._eas = []
 
   @classmethod
-  def from_attrs(cls, id, name):
+  def from_attrs(cls, id, name, ta_attrs, _geo_service=None):
+    if not _geo_service: _geo_service = geo_location_service
+
     ret_val = cls()
 
     if not id:
@@ -21,7 +25,23 @@ class Client(AggregateBase):
     if not name:
       raise TypeError("name is required")
 
-    ret_val._raise_event(ClientCreated1(id, name))
+    if ta_attrs is None:
+      raise TypeError("ta_attrs is required")
+
+    if not isinstance(ta_attrs, dict):
+      raise TypeError("ta_attrs must be a dict")
+
+    for v in ta_attrs.values():
+      if not isinstance(v, (list, tuple)):
+        raise TypeError("Each value must be an iterable")
+
+    locations = ta_attrs.get(constants.LOCATIONS)
+
+    if locations:
+      locations = [_geo_service.get_geocoded_address_dict(l) for l in locations]
+      ta_attrs[constants.LOCATIONS] = locations
+
+    ret_val._raise_event(ClientCreated1(id, name, ta_attrs))
 
     return ret_val
 
@@ -53,6 +73,7 @@ class Client(AggregateBase):
   def _handle_created_1_event(self, event):
     self.id = event.id
     self.name = event.name
+    self.ta_attrs = event.ta_attrs
 
   def _handle_associated_with_topic_1_event(self, event):
     self._ta_topics.append(TargetAudienceTopic(event.id, event.topic_id))

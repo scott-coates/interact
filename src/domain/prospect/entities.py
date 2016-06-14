@@ -45,7 +45,7 @@ class Prospect(AggregateBase):
 
     location = attrs.get(constants.LOCATION)
     if location:
-      location = dict(_geo_service.get_geocoded_address(location)._asdict())
+      location = _geo_service.get_geocoded_address_dict(location)
       attrs[constants.LOCATION] = location
 
     self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))

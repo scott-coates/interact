@@ -38,3 +38,7 @@ def get_geocoded_address(address_str):
 
   return CompleteAddress(results.latitude, results.longitude, address1, address2, city, state,
                          country, zip_code, results.formatted_address)
+
+
+def get_geocoded_address_dict(address_str):
+  return dict(get_geocoded_address(address_str)._asdict())

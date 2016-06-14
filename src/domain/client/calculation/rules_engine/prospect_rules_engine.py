@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
+from src.domain.common import constants
 from src.libs.nlp_utils.services.enums import GenderEnum
 
 logger = logging.getLogger(__name__)
@@ -72,13 +73,13 @@ class ProspectRulesEngine(BaseRulesEngine):
   def _apply_location_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    location = self.prospect.prospect_attrs.get(constants.LOCATION)
+    locations = self.prospect.attrs.get(constants.LOCATIONS)
 
-    if location:
-      location_score = self._location_score
+    if locations:
+      location_score = 1
 
       try:
-        country = self._geo_location_service.get_country(location)
+        country = self._geo_location_service.get_country(locations)
       except:
         country = None
 
@@ -89,7 +90,7 @@ class ProspectRulesEngine(BaseRulesEngine):
             score += location_score
             counter[constants.LOCATION_SCORE] += location_score
 
-      location = location.lower()
+      locations = locations.lower()
 
       if any(loc in location for loc in self._important_locations):
         score += location_score
