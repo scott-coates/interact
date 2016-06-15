@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from src.apps.engagement_discovery.signals import engagement_opportunity_discovered
 from src.domain.prospect import tasks
 from src.domain.prospect.events import duplicate_profile_discovered
+from src.domain.prospect.tasks import handle_duplicate_profile_task
 
 
 @receiver(engagement_opportunity_discovered)
@@ -25,3 +26,5 @@ def handle_duplicate_profile(sender, **kwargs):
   duplicate_prospect_id = kwargs['duplicate_prospect_id']
   existing_external_id = kwargs['existing_external_id']
   existing_provider_type = kwargs['existing_provider_type']
+
+  handle_duplicate_profile_task.delay(duplicate_prospect_id, existing_external_id, existing_provider_type)
