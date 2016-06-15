@@ -49,7 +49,7 @@ def save_client_ea_lookup(id, ta_attrs):
 def save_topic_to_client_ea_lookup(client_id, topic_id):
   client = get_client_ea_lookup(client_id)
   topic = get_client_topic_lookup(topic_id)
-  client.ta_topics.append({constants.ID: topic_id, constants.SNOWBALL_STEM: topic.snowball_stem})
+  client.ta_topics[topic_id] = {constants.SNOWBALL_STEM: topic.snowball_stem}
   client.save()
   return client
 
@@ -83,7 +83,7 @@ def save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id):
 
 def save_topic_to_eo_ea_lookup(eo_id, topic_id):
   eo = EOLookupForEA.objects.get(id=eo_id)
-  eo.topic_ids.append(topic_id)
+  eo.topic_ids[topic_id] = True
   eo.save()
   return eo
 

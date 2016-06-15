@@ -21,7 +21,7 @@ class ActiveTATopicOption(ReadModel):
 
 class ClientLookupForEA(ReadModel):
   ta_attrs = JSONField()
-  ta_topics = JSONField(default=list)
+  ta_topics = JSONField(default=dict)
 
 
 class ProspectLookupForEA(ReadModel):
@@ -42,7 +42,7 @@ class ProfileLookupForEA(ReadModel):
 
 class EOLookupForEA(ReadModel):
   eo_attrs = JSONField()
-  topic_ids = JSONField(default=list)
+  topic_ids = JSONField(default=dict)
   profile_id = models.CharField(max_length=8)
   prospect_id = models.CharField(max_length=8)
   provider_type = models.CharField(max_length=2400)
