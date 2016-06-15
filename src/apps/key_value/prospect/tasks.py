@@ -8,7 +8,7 @@ from src.libs.python_utils.logging.logging_utils import log_wrapper
 logger = logging.getLogger(__name__)
 
 
-@job('high')
+@job('default')
 def save_eo_topic_set_task(eo_id, topic_id):
   log_message = (
     "eo_id: %s, topic_id: %s",

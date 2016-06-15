@@ -18,6 +18,6 @@ def create_ta_topic_in_graphdb_task(client_id, ta_topic_id, topic_id):
   return service.create_ta_topic_in_graphdb(client_id, ta_topic_id, topic_id)['id']
 
 
-@job('high')
+@job('default')
 def create_ea_in_graphdb_task(id, attrs, client_id):
   return service.create_ea_in_graphdb(id, attrs, client_id)['id']

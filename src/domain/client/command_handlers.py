@@ -52,5 +52,4 @@ def create_ea(_aggregate_repository=None, **kwargs):
   client = _aggregate_repository.get(Client, id)
   version = client.version
   client.add_ea(**command.data)
-  x = client
-  # _aggregate_repository.save(client_id, version)
+  _aggregate_repository.save(client, version)
