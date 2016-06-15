@@ -42,7 +42,7 @@ def save_topic_to_client_ea_lookup_task(client_id, topic_id):
     return service.save_topic_to_client_ea_lookup(client_id, topic_id)
 
 
-@job('high')
+@job('default')
 def save_prospect_ea_lookup_task(id, attrs):
   log_message = ("id: %s", id)
 
@@ -50,7 +50,7 @@ def save_prospect_ea_lookup_task(id, attrs):
     return service.save_prospect_ea_lookup(id, attrs).id
 
 
-@job('high')
+@job('default')
 def save_profile_ea_lookup_task(id, profile_attrs, provider_type, prospect_id):
   log_message = ("id: %s", id)
 
@@ -58,7 +58,7 @@ def save_profile_ea_lookup_task(id, profile_attrs, provider_type, prospect_id):
     return service.save_profile_ea_lookup(id, profile_attrs, provider_type, prospect_id).id
 
 
-@job('high')
+@job('default')
 def save_eo_ea_lookup_task(id, eo_attrs, provider_type, profile_id, prospect_id):
   log_message = ("id: %s", id)
 
@@ -66,7 +66,7 @@ def save_eo_ea_lookup_task(id, eo_attrs, provider_type, profile_id, prospect_id)
     return service.save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id).id
 
 
-@job('high')
+@job('default')
 def save_topic_to_eo_ea_lookup_task(eo_id, topic_id):
   log_message = ("eo_id: %s topic_id: %s", eo_id, topic_id)
 
