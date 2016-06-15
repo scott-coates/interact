@@ -24,7 +24,8 @@ def provide_rules_data(client_id, assigned_calc_objects):
 
 
 def _provide_stemmed_keywords(client, assigned_calc_objects):
-  topic_ids = chain.from_iterable(c.topic_ids for c in assigned_calc_objects)
+  # casting to a list because for some reason the chain iterable yielded no results
+  topic_ids = list(chain.from_iterable(c.topic_ids for c in assigned_calc_objects))
 
   available_keywords = [v[constants.SNOWBALL_STEM] for k, v in client.ta_topics.items() if k not in topic_ids]
 

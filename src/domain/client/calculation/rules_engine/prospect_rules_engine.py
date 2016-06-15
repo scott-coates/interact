@@ -68,13 +68,17 @@ class ProspectRulesEngine(BaseRulesEngine):
     bios = self.prospect_attrs.get(constants.BIOS)
 
     if bios:
-      bio = self._token_utils.stemmify_snowball_string(' '.join(bios))
+      bio = ' '.join(bios)
+
+      bio_tokens = self._token_utils.tokenize_string(bio)
+
+      bio_stemmed = self._token_utils.stemmify_snowball_string(bio)
 
       keywords = self.rules_data.get(constants.KEYWORDS)
       if keywords:
         bio_keyword_score = 1
         for k in keywords:
-          if k in bio:
+          if k in bio_stemmed:
             score += bio_keyword_score
             counter[constants.BIO_KEYWORD_SCORE] += bio_keyword_score
 
@@ -84,8 +88,9 @@ class ProspectRulesEngine(BaseRulesEngine):
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
       if avoid_words:
         bio_avoid_keyword_score = -1
-        for aw in avoid_words:
-          if aw in bio:
+        # iterate through bio tokens to be less inclusive and prevent false positives (consider the word mass)
+        for b in bio_tokens:
+          if b in avoid_words:
             score += bio_avoid_keyword_score
             counter[constants.BIO_AVOID_KEYWORD_SCORE] += bio_avoid_keyword_score
 

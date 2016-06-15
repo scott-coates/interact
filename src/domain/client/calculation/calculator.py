@@ -40,7 +40,6 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
       constants.ID: profile.id
     })
 
-  # loop through ae's
   score_attrs[constants.ASSIGNED_ENTITIES] = []
   for ae in assigned_calc_objects:
     ae_score, ae_score_attrs = rules_engine.get_assigned_entity_score(ae, rules_data)
