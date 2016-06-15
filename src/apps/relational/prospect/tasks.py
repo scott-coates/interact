@@ -1,8 +1,10 @@
 import logging
 
+from django.db import IntegrityError
 from django_rq import job
 
 from src.apps.relational.prospect import service
+from src.domain.prospect.events import duplicate_profile_discovered
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,14 @@ def save_profile_lookup_by_provider_task(profile_id, external_id, provider_type,
   )
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id)
+    try:
+      service.save_profile_lookup_by_provider(profile_id, external_id, provider_type, prospect_id)
+    except IntegrityError:
+      # we tried adding a duplicate profile which means we have a duplicate prospect - they need to be merged
+      duplicate_profile_discovered.send(None, duplicate_prospect_id=prospect_id,
+                                        existing_external_id=external_id,
+                                        existing_provider_type=provider_type)
+    return profile_id
 
 
 @job('default')
@@ -27,4 +36,5 @@ def save_eo_lookup_by_provider_task(eo_id, external_id, provider_type, prospect_
   )
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id)
+    service.save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id)
+    return eo_id

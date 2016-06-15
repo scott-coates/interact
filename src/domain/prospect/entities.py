@@ -4,7 +4,8 @@ from itertools import chain
 from src.domain.common import constants
 from src.domain.prospect.engagement_opportunity import service  as eo_service
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
-  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1, ProspectUpdatedAttrsFromProfile1
+  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1, ProspectUpdatedAttrsFromProfile1, \
+  ProspectMarkedAsDuplicate, ProspectDeleted
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 from src.libs.geo_utils.services import geo_location_service
@@ -30,9 +31,18 @@ class Prospect(AggregateBase):
 
     return ret_val
 
+  def mark_as_duplicate(self, existing_prospect_id):
+    if self.duplicate: raise Exception(self, 'already marked as duplicate.')
+    self._raise_event(ProspectMarkedAsDuplicate(existing_prospect_id))
+    if self.deleted: raise Exception(self, 'already marked as deleted.')
+    self._raise_event(ProspectDeleted('Duplicate prospect. Existing prospect id: {0}.'.format(existing_prospect_id)))
+
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
     if not _geo_service: _geo_service = geo_location_service
+
+    profile = self._get_profile_by_external_id_and_provider_type(external_id, provider_type)
+    if profile: raise Exception(profile, 'already exists.')
 
     profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
 
@@ -65,6 +75,9 @@ class Prospect(AggregateBase):
 
     if not _eo_service: _eo_service = eo_service
 
+    eo = self._get_eo_by_external_id_and_provider_type(external_id, provider_type)
+    if eo: raise Exception(eo, 'already exists.')
+
     attrs = _eo_service.prepare_attrs_from_engagement_opportunity(attrs)
 
     self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
@@ -94,8 +107,21 @@ class Prospect(AggregateBase):
     eo = self._get_eo_by_id(event.engagement_opportunity_id)
     eo._add_topic_id(event.topic_id)
 
+  def _handle_marked_as_duplicate_1_event(self, event):
+    self.duplicate = True
+    self.existing_prospect_id = event.existing_prospect_id
+
+  def _handle_deleted_1_event(self, event):
+    self.deleted = True
+    self.reason = event.reason
+
   def _get_profile_by_id(self, profile_id):
     profile = next(p for p in self._profiles if p.id == profile_id)
+
+    return profile
+
+  def _get_profile_by_external_id_and_provider_type(self, external_id, provider_type):
+    profile = next(p for p in self._profiles if p.external_id == external_id and p.provider_type == provider_type)
 
     return profile
 
@@ -103,6 +129,14 @@ class Prospect(AggregateBase):
     profiles = self._profiles
     eos = chain.from_iterable(p._engagement_opportunities for p in profiles)
     eo = next(eo for eo in eos if eo.id == eo_id)
+
+    return eo
+
+  def _get_eo_by_external_id_and_provider_type(self, external_id, provider_type):
+    profiles = self._profiles
+
+    eos = chain.from_iterable(p._engagement_opportunities for p in profiles)
+    eo = next(eo for eo in eos if eo.external_id == external_id and eo.provider_type == provider_type)
 
     return eo
 

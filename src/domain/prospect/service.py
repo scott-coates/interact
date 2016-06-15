@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from src.apps.relational.prospect.service import get_profile_lookup_from_provider_info, \
   get_engagement_opportunity_lookup_from_provider_info, get_engagement_opportunity_lookup, get_profile_lookup
-from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO
+from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO, MarkProspectAsDuplicate
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
 
@@ -28,8 +28,7 @@ def populate_profile_id_from_provider_info(prospect_id, external_id, provider_ty
 
   try:
     profile = get_profile_lookup_from_provider_info(external_id, provider_type)
-    # todo i think this is the time to refresh their profile data
-    # every tmie we come across their profile, we can see what's new.
+
     profile_id = profile.id
 
   except ObjectDoesNotExist:
@@ -43,11 +42,13 @@ def populate_profile_id_from_provider_info(prospect_id, external_id, provider_ty
   return profile_id
 
 
-def populate_engagement_opportunity_id_from_engagement_discovery(profile_id, engagement_opportunity_discovery_object,
+def populate_engagement_opportunity_id_from_engagement_discovery(profile_id,
+                                                                 prospect_id, engagement_opportunity_discovery_object,
                                                                  _dispatcher=None):
   if not _dispatcher: _dispatcher = dispatcher
 
   discovery = engagement_opportunity_discovery_object
+
   provider_type = discovery.provider_type
 
   try:
@@ -58,8 +59,6 @@ def populate_engagement_opportunity_id_from_engagement_discovery(profile_id, eng
 
   except ObjectDoesNotExist:
 
-    profile = get_profile_lookup(profile_id)
-
     eo_id = generate_id()
 
     create_eo = AddEO(eo_id, discovery.engagement_opportunity_external_id,
@@ -67,7 +66,7 @@ def populate_engagement_opportunity_id_from_engagement_discovery(profile_id, eng
                       provider_type, discovery.provider_action_type, discovery.created_date,
                       profile_id)
 
-    _dispatcher.send_command(profile.prospect_id, create_eo)
+    _dispatcher.send_command(prospect_id, create_eo)
 
   return eo_id
 
@@ -82,3 +81,16 @@ def add_topic_to_eo(eo_id, topic_id):
   dispatcher.send_command(prospect_id, add_topic)
 
   return eo_id
+
+
+def handle_duplicate_profile(duplicate_prospect_id, existing_external_id, existing_provider_type,
+                             _dispatcher=None):
+  if not _dispatcher: _dispatcher = dispatcher
+
+  existing_profile = get_profile_lookup_from_provider_info(existing_external_id, existing_provider_type)
+
+  existing_prospect_id = existing_profile.prospect_id
+
+  _dispatcher.send_command(duplicate_prospect_id, existing_prospect_id)
+
+  return duplicate_prospect_id

@@ -34,17 +34,18 @@ def populate_profile_from_provider_info_task(external_id, provider_type):
   )
 
   with log_wrapper(logger.info, *log_message):
-    ret_val = service.populate_profile_id_from_provider_info(prospect_id, external_id, provider_type)
+    profile_id = service.populate_profile_id_from_provider_info(prospect_id, external_id, provider_type)
 
     job.dependency.delete()
 
-    return ret_val
+    return profile_id, prospect_id
 
 
 @job('default', result_ttl=-1)
 def populate_engagement_opportunity_id_from_engagement_discovery_task(engagement_opportunity_discovery_object):
   job = get_current_job()
-  profile_id = job.dependency.result
+
+  profile_id, prospect_id = job.dependency.result
 
   log_message = (
     "Begin add eo. profile_id: %s, eo_external_id: %s",
@@ -52,7 +53,7 @@ def populate_engagement_opportunity_id_from_engagement_discovery_task(engagement
   )
 
   with log_wrapper(logger.info, *log_message):
-    ret_val = service.populate_engagement_opportunity_id_from_engagement_discovery(profile_id,
+    ret_val = service.populate_engagement_opportunity_id_from_engagement_discovery(profile_id, prospect_id,
                                                                                    engagement_opportunity_discovery_object)
     job.dependency.delete()
     return ret_val
@@ -74,5 +75,19 @@ def add_topic_to_eo_task(topic_id):
       ret_val = service.add_topic_to_eo(eo_id, topic_id)
 
     job.dependency.delete()
+
+    return ret_val
+
+
+@job('default')
+def handle_duplicate_profile_task(duplicate_prospect_id, existing_external_id, existing_provider_type):
+  log_message = (
+    "duplicate_prospect_id: %s, existing_external_id: %s existing_provider_type: %s",
+    duplicate_prospect_id, existing_external_id, existing_provider_type
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    ret_val = service.handle_duplicate_profile(duplicate_prospect_id, existing_external_id,
+                                               existing_provider_type)
 
     return ret_val
