@@ -14,3 +14,11 @@ def save_active_client_task(id):
 
   with log_wrapper(logger.info, *log_message):
     return service.save_active_client(id)
+
+
+@job('high')
+def save_client_assigned_prospect_task(client_id, prospect_id):
+  log_message = ("client_id: %s prospect_id: %s", client_id, prospect_id)
+
+  with log_wrapper(logger.info, *log_message):
+    return service.save_client_assigned_prospect(client_id, prospect_id)

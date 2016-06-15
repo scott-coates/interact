@@ -6,7 +6,6 @@ from src.domain.common import constants
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.python_utils.logging.logging_utils import log_wrapper
-import nltk
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +28,7 @@ def refresh_assignments(client_id, _dispatcher=None):
     logger.debug("Assignments to create for client_id: %s: %i", client_id, total_assignments_count)
 
     for group in entities_to_add:
+      prospect_id = group[constants.PROSPECT_ID]
       group_log_message = ("Assignment: %i out of %i for client_id: %s", counter, total_assignments_count, client_id)
 
       with log_wrapper(logger.debug, *group_log_message):
@@ -40,7 +40,7 @@ def refresh_assignments(client_id, _dispatcher=None):
 
         ea_id = generate_id()
         try:
-          add_ea = AddEA(ea_id, assignment_attrs)
+          add_ea = AddEA(ea_id, assignment_attrs, prospect_id)
           _dispatcher.send_command(client_id, add_ea)
         except Exception as e:
           logger.warn("Error creating assignment", exc_info=True)

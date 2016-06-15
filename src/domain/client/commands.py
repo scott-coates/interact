@@ -31,5 +31,5 @@ class AddEA(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, attrs):
+  def __init__(self, id, attrs, prospect_id):
     pass

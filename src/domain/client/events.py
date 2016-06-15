@@ -35,5 +35,5 @@ class ClientAddedEngagementAssignment1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, attrs, score, score_attrs):
+  def __init__(self, id, attrs, score, score_attrs, prospect_id):
     super().__init__()

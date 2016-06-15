@@ -55,8 +55,9 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
     )
 
-  def add_ea(self, id, attrs, _calculator=None):
+  def add_ea(self, id, prospect_id, attrs, _calculator=None):
     if not _calculator: _calculator = calculator
+
     if not isinstance(attrs, dict):
       raise TypeError("attrs must be a dict")
 
@@ -67,7 +68,7 @@ class Client(AggregateBase):
     score, score_attrs = _calculator.calculate_engagement_assignment_score(self.id, attrs)
 
     self._raise_event(
-        ClientAddedEngagementAssignment1(id, attrs, score, score_attrs)
+        ClientAddedEngagementAssignment1(id, attrs, score, score_attrs, prospect_id)
     )
 
   def _handle_created_1_event(self, event):
@@ -83,7 +84,7 @@ class Client(AggregateBase):
     ta_topic._add_topic_option(**event.data)
 
   def _handle_added_ea_1_event(self, event):
-    self._eas.append(EngagementAssignment(event.id, event.attrs, event.score, event.score_attrs))
+    self._eas.append(EngagementAssignment(event.id, event.attrs, event.score, event.score_attrs, event.prospect_id))
 
   def _get_ta_topic_by_id(self, ta_topic_id):
     ta_topic = next(t for t in self._ta_topics if t.id == ta_topic_id)
@@ -143,7 +144,7 @@ class TargetAudienceTopicOption:
 
 
 class EngagementAssignment:
-  def __init__(self, id, attrs, score, score_attrs):
+  def __init__(self, id, attrs, score, score_attrs, prospect_id):
     if not id:
       raise TypeError("id is required")
 
@@ -156,10 +157,15 @@ class EngagementAssignment:
     if score_attrs is None:
       raise TypeError("score_attrs is required")
 
+    if not prospect_id:
+      raise TypeError("prospect_id is required")
+
     self.id = id
     self.attrs = attrs
     self.score = score
     self.score_attrs = score_attrs
+
+    self.prospect_id = prospect_id
 
   def __str__(self):
     return 'EA {id}: {score}'.format(id=self.id, score=self.score)
