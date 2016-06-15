@@ -16,3 +16,19 @@ def get_active_client_ids():
   # turn bytes into str
   ret_val = map(lambda m: m.decode(), kdb.smembers('active_clients'))
   return ret_val
+
+
+def save_client_assigned_prospect(client_id, prospect_id):
+  kdb = get_key_value_client()
+
+  ret_val = kdb.sadd('client_prospects:{0}'.format(client_id), prospect_id)
+
+  return ret_val
+
+
+def client_contains_assigned_prospect(client_id, prospect_id):
+  kdb = get_key_value_client()
+
+  ret_val = kdb.sismember('client_prospects:{0}'.format(client_id), prospect_id)
+
+  return ret_val

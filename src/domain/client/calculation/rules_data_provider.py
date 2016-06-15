@@ -7,7 +7,8 @@ from src.libs.text_utils.filter import profanity_filter
 
 def provide_rules_data(client_id, assigned_calc_objects):
   ret_val = {
-    constants.PROFANITY_FILTER_WORDS: profanity_filter.bad_words
+    constants.PROFANITY_FILTER_WORDS: profanity_filter.bad_words,
+    constants.CLIENT_ID: client_id
   }
 
   client = get_client_ea_lookup(client_id)

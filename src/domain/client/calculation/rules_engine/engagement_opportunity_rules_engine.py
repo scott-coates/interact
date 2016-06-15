@@ -8,12 +8,13 @@ logger = logging.getLogger(__name__)
 
 
 class EngagementOpportunityRulesEngine(BaseRulesEngine):
-  def __init__(self, engagement_opportunity, calc_data, _iter_utils=None):
+  def __init__(self, eo_id, eo_attrs, rules_data, _iter_utils=None):
     if not _iter_utils: _iter_utils = iter_utils
     self._iter_utils = _iter_utils
 
-    self.engagement_opportunity = engagement_opportunity
-    self.calc_data = calc_data
+    self.eo_id = eo_id
+    self.eo_attrs = eo_attrs
+    self.rules_data = rules_data
 
   def score_it(self):
     score, score_attrs = self._apply_score()
@@ -26,14 +27,14 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
 
 
 class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
-  def __init__(self, engagement_opportunity, calc_data, _iter_utils=None, _scraper_utils=None, _text_parser=None):
+  def __init__(self, engagement_opportunity, rules_data, _iter_utils=None, _scraper_utils=None, _text_parser=None):
     # if not _scraper_utils: _scraper_utils = scraper_utils
     # self._scraper_utils = _scraper_utils
     #
     # if not _text_parser: _text_parser = text_parser
     # self._text_parser = _text_parser
 
-    super().__init__(engagement_opportunity, calc_data, _iter_utils)
+    super().__init__(engagement_opportunity, rules_data, _iter_utils)
 
   def _apply_score(self):
     score, score_attrs = 0, {}
@@ -57,7 +58,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
       tweet_text_ta_topic_score = self._tweet_text_ta_topic_score
 
-      client_topics = self.calc_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
+      client_topics = self.rules_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
 
       tweet_text = self._iter_utils.stemmify_string(tweet_text)
 
@@ -84,7 +85,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
       website_text_ta_topic_score = self._website_text_ta_topic_score
 
-      client_topics = self.calc_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
+      client_topics = self.rules_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
 
       for website in websites:
         try:

@@ -1,5 +1,6 @@
 import logging
 
+from src.apps.key_value.client.service import client_contains_assigned_prospect
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.domain.common import constants
 from src.libs.geo_utils.services.geo_distance_service import mi_distance
@@ -9,13 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class ProspectRulesEngine(BaseRulesEngine):
-  def __init__(self, prospect_attrs, rules_data, _token_utils=None):
+  def __init__(self, prospect_id, prospect_attrs, rules_data, _token_utils=None):
 
     if not _token_utils: _token_utils = token_utils
-
     self._token_utils = _token_utils
 
+    self.prospect_id = prospect_id
     self.prospect_attrs = prospect_attrs
+
     self.rules_data = rules_data
 
   def score_it(self):
@@ -34,21 +36,11 @@ class ProspectRulesEngine(BaseRulesEngine):
     score += bio_score
     score_attrs.update(bio_score_attrs)
 
-    # website_score, website_score_attrs = self._apply_website_score()
-    # score += website_score
-    # score_attrs.update(website_score_attrs)
-    #
-    # email_score, email_score_attrs = self._apply_email_score()
-    # score += email_score
-    # score_attrs.update(email_score_attrs)
-    #
-    # prospect_assignment_score, prospect_assignment_score_attrs = self._apply_prospect_assignment_score()
-    # score += prospect_assignment_score
-    # score_attrs.update(prospect_assignment_score_attrs)
+    prospect_assignment_score, prospect_assignment_score_attrs = self._apply_prospect_assignment_score()
+    score += prospect_assignment_score
+    score_attrs.update(prospect_assignment_score_attrs)
 
     return score, score_attrs
-
-  # region apply score logic
 
   def _apply_location_score(self):
     score, score_attrs, counter = self._get_default_score_items()
@@ -60,7 +52,6 @@ class ProspectRulesEngine(BaseRulesEngine):
       location_score = 1
       # iterate through all rules_locations
       # if there is any intersection within _default_location_threshold miles, award the score
-      # todo location threshold
       for p_loc in p_locations:
         dest = (p_loc[constants.LAT], p_loc[constants.LNG])
         if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
@@ -103,128 +94,16 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     return score, score_attrs
 
-  def _apply_website_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
-
-    websites = self.prospect.prospect_attrs.get(constants.WEBSITES)
-
-    important_websites = self._important_websites
-
-    if important_websites:
-
-      if websites:
-
-        website_score = self._website_score
-
-        for ws in important_websites:
-          if any(domain in ws.lower() for domain in self._important_websites):
-            score += website_score
-            counter[constants.WEBSITES_SCORE] += website_score
-
-        if counter[constants.WEBSITES_SCORE]:
-          score_attrs[constants.WEBSITES_SCORE] = counter[constants.WEBSITES_SCORE]
-
-    return score, score_attrs
-
-  def _apply_email_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
-
-    email_addresses = self.prospect.prospect_attrs.get(constants.EMAIL_ADDRESSES)
-
-    if email_addresses:
-      score += self._email_score
-      counter[constants.EMAIL_ADDRESSES_SCORE] += self._email_score
-
-    if counter[constants.EMAIL_ADDRESSES_SCORE]:
-      score_attrs[constants.EMAIL_ADDRESSES_SCORE] = counter[constants.EMAIL_ADDRESSES_SCORE]
-
-    return score, score_attrs
-
   def _apply_prospect_assignment_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    client_uid = self.rules_data[constants.CLIENT_UID]
-    prospect_uid = self.prospect.prospect_uid
+    client_id = self.rules_data[constants.CLIENT_ID]
+    prospect_id = self.prospect_id
 
-    try:
-      self._assigned_prospect_service.get_assigned_prospect_from_attrs(client_uid, prospect_uid)
-    except:
-      new_prospect_score = self._new_prospect_score
+    new_prospect_for_client = client_contains_assigned_prospect(client_id, prospect_id)
+    if not new_prospect_for_client:
+      new_prospect_score = 1
       score += new_prospect_score
       score_attrs[constants.NEW_PROSPECT_SCORE] = new_prospect_score
-      logger.debug("new assigned prospect. client_uid: %s prospect_uid: %s", client_uid, prospect_uid)
-    else:
-      logger.debug("existing assigned prospect. client_uid: %s prospect_uid: %s", client_uid, prospect_uid)
 
     return score, score_attrs
-
-  # endregion apply score logic
-
-  # region define prospect scoring attrs
-
-  @property
-  def _important_locations(self):
-    return ()
-
-  @property
-  def _location_score(self):
-    return 1
-
-  @property
-  def _important_home_countries(self):
-    return ()
-
-  @property
-  def _age_range(self):
-    return (None, None)
-
-  @property
-  def _age_score(self):
-    return 1
-
-  @property
-  def _preferred_gender(self):
-    return None
-
-  @property
-  def _gender_score(self):
-    return 1
-
-  @property
-  def _important_bio_keywords(self):
-    return ()
-
-  @property
-  def _bio_important_keyword_score(self):
-    return 1
-
-  @property
-  def _bio_client_topic_score(self):
-    return 1
-
-  @property
-  def _important_websites(self):
-    return ()
-
-  @property
-  def _website_score(self):
-    return 1
-
-  @property
-  def _email_score(self):
-    return 1
-
-  @property
-  def _new_prospect_score(self):
-    return 1
-
-  @property
-  def _bio_avoid_keywords(self):
-    return ()
-
-  @property
-  def _bio_avoid_keyword_score(self):
-    return -1
-
-  "pycharm recognize region"
-  # endregion define prospect scoring attrs

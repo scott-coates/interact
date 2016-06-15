@@ -8,13 +8,14 @@ logger = logging.getLogger(__name__)
 
 
 class ProfileRulesEngine(BaseRulesEngine):
-  def __init__(self, profile, calc_data, _iter_utils=None):
+  def __init__(self, profile_id, profile_attrs, rules_data, _iter_utils=None):
     if not _iter_utils: _iter_utils = iter_utils
     self._iter_utils = _iter_utils
 
-    self.profile = profile
+    self.profile_id = profile_id
+    self.profile_attrs = profile_attrs
 
-    self.calc_data = calc_data
+    self.rules_data = rules_data
 
   def score_it(self):
     score, score_attrs = self._apply_score()
@@ -47,7 +48,7 @@ class TwitterProfileRulesEngine(ProfileRulesEngine):
 
     if recent_tweets:
 
-      client_topics = self.calc_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
+      client_topics = self.rules_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
 
       recent_tweets_score = self._recent_tweets_score
 
