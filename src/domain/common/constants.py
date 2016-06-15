@@ -25,6 +25,10 @@ ASSIGNED_ENTITY_TYPE = 'assigned_entity_type'
 FOLLOWERS_COUNT = 'followers_count'
 FOLLOWING_COUNT = 'following_count'
 
+KEYWORDS = 'keywords'
+
+SNOWBALL_STEM = 'snowball_stem'
+
 LOCATION_SCORE = 'location_score'
 
 

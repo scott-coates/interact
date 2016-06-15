@@ -4,6 +4,9 @@ from jsonfield import JSONField
 from src.apps.relational.models import ReadModel
 
 
+class TopicLookupForClient(ReadModel):
+  snowball_stem = models.CharField(max_length=2400)
+
 class ActiveTATopicOption(ReadModel):
   option_name = models.CharField(max_length=2400)
   option_type = models.CharField(max_length=2400)
@@ -18,6 +21,7 @@ class ActiveTATopicOption(ReadModel):
 
 class ClientLookupForEA(ReadModel):
   ta_attrs = JSONField()
+  ta_topics = JSONField(default=list)
 
 
 class ProspectLookupForEA(ReadModel):

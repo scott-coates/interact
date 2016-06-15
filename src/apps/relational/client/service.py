@@ -1,9 +1,20 @@
 import logging
 
 from src.apps.relational.client.models import ActiveTATopicOption, ProspectLookupForEA, ProfileLookupForEA, \
-  EOLookupForEA, ClientLookupForEA
+  EOLookupForEA, ClientLookupForEA, TopicLookupForClient
+from src.domain.common import constants
 
 logger = logging.getLogger(__name__)
+
+
+def save_topic_lookup(id, stem):
+  topic, _ = TopicLookupForClient.objects.update_or_create(
+      id=id, defaults=dict(
+          snowball_stem=stem
+      )
+  )
+
+  return topic
 
 
 def get_active_ta_topic_options():
@@ -32,6 +43,14 @@ def save_client_ea_lookup(id, ta_attrs):
           ta_attrs=ta_attrs
       )
   )
+  return client
+
+
+def save_topic_to_client_ea_lookup(client_id, topic_id):
+  client = get_client_ea_lookup(client_id)
+  topic = get_client_topic_lookup(topic_id)
+  client.ta_topics.append({constants.ID: topic_id, constants.SNOWBALL_STEM: topic.snowball_stem})
+  client.save()
   return client
 
 
@@ -67,6 +86,10 @@ def save_topic_to_eo_ea_lookup(eo_id, topic_id):
   eo.topic_ids.append(topic_id)
   eo.save()
   return eo
+
+
+def get_client_topic_lookup(id):
+  return TopicLookupForClient.objects.get(id=id)
 
 
 def get_client_ea_lookup(id):
