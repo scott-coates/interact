@@ -64,3 +64,11 @@ def replay_events(event_names, _event_repository=None, _event_service=None, _eve
 
       counter += 1
       logger.debug("Sending signal #%i of %i: %s : %s", counter, total, event_name, event.stream_id)
+
+
+def clear_events(event_names, _event_repository=None):
+  if not _event_repository:    _event_repository = event_repository
+
+  events = _event_repository.delete_events(event_names)
+
+  return events

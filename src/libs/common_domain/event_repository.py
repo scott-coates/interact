@@ -8,7 +8,7 @@ def get_events(event_names=None):
 
   if event_names:
     ret_val = ret_val.filter(event_name__in=event_names)
-    
+
   return ret_val
 
 
@@ -30,6 +30,17 @@ def create_events(stream_id, starting_sequence, event_type, events):
       ]
 
   events = Event.objects.bulk_create(event_data)
+
+  return events
+
+
+def delete_events(event_names=None):
+  events = Event.objects.order_by('event_sequence', 'id')
+
+  if event_names:
+    events = events.filter(event_name__in=event_names)
+
+  events.delete()
 
   return events
 

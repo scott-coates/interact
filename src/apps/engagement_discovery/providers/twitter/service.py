@@ -21,10 +21,15 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     if geocode:
       kwargs['geocode'] = geocode
 
-    since = ta_topic_option.option_attrs.get('since', 'd')
+    since = ta_topic_option.option_attrs.get('since', 'm')
     kwargs['since'] = since
 
     twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)
+
+    total_eos_count = len(twitter_eos)
+    counter = 1
+
+    logger.debug("EO's to create for ta topic option %s %i", ta_topic_option, total_eos_count)
 
     for twitter_eo in twitter_eos:
       discovery_object = EngagementOpportunityDiscoveryObject(
@@ -37,9 +42,12 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
           ta_topic_option.topic_id
       )
 
-      logger.debug('sending discovery object. Username: %s. Tweet: %s', twitter_eo.username,
+      logger.debug('Sending discovery object %i out of %i. Username: %s. Tweet: %s', counter, total_eos_count,
+                   twitter_eo.username,
                    twitter_eo.twitter_obj['text'])
 
       engagement_opportunity_discovered.send(
           EngagementOpportunityDiscoveryObject,
           engagement_opportunity_discovery_object=discovery_object)
+
+      counter += 1
