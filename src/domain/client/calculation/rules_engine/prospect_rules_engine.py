@@ -1,35 +1,22 @@
 import logging
 
-from dateutil.relativedelta import relativedelta
-from django.utils import timezone
-
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.domain.common import constants
 from src.libs.geo_utils.services.geo_distance_service import mi_distance
-from src.libs.nlp_utils.services.enums import GenderEnum
+from src.libs.text_utils.token import token_utils
 
 logger = logging.getLogger(__name__)
 
 
 class ProspectRulesEngine(BaseRulesEngine):
-  def __init__(
-      self, prospect_attrs, rules_data,
-      _geo_location_service=None, _iter_utils=None, _assigned_prospect_service=None, _datetime_parser=None):
+  def __init__(self, prospect_attrs, rules_data, _token_utils=None):
 
-    self.prospect_attrs= prospect_attrs
+    if not _token_utils: _token_utils = token_utils
+
+    self._token_utils = _token_utils
+
+    self.prospect_attrs = prospect_attrs
     self.rules_data = rules_data
-
-    # if not _geo_location_service: _geo_location_service = geo_location_service
-    # self._geo_location_service = _geo_location_service
-    #
-    # if not _iter_utils: _iter_utils = iter_utils
-    # self._iter_utils = _iter_utils
-    #
-    # if not _assigned_prospect_service: _assigned_prospect_service = assigned_prospect_service
-    # self._assigned_prospect_service = _assigned_prospect_service
-    #
-    # if not _datetime_parser: _datetime_parser = datetime_parser
-    # self._datetime_parser = _datetime_parser
 
   def score_it(self):
     score, score_attrs = self._apply_score()
@@ -43,10 +30,10 @@ class ProspectRulesEngine(BaseRulesEngine):
     score += location_score
     score_attrs.update(location_score_attrs)
 
-    # bio_score, bio_score_attrs = self._apply_bio_score()
-    # score += bio_score
-    # score_attrs.update(bio_score_attrs)
-    #
+    bio_score, bio_score_attrs = self._apply_bio_score()
+    score += bio_score
+    score_attrs.update(bio_score_attrs)
+
     # website_score, website_score_attrs = self._apply_website_score()
     # score += website_score
     # score_attrs.update(website_score_attrs)
@@ -72,7 +59,8 @@ class ProspectRulesEngine(BaseRulesEngine):
     if p_locations and r_locations:
       location_score = 1
       # iterate through all rules_locations
-      # if there is any intersection within 35 miles, award the score
+      # if there is any intersection within _default_location_threshold miles, award the score
+      # todo location threshold
       for p_loc in p_locations:
         dest = (p_loc[constants.LAT], p_loc[constants.LNG])
         if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
@@ -89,67 +77,29 @@ class ProspectRulesEngine(BaseRulesEngine):
     bios = self.prospect_attrs.get(constants.BIOS)
 
     if bios:
-      bio = self._iter_utils.stemmify_string(bio)
+      bio = self._token_utils.stemmify_snowball_string(' '.join(bios))
 
-      # region client_id topic
-      client_topics = self.rules_data[constants.STEMMED_TA_TOPIC_KEYWORDS]
-      if client_topics:
-        bio_client_topic_score = self._bio_client_topic_score
+      keywords = self.rules_data.get(constants.KEYWORDS)
+      if keywords:
+        bio_keyword_score = 1
+        for k in keywords:
+          if k in bio:
+            score += bio_keyword_score
+            counter[constants.BIO_KEYWORD_SCORE] += bio_keyword_score
 
-        for stemmed_topic_keyword in client_topics:
-          if stemmed_topic_keyword in bio:
-            score += bio_client_topic_score
-            counter[constants.BIO_CLIENT_TA_TOPIC_SCORE] += bio_client_topic_score
+        if counter[constants.BIO_KEYWORD_SCORE]:
+          score_attrs[constants.BIO_KEYWORD_SCORE] = counter[constants.BIO_KEYWORD_SCORE]
 
-        if counter[constants.BIO_CLIENT_TA_TOPIC_SCORE]:
-          score_attrs[constants.BIO_CLIENT_TA_TOPIC_SCORE] = counter[constants.BIO_CLIENT_TA_TOPIC_SCORE]
-
-      "pycharm doesn't recognize endregion"
-      # endregion client_id topic
-
-      # region important keywords
-      bio_keywords = self._important_bio_keywords
-
-      if bio_keywords:
-        bio_keywords = self._iter_utils.stemmify_iterable(bio_keywords)
-
-        bio_score = self._bio_important_keyword_score
-
-        for kw in bio_keywords:
-          if kw in bio:
-            score += bio_score
-            counter[constants.BIO_IMPORTANT_KEYWORD_SCORE] += bio_score
-
-        if counter[constants.BIO_IMPORTANT_KEYWORD_SCORE]:
-          score_attrs[constants.BIO_IMPORTANT_KEYWORD_SCORE] = counter[constants.BIO_IMPORTANT_KEYWORD_SCORE]
-
-      "pycharm doesn't recognize endregion"
-      # endregion important keywords
-
-      # region avoid keywords
-      bio_keywords = self._important_bio_keywords
-
-      if bio_keywords:
-        bio_keywords = self._iter_utils.stemmify_iterable(bio_keywords)
-
-        bio_score = self._bio_important_keyword_score
-
-        avoid_words = self.rules_data[constants.PROFANITY_FILTER_WORDS]
-
-        avoid_words += self._bio_avoid_keywords
-
-        avoid_words = self._iter_utils.stemmify_iterable(avoid_words)
-
-        for kw in bio_keywords:
-          if kw in avoid_words:
-            score += bio_score
-            counter[constants.BIO_AVOID_KEYWORD_SCORE] += bio_score
+      avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
+      if avoid_words:
+        bio_avoid_keyword_score = -1
+        for aw in avoid_words:
+          if aw in bio:
+            score += bio_avoid_keyword_score
+            counter[constants.BIO_AVOID_KEYWORD_SCORE] += bio_avoid_keyword_score
 
         if counter[constants.BIO_AVOID_KEYWORD_SCORE]:
           score_attrs[constants.BIO_AVOID_KEYWORD_SCORE] = counter[constants.BIO_AVOID_KEYWORD_SCORE]
-
-      "pycharm doesn't recognize endregion"
-      # endregion avoid keywords
 
     return score, score_attrs
 

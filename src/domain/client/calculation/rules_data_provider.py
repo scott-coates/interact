@@ -27,4 +27,4 @@ def _provide_stemmed_keywords(client, assigned_calc_objects):
 
   available_keywords = [v[constants.SNOWBALL_STEM] for k, v in client.ta_topics.items() if k not in topic_ids]
 
-  return list(set(available_keywords))
+  return set(available_keywords)

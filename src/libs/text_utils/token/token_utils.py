@@ -1,6 +1,6 @@
-# import nltk
-#
-# snowball = nltk.SnowballStemmer('english')
+import nltk
+
+snowball = nltk.SnowballStemmer('english')
 
 
 def stemmify_snowball_string(string):

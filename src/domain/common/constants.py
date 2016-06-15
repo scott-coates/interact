@@ -29,6 +29,8 @@ KEYWORDS = 'keywords'
 
 SNOWBALL_STEM = 'snowball_stem'
 
+BIO_AVOID_KEYWORD_SCORE = 'bio_avoid_keyword_score'
+BIO_KEYWORD_SCORE = 'bio_keyword_score'
 LOCATION_SCORE = 'location_score'
 
 
