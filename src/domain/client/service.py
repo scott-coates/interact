@@ -6,6 +6,7 @@ from src.domain.common import constants
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.python_utils.logging.logging_utils import log_wrapper
+import nltk
 
 logger = logging.getLogger(__name__)
 

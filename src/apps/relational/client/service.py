@@ -35,7 +35,7 @@ def save_client_ea_lookup(id, ta_attrs):
   return client
 
 
-def save_prospect_ea_lookup_(id, attrs):
+def save_prospect_ea_lookup(id, attrs):
   prospect, _ = ProspectLookupForEA.objects.update_or_create(
       id=id, defaults=dict(
           attrs=attrs
@@ -44,7 +44,7 @@ def save_prospect_ea_lookup_(id, attrs):
   return prospect
 
 
-def save_profile_ea_lookup_(id, profile_attrs, provider_type, prospect_id):
+def save_profile_ea_lookup(id, profile_attrs, provider_type, prospect_id):
   profile, _ = ProfileLookupForEA.objects.update_or_create(
       id=id, defaults=dict(
           provider_type=provider_type, profile_attrs=profile_attrs, prospect_id=prospect_id
@@ -53,12 +53,19 @@ def save_profile_ea_lookup_(id, profile_attrs, provider_type, prospect_id):
   return profile
 
 
-def save_eo_ea_lookup_(id, eo_attrs, provider_type, profile_id, prospect_id):
+def save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id):
   eo, _ = EOLookupForEA.objects.update_or_create(
       id=id, defaults=dict(
           eo_attrs=eo_attrs, provider_type=provider_type, profile_id=profile_id, prospect_id=prospect_id
       )
   )
+  return eo
+
+
+def save_topic_to_eo_ea_lookup(eo_id, topic_id):
+  eo = EOLookupForEA.objects.get(id=eo_id)
+  eo.topic_ids.append(topic_id)
+  eo.save()
   return eo
 
 

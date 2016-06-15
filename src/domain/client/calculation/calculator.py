@@ -11,11 +11,11 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
   if not _score_processor: _score_processor = score_processor
   if not _rules_data_provider: _rules_data_provider = rules_data_provider
 
-  rules_data = _rules_data_provider.provide_rules_data(client_id, assignment_attrs)
-
   score_attrs = {}
 
   assigned_calc_objects = _get_assigned_calc_objects(assignment_attrs)
+
+  rules_data = _rules_data_provider.provide_rules_data(client_id, assigned_calc_objects)
 
   prospect_id = assigned_calc_objects[0].prospect_id
   prospect = get_prospect_ea_lookup(prospect_id)
@@ -85,6 +85,7 @@ def _get_assigned_calc_objects(assignment_attrs):
       if assignment_attr == constants.EO_IDS:
         eo_ea_lookup = get_eo_ea_lookup(id)
         assigned_entity_attrs = eo_ea_lookup.eo_attrs
+        topic_ids = eo_ea_lookup.topic_ids
         provider_type = eo_ea_lookup.provider_type
         prospect_id = eo_ea_lookup.prospect_id
         entity_type = constants.EO
@@ -92,7 +93,7 @@ def _get_assigned_calc_objects(assignment_attrs):
         raise ValueError("Invalid assignment attrs")
 
       assigned_entities.append(
-          CalculationAssignedEntityObject(assigned_entity_attrs, id, entity_type, provider_type, prospect_id)
+          CalculationAssignedEntityObject(assigned_entity_attrs, id, entity_type, provider_type, prospect_id, topic_ids)
       )
 
   return assigned_entities

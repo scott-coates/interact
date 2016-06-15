@@ -26,13 +26,12 @@ def save_client_ea_lookup_task(id, ta_attrs):
     return service.save_client_ea_lookup(id, ta_attrs).id
 
 
-
 @job('high')
 def save_prospect_ea_lookup_task(id, attrs):
   log_message = ("id: %s", id)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_prospect_ea_lookup_(id, attrs).id
+    return service.save_prospect_ea_lookup(id, attrs).id
 
 
 @job('high')
@@ -40,7 +39,7 @@ def save_profile_ea_lookup_task(id, profile_attrs, provider_type, prospect_id):
   log_message = ("id: %s", id)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_profile_ea_lookup_(id, profile_attrs, provider_type, prospect_id).id
+    return service.save_profile_ea_lookup(id, profile_attrs, provider_type, prospect_id).id
 
 
 @job('high')
@@ -48,4 +47,12 @@ def save_eo_ea_lookup_task(id, eo_attrs, provider_type, profile_id, prospect_id)
   log_message = ("id: %s", id)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_eo_ea_lookup_(id, eo_attrs, provider_type, profile_id, prospect_id).id
+    return service.save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id).id
+
+
+@job('high')
+def save_topic_to_eo_ea_lookup_task(eo_id, topic_id):
+  log_message = ("eo_id: %s topic_id: %s", eo_id, topic_id)
+
+  with log_wrapper(logger.info, *log_message):
+    return service.save_topic_to_eo_ea_lookup(eo_id, topic_id).id
