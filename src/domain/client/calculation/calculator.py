@@ -51,10 +51,9 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
       constants.ASSIGNED_ENTITY_TYPE: ae.assigned_entity_type
     })
 
-  # score, score_attrs = _score_processor.process_score(client_id, score_attrs)
+  score, score_attrs = _score_processor.process_score(score_attrs)
 
-  # return score, score_attrs
-  return 0, {}
+  return score, score_attrs
 
 
 def _get_profiles(assigned_calc_objects, prospect_id):

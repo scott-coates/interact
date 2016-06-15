@@ -12,36 +12,6 @@ logger = logging.getLogger(__name__)
 _twitter_url_prefix = "https://twitter.com/{0}"
 
 
-def _is_valid_tweet(tweet):
-  ret_val = True
-
-  if ret_val:
-    if tweet['in_reply_to_user_id']:
-      ret_val = False
-
-  if ret_val:
-    if tweet['retweet_count'] >= 20 or tweet['favorite_count'] >= 20:
-      ret_val = False
-
-  if ret_val:
-    if tweet['user']['statuses_count'] < 50:
-      ret_val = False
-
-  if ret_val:
-    followers_count = tweet['user']['followers_count']
-    following_count = tweet['user']['friends_count']
-
-    if following_count >= 30 and followers_count >= 30:
-      # if not true, they're probably not active on twitter, maybe just trying it out and not really engaged yet
-      if followers_count > 500:
-        ret_val = (following_count / followers_count) >= .65
-        # if less than this number, they have a big following and don't follow as many people as who follow them
-    else:
-      ret_val = False
-
-  return ret_val
-
-
 def find_tweets_from_keyword(keyword, _twitter_client_service=None, **kwargs):
   ret_val = []
   if not _twitter_client_service:
@@ -60,22 +30,7 @@ def find_tweets_from_keyword(keyword, _twitter_client_service=None, **kwargs):
         **kwargs
     )
 
-  if kwargs.get('screen_name'):
-    valid_tweets = tweets_from_keywords
-
-  else:
-    valid_tweet_log_message = (
-      "Getting valid tweets for keyword: %s",
-      keyword
-    )
-
-    with log_wrapper(logger.debug, *valid_tweet_log_message):
-
-      tweets_from_keywords = [tweet for tweet in tweets_from_keywords if _is_valid_tweet(tweet)]
-
-      valid_tweets = tweets_from_keywords
-
-  for tweet in valid_tweets:
+  for tweet in tweets_from_keywords:
     username = tweet['user']['screen_name']
 
     profile_url = _twitter_url_prefix.format(username)
