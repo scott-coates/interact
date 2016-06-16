@@ -34,7 +34,6 @@ def handle_duplicate_profile(sender, **kwargs):
 
 @event_idempotent
 @receiver(ProspectMarkedAsDuplicate.event_signal)
-@receiver(ProspectAddedProfile1.event_signal)
 @receiver(EngagementOpportunityAddedToProfile1.event_signal)
 def execute_prospect_duplicate_1(**kwargs):
   duplicate_prospect_id = kwargs['aggregate_id']
