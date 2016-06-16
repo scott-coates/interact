@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from src.apps.relational.client import tasks
 from src.domain.client.events import ClientAddedTargetAudienceTopicOption1, ClientCreated1, ClientAssociatedWithTopic1
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, EngagementOpportunityAddedToProfile1, \
-  ProspectUpdatedAttrsFromProfile1, TopicAddedToEngagementOpportunity1
+  ProspectUpdatedAttrsFromProfile1, TopicAddedToEngagementOpportunity1, ProspectDeleted
 from src.domain.topic.events import TopicCreated1
 from src.libs.common_domain.decorators import event_idempotent
 
@@ -58,6 +58,15 @@ def execute_added_prospect_1(**kwargs):
   event = kwargs['event']
 
   tasks.save_prospect_ea_lookup_task.delay(aggregate_id, event.attrs)
+
+
+@event_idempotent
+@receiver(ProspectDeleted.event_signal)
+def execute_deleted_1(**kwargs):
+  aggregate_id = kwargs['aggregate_id']
+
+  tasks.delete_prospect_for_ea_task.delay(aggregate_id)
+
 
 
 @event_idempotent

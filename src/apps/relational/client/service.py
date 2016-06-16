@@ -106,3 +106,8 @@ def get_profile_ea_lookups_by_prospect_id(prospect_id):
 
 def get_eo_ea_lookup(id):
   return EOLookupForEA.objects.get(id=id)
+
+
+def delete_prospect_for_ea(prospect_id):
+  ProfileLookupForEA.objects.filter(prospect_id=prospect_id).delete()
+  ProspectLookupForEA.objects.filter(id=prospect_id).delete()

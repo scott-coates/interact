@@ -72,3 +72,15 @@ def save_topic_to_eo_ea_lookup_task(eo_id, topic_id):
 
   with log_wrapper(logger.info, *log_message):
     return service.save_topic_to_eo_ea_lookup(eo_id, topic_id).id
+
+
+@job('default')
+def delete_prospect_for_ea_task(prospect_id):
+  log_message = (
+    "prospect_id: %s",
+    prospect_id
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    service.delete_prospect_for_ea(prospect_id)
+    return prospect_id

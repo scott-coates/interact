@@ -1,3 +1,4 @@
+import functools
 from pygeocoder import Geocoder
 
 from src.libs.geo_utils.complete_address import CompleteAddress
@@ -14,6 +15,7 @@ def _get_address_component(address_components, component):
   return ret_val
 
 
+@functools.lru_cache
 def get_geocoded_address(address_str):
   results = _geocoder.geocode(address_str)
 

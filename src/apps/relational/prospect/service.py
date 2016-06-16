@@ -40,5 +40,5 @@ def get_engagement_opportunity_lookup(eo_id):
 
 
 def delete_prospect(prospect_id):
-  ProfileLookupForEA.objects.filter(prospect_id=prospect_id).delete()
-  ProspectLookupForEA.objects.filter(id=prospect_id).delete()
+  # we'll save this method for now for when we inevitably need it to clean up prospect read models
+  pass
