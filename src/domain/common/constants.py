@@ -28,13 +28,15 @@ FOLLOWERS_COUNT = 'followers_count'
 FOLLOWING_COUNT = 'following_count'
 
 KEYWORDS = 'keywords'
+TOPIC_KEYWORDS = 'topic_keywords'
 
 SNOWBALL_STEM = 'snowball_stem'
 
-NEW_PROSPECT_SCORE='new_prospect_score'
+NEW_PROSPECT_SCORE = 'new_prospect_score'
 BIO_AVOID_KEYWORD_SCORE = 'bio_avoid_keyword_score'
 BIO_KEYWORD_SCORE = 'bio_keyword_score'
 LOCATION_SCORE = 'location_score'
+EO_KEYWORD_SCORE = 'eo_keyword_score'
 
 
 class Provider:

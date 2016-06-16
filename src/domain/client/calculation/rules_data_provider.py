@@ -14,7 +14,7 @@ def provide_rules_data(client_id, assigned_calc_objects):
   client = get_client_ea_lookup(client_id)
 
   client_keywords = _provide_stemmed_keywords(client, assigned_calc_objects)
-  ret_val[constants.KEYWORDS] = client_keywords
+  ret_val.update(client_keywords)
 
   locations = client.ta_attrs.get(constants.LOCATIONS)
   if locations:
@@ -24,9 +24,16 @@ def provide_rules_data(client_id, assigned_calc_objects):
 
 
 def _provide_stemmed_keywords(client, assigned_calc_objects):
+  ret_val = {}
+
   # casting to a list because for some reason the chain iterable yielded no results
   topic_ids = list(chain.from_iterable(c.topic_ids for c in assigned_calc_objects))
 
-  available_keywords = [v[constants.SNOWBALL_STEM] for k, v in client.ta_topics.items() if k not in topic_ids]
+  ret_val[constants.KEYWORDS] = {v[constants.SNOWBALL_STEM] for k, v in client.ta_topics.items()}
 
-  return set(available_keywords)
+  ret_val[constants.TOPIC_KEYWORDS] = {
+    v[constants.SNOWBALL_STEM] for k, v in client.ta_topics.items() if k not in
+    topic_ids
+    }
+
+  return ret_val
