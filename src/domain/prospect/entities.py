@@ -46,6 +46,7 @@ class Prospect(AggregateBase):
     for p in duplicate_prospect_profiles:
       existing_profile = self._find_profile_by_external_id_and_provider_type(p.external_id, p.provider_type)
 
+      # this ensures that all eo's are synced up
       for eo in p._engagement_opportunities:
         existing_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
         if not existing_eo:
@@ -54,10 +55,13 @@ class Prospect(AggregateBase):
                                                                  self.is_duplicated,
                                                                  self.existing_prospect_id, existing_profile.id))
 
-        eo = self._get_eo_by_id(eo.id)
+        # this part ensures that all eo's have their updated topics - this can happen if eo's are merged to an
+        # existing prospect and then later have a topic attached to it.
+        fetched_eo = self._get_eo_by_id(eo.id)
         for t in eo._topic_ids:
-          if t not in eo._topic_ids:
-            self._raise_event(TopicAddedToEngagementOpportunity1(eo.id, eo.t.id))
+          if t not in fetched_eo._topic_ids:
+            self._raise_event(
+              TopicAddedToEngagementOpportunity1(fetched_eo.id, self.is_duplicated, self.existing_prospect_id, t))
 
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
@@ -109,7 +113,7 @@ class Prospect(AggregateBase):
 
   def add_topic_to_eo(self, eo_id, topic_id):
     self._raise_event(
-      TopicAddedToEngagementOpportunity1(eo_id, self.is_duplicated, self.existing_prospect_id, topic_id))
+        TopicAddedToEngagementOpportunity1(eo_id, self.is_duplicated, self.existing_prospect_id, topic_id))
 
   def _handle_created_1_event(self, event):
     self.id = event.id
