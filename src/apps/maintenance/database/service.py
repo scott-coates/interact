@@ -17,3 +17,10 @@ def clear_read_model():
   read_model_types = ContentType.objects.filter(app_label='relational')
   for read_model_type in read_model_types:
     read_model_type.model_class().objects.all().delete()
+
+
+def clear_rq_jobs():
+  kdb = get_key_value_client()
+  read_model_keys = kdb.keys('rq:*')
+  for r in read_model_keys:
+    kdb.delete(r)
