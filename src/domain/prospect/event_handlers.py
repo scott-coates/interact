@@ -2,10 +2,9 @@ from django.dispatch import receiver
 
 from src.apps.engagement_discovery.signals import engagement_opportunity_discovered
 from src.domain.prospect import tasks
-from src.domain.prospect.events import duplicate_profile_discovered, ProspectMarkedAsDuplicate, ProspectAddedProfile1, \
+from src.domain.prospect.events import duplicate_profile_discovered, ProspectMarkedAsDuplicate, \
   EngagementOpportunityAddedToProfile1
 from src.domain.prospect.tasks import handle_duplicate_profile_task
-from src.libs.common_domain.decorators import event_idempotent
 
 
 @receiver(engagement_opportunity_discovered)
@@ -32,7 +31,6 @@ def handle_duplicate_profile(sender, **kwargs):
   handle_duplicate_profile_task.delay(duplicate_prospect_id, existing_external_id, existing_provider_type)
 
 
-@event_idempotent
 @receiver(ProspectMarkedAsDuplicate.event_signal)
 @receiver(EngagementOpportunityAddedToProfile1.event_signal)
 def execute_prospect_duplicate_1(**kwargs):

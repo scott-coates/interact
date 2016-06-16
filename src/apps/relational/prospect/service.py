@@ -1,3 +1,4 @@
+from src.apps.relational.client.models import ProfileLookupForEA, ProspectLookupForEA
 from src.apps.relational.prospect.models import ProfileLookupByProvider, EngagementOpportunityLookupByProvider
 
 
@@ -36,3 +37,8 @@ def get_engagement_opportunity_lookup_from_provider_info(external_id, provider_t
 
 def get_engagement_opportunity_lookup(eo_id):
   return EngagementOpportunityLookupByProvider.objects.get(id=eo_id)
+
+
+def delete_prospect(prospect_id):
+  ProfileLookupForEA.objects.filter(prospect_id=prospect_id).delete()
+  ProspectLookupForEA.objects.filter(id=prospect_id).delete()

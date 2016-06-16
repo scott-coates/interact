@@ -38,3 +38,14 @@ def save_eo_lookup_by_provider_task(eo_id, external_id, provider_type, prospect_
   with log_wrapper(logger.info, *log_message):
     service.save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id)
     return eo_id
+
+@job('default')
+def delete_prospect_task(prospect_id):
+  log_message = (
+    "prospect_id: %s",
+    prospect_id
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    service.delete_prospect(prospect_id)
+    return prospect_id
