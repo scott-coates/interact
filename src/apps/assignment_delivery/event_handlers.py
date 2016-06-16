@@ -9,5 +9,5 @@ from src.libs.common_domain.decorators import event_idempotent
 @receiver(ClientAddedEngagementAssignment1.event_signal)
 def execute_ea_created_1(**kwargs):
   event = kwargs['event']
-
-  tasks.deliver_ea_task.delay(event.data)
+  prospect_id = event.prospect_id
+  tasks.deliver_ea_task.delay(prospect_id, event.data)
