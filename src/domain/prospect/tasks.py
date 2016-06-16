@@ -56,23 +56,23 @@ def populate_engagement_opportunity_id_from_engagement_discovery_task(engagement
     ret_val = service.populate_engagement_opportunity_id_from_engagement_discovery(profile_id, prospect_id,
                                                                                    engagement_opportunity_discovery_object)
     job.dependency.delete()
-    return ret_val
+    return (ret_val, profile_id, prospect_id)
 
 
 @job('default')
 def add_topic_to_eo_task(topic_id):
   job = get_current_job()
-  eo_id = job.dependency.result
+  eo_id, profile_id, prospect_id = job.dependency.result
   log_message = (
-    "eo_id: %s, topic_id: %s",
-    eo_id, topic_id
+    "eo_id: %s, topic_id: %s, profile_id: %s, prospect_id: %s",
+    eo_id, topic_id, profile_id, prospect_id
   )
 
   with log_wrapper(logger.info, *log_message):
     ret_val = None
 
     if not eo_contains_topic(eo_id, topic_id):
-      ret_val = service.add_topic_to_eo(eo_id, topic_id)
+      ret_val = service.add_topic_to_eo(eo_id, topic_id, prospect_id)
 
     job.dependency.delete()
 

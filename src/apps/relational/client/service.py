@@ -1,7 +1,7 @@
 import logging
 
-from src.apps.relational.client.models import ActiveTATopicOption, ProspectLookupForEA, ProfileLookupForEA, \
-  EOLookupForEA, ClientLookupForEA, TopicLookupForClient
+from src.apps.relational.client.models import ActiveTaTopicOption, ProspectLookupForEa, ProfileLookupForEa, \
+  EOLookupForEa, ClientLookupForEa, TopicLookupForClient
 from src.domain.common import constants
 
 logger = logging.getLogger(__name__)
@@ -18,16 +18,16 @@ def save_topic_lookup(id, stem):
 
 
 def get_active_ta_topic_options():
-  active_topics = ActiveTATopicOption.objects.all()
+  active_topics = ActiveTaTopicOption.objects.all()
   return active_topics
 
 
 def get_ta_topic_option(ta_topic_option_id):
-  return ActiveTATopicOption.objects.get(id=ta_topic_option_id)
+  return ActiveTaTopicOption.objects.get(id=ta_topic_option_id)
 
 
 def save_active_ta_topic_option(id, option_name, option_type, option_attrs, ta_topic_id, topic_id, client_id):
-  at, _ = ActiveTATopicOption.objects.update_or_create(
+  at, _ = ActiveTaTopicOption.objects.update_or_create(
       id=id, defaults=dict(
           option_name=option_name, option_type=option_type,
           option_attrs=option_attrs, ta_topic_id=ta_topic_id,
@@ -38,7 +38,7 @@ def save_active_ta_topic_option(id, option_name, option_type, option_attrs, ta_t
 
 
 def save_client_ea_lookup(id, ta_attrs):
-  client, _ = ClientLookupForEA.objects.update_or_create(
+  client, _ = ClientLookupForEa.objects.update_or_create(
       id=id, defaults=dict(
           ta_attrs=ta_attrs
       )
@@ -55,7 +55,7 @@ def save_topic_to_client_ea_lookup(client_id, topic_id):
 
 
 def save_prospect_ea_lookup(id, attrs):
-  prospect, _ = ProspectLookupForEA.objects.update_or_create(
+  prospect, _ = ProspectLookupForEa.objects.update_or_create(
       id=id, defaults=dict(
           attrs=attrs
       )
@@ -64,7 +64,7 @@ def save_prospect_ea_lookup(id, attrs):
 
 
 def save_profile_ea_lookup(id, profile_attrs, provider_type, prospect_id):
-  profile, _ = ProfileLookupForEA.objects.update_or_create(
+  profile, _ = ProfileLookupForEa.objects.update_or_create(
       id=id, defaults=dict(
           provider_type=provider_type, profile_attrs=profile_attrs, prospect_id=prospect_id
       )
@@ -73,7 +73,7 @@ def save_profile_ea_lookup(id, profile_attrs, provider_type, prospect_id):
 
 
 def save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id):
-  eo, _ = EOLookupForEA.objects.update_or_create(
+  eo, _ = EOLookupForEa.objects.update_or_create(
       id=id, defaults=dict(
           eo_attrs=eo_attrs, provider_type=provider_type, profile_id=profile_id, prospect_id=prospect_id
       )
@@ -82,7 +82,7 @@ def save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id):
 
 
 def save_topic_to_eo_ea_lookup(eo_id, topic_id):
-  eo = EOLookupForEA.objects.get(id=eo_id)
+  eo = EOLookupForEa.objects.get(id=eo_id)
   eo.topic_ids[topic_id] = True
   eo.save()
   return eo
@@ -93,21 +93,21 @@ def get_client_topic_lookup(id):
 
 
 def get_client_ea_lookup(id):
-  return ClientLookupForEA.objects.get(id=id)
+  return ClientLookupForEa.objects.get(id=id)
 
 
 def get_prospect_ea_lookup(id):
-  return ProspectLookupForEA.objects.get(id=id)
+  return ProspectLookupForEa.objects.get(id=id)
 
 
 def get_profile_ea_lookups_by_prospect_id(prospect_id):
-  return ProfileLookupForEA.objects.filter(prospect_id=prospect_id)
+  return ProfileLookupForEa.objects.filter(prospect_id=prospect_id)
 
 
 def get_eo_ea_lookup(id):
-  return EOLookupForEA.objects.get(id=id)
+  return EOLookupForEa.objects.get(id=id)
 
 
 def delete_prospect_for_ea(prospect_id):
-  ProfileLookupForEA.objects.filter(prospect_id=prospect_id).delete()
-  ProspectLookupForEA.objects.filter(id=prospect_id).delete()
+  ProfileLookupForEa.objects.filter(prospect_id=prospect_id).delete()
+  ProspectLookupForEa.objects.filter(id=prospect_id).delete()

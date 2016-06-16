@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from src.apps.engagement_discovery.signals import engagement_opportunity_discovered
 from src.domain.prospect import tasks
 from src.domain.prospect.events import duplicate_profile_discovered, ProspectMarkedAsDuplicate, \
-  EngagementOpportunityAddedToProfile1
+  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1
 from src.domain.prospect.tasks import handle_duplicate_profile_task
 
 
@@ -33,6 +33,7 @@ def handle_duplicate_profile(sender, **kwargs):
 
 @receiver(ProspectMarkedAsDuplicate.event_signal)
 @receiver(EngagementOpportunityAddedToProfile1.event_signal)
+@receiver(TopicAddedToEngagementOpportunity1.event_signal)
 def execute_prospect_duplicate_1(**kwargs):
   duplicate_prospect_id = kwargs['aggregate_id']
   event = kwargs['event']

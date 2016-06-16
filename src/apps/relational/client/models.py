@@ -7,7 +7,7 @@ from src.apps.relational.models import ReadModel
 class TopicLookupForClient(ReadModel):
   snowball_stem = models.CharField(max_length=2400)
 
-class ActiveTATopicOption(ReadModel):
+class ActiveTaTopicOption(ReadModel):
   option_name = models.CharField(max_length=2400)
   option_type = models.CharField(max_length=2400)
   option_attrs = JSONField()
@@ -16,31 +16,31 @@ class ActiveTATopicOption(ReadModel):
   client_id = models.CharField(max_length=8)
 
   def __str__(self):
-    return 'ActiveTATopicOption {id}: {option_name}'.format(id=self.id, option_name=self.option_name)
+    return 'ActiveTaTopicOption {id}: {option_name}'.format(id=self.id, option_name=self.option_name)
 
 
-class ClientLookupForEA(ReadModel):
+class ClientLookupForEa(ReadModel):
   ta_attrs = JSONField()
   ta_topics = JSONField(default=dict)
 
 
-class ProspectLookupForEA(ReadModel):
+class ProspectLookupForEa(ReadModel):
   attrs = JSONField()
 
   def __str__(self):
-    return 'ProspectLookupForEA {id}'.format(id=self.id)
+    return 'ProspectLookupForEa {id}'.format(id=self.id)
 
 
-class ProfileLookupForEA(ReadModel):
+class ProfileLookupForEa(ReadModel):
   profile_attrs = JSONField()
   prospect_id = models.CharField(max_length=8)
   provider_type = models.CharField(max_length=2400)
 
   def __str__(self):
-    return 'ProfileLookupForEA {id}'.format(id=self.id)
+    return 'ProfileLookupForEa {id}'.format(id=self.id)
 
 
-class EOLookupForEA(ReadModel):
+class EOLookupForEa(ReadModel):
   eo_attrs = JSONField()
   topic_ids = JSONField(default=dict)
   profile_id = models.CharField(max_length=8)
@@ -48,4 +48,4 @@ class EOLookupForEA(ReadModel):
   provider_type = models.CharField(max_length=2400)
 
   def __str__(self):
-    return 'EOLookupForEA {id}'.format(id=self.id)
+    return 'EOLookupForEa {id}'.format(id=self.id)

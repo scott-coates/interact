@@ -54,6 +54,11 @@ class Prospect(AggregateBase):
                                                                  self.is_duplicated,
                                                                  self.existing_prospect_id, existing_profile.id))
 
+        eo = self._get_eo_by_id(eo.id)
+        for t in eo._topic_ids:
+          if t not in eo._topic_ids:
+            self._raise_event(TopicAddedToEngagementOpportunity1(eo.id, eo.t.id))
+
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
     if not _geo_service: _geo_service = geo_location_service
@@ -103,7 +108,8 @@ class Prospect(AggregateBase):
                                                            self.existing_prospect_id, profile_id))
 
   def add_topic_to_eo(self, eo_id, topic_id):
-    self._raise_event(TopicAddedToEngagementOpportunity1(eo_id, topic_id))
+    self._raise_event(
+      TopicAddedToEngagementOpportunity1(eo_id, self.is_duplicated, self.existing_prospect_id, topic_id))
 
   def _handle_created_1_event(self, event):
     self.id = event.id

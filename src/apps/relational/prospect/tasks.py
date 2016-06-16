@@ -36,8 +36,13 @@ def save_eo_lookup_by_provider_task(eo_id, external_id, provider_type, prospect_
   )
 
   with log_wrapper(logger.info, *log_message):
-    service.save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id)
+    try:
+      service.save_eo_lookup_by_provider(eo_id, external_id, provider_type, prospect_id)
+    except IntegrityError:
+      # we tried adding a duplicate eo - it should be and be preserved under the existing prospect
+      pass
     return eo_id
+
 
 @job('default')
 def delete_prospect_task(prospect_id):

@@ -68,5 +68,5 @@ class TopicAddedToEngagementOpportunity1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, engagement_opportunity_id, topic_id):
+  def __init__(self, engagement_opportunity_id, prospect_is_duplicated, existing_prospect_id, topic_id):
     super().__init__()
