@@ -8,5 +8,5 @@ logger = logging.getLogger(__name__)
 
 
 @job('default')
-def deliver_ea_task(ea_attrs):
-  return deliver_ea(ea_attrs)
+def deliver_ea_task(prospect_id, ea_data):
+  return deliver_ea(prospect_id, ea_data)
