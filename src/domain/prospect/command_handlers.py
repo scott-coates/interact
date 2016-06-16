@@ -25,9 +25,11 @@ def mark_prospect_as_duplicate(_aggregate_repository=None, **kwargs):
   prospect_id = kwargs['aggregate_id']
 
   prospect = _aggregate_repository.get(Prospect, prospect_id)
-  version = prospect.version
-  prospect.mark_as_duplicate(**command.data)
-  _aggregate_repository.save(prospect, version)
+
+  if not prospect.is_duplicated:
+    version = prospect.version
+    prospect.mark_as_duplicate(**command.data)
+    _aggregate_repository.save(prospect, version)
 
 
 @receiver(ConsumeDuplicateProspect.command_signal)

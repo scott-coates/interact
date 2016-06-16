@@ -41,7 +41,10 @@ def _get_cached_geocoded_address(address_str):
     geocoded_address = _perform_geo_address_search(address_str)
     kdb.hmset(address_key, geocoded_address._asdict())
   else:
-    geocoded_address = CompleteAddress(**dict(map(lambda m: (m[0].decode(), m[1].decode()), geocoded_address.items())))
+    geocoded_address = dict(map(lambda m: (m[0].decode(), m[1].decode()), geocoded_address.items()))
+    geocoded_address['lat'] = float(geocoded_address['lat'])
+    geocoded_address['lng'] = float(geocoded_address['lng'])
+    geocoded_address = CompleteAddress(**geocoded_address)
   return geocoded_address
 
 
