@@ -34,12 +34,13 @@ class ProspectDeleted(DomainEvent):
   def __init__(self, reason):
     super().__init__()
 
+
 class ProspectAddedProfile1(DomainEvent):
   event_func_name = 'profile_added_to_prospect_1'
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, external_id, provider_type, attrs):
+  def __init__(self, id, external_id, provider_type, attrs, prospect_is_duplicated, existing_prospect_id):
     super().__init__()
 
 
@@ -58,7 +59,7 @@ class EngagementOpportunityAddedToProfile1(DomainEvent):
 
   @initializer
   def __init__(self, id, external_id, attrs, provider_type,
-               provider_action_type, created_date, profile_id):
+               provider_action_type, created_date, prospect_is_duplicated, existing_prospect_id, profile_id):
     super().__init__()
 
 

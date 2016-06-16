@@ -39,10 +39,12 @@ def consume_duplicate_prospect(_aggregate_repository=None, **kwargs):
   duplicate_prospect_id = command.duplicate_prospect_id
 
   prospect = _aggregate_repository.get(Prospect, prospect_id)
-  duplicate_prospect = _aggregate_repository.get(Prospect, prospect_id)
-  version = prospect.version
-  prospect.consume_duplicate_prospect(duplicate_prospect)
-  _aggregate_repository.save(prospect, version)
+  duplicate_prospect = _aggregate_repository.get(Prospect, duplicate_prospect_id)
+
+  if duplicate_prospect.is_duplicated:
+    version = prospect.version
+    prospect.consume_duplicate_prospect(duplicate_prospect)
+    _aggregate_repository.save(prospect, version)
 
 
 @receiver(AddProfile.command_signal)
