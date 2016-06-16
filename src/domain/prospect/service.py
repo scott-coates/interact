@@ -4,6 +4,7 @@ from src.apps.relational.prospect.service import get_profile_lookup_from_provide
   get_engagement_opportunity_lookup_from_provider_info, get_engagement_opportunity_lookup
 from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO, MarkProspectAsDuplicate, \
   ConsumeDuplicateProspect
+from src.domain.prospect.exceptions import DuplicateProspectError
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
 
@@ -30,9 +31,12 @@ def populate_profile_id_from_provider_info(prospect_id, external_id, provider_ty
   try:
     profile = get_profile_lookup_from_provider_info(external_id, provider_type)
 
+    if prospect_id != profile.prospect_id:
+      raise DuplicateProspectError(profile.prospect_id, prospect_id)
+
     profile_id = profile.id
 
-  except ObjectDoesNotExist:
+  except (ObjectDoesNotExist, DuplicateProspectError):
 
     profile_id = generate_id()
 
