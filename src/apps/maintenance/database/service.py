@@ -10,7 +10,9 @@ def clear_read_model():
   purge_data(gdb)
 
   kdb = get_key_value_client()
-  kdb.flushall()
+  read_model_keys = kdb.keys('read_model:*')
+  for r in read_model_keys:
+    kdb.delete(r)
 
   read_model_types = ContentType.objects.filter(app_label='relational')
   for read_model_type in read_model_types:
