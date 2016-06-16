@@ -32,7 +32,7 @@ class Prospect(AggregateBase):
     return ret_val
 
   def mark_as_duplicate(self, existing_prospect_id):
-    if self.duplicate: raise Exception(self, 'already marked as duplicate.')
+    if self.duplicated: raise Exception(self, 'already marked as duplicate.')
     self._raise_event(ProspectMarkedAsDuplicate(existing_prospect_id))
     if self.deleted: raise Exception(self, 'already marked as deleted.')
     self._raise_event(ProspectDeleted('Duplicate prospect. Existing prospect id: {0}.'.format(existing_prospect_id)))
@@ -45,11 +45,11 @@ class Prospect(AggregateBase):
       if not existing_profile:
         self._raise_event(ProspectAddedProfile1(p.id, p.external_id, p.provider_type, p.attrs))
 
-        for eo in p._engagement_opportunities:
-          existing_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
-          if not existing_eo:
-            self._raise_event(EngagementOpportunityAddedToProfile1(eo.id, eo.external_id, eo.attrs, eo.provider_type,
-                                                                   eo.provider_action_type, eo.created_date, p.id))
+      for eo in p._engagement_opportunities:
+        existing_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
+        if not existing_eo:
+          self._raise_event(EngagementOpportunityAddedToProfile1(eo.id, eo.external_id, eo.attrs, eo.provider_type,
+                                                                 eo.provider_action_type, eo.created_date, p.id))
 
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
@@ -122,7 +122,7 @@ class Prospect(AggregateBase):
     eo._add_topic_id(event.topic_id)
 
   def _handle_marked_as_duplicate_1_event(self, event):
-    self.duplicate = True
+    self.duplicated = True
     self.existing_prospect_id = event.existing_prospect_id
 
   def _handle_deleted_1_event(self, event):
