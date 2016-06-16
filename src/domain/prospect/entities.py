@@ -37,11 +37,25 @@ class Prospect(AggregateBase):
     if self.deleted: raise Exception(self, 'already marked as deleted.')
     self._raise_event(ProspectDeleted('Duplicate prospect. Existing prospect id: {0}.'.format(existing_prospect_id)))
 
+  def consume_duplicate_prospect(self, duplicate_prospect):
+    duplicate_prospect_profiles = duplicate_prospect._profiles
+
+    for p in duplicate_prospect_profiles:
+      existing_profile = self._find_profile_by_external_id_and_provider_type(p.external_id, p.provider_type)
+      if not existing_profile:
+        self._raise_event(ProspectAddedProfile1(p.id, p.external_id, p.provider_type, p.attrs))
+
+        for eo in p._engagement_opportunities:
+          existing_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
+          if not existing_eo:
+            self._raise_event(EngagementOpportunityAddedToProfile1(eo.id, eo.external_id, eo.attrs, eo.provider_type,
+                                                                   eo.provider_action_type, eo.created_date, p.id))
+
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
     if not _geo_service: _geo_service = geo_location_service
 
-    profile = self._get_profile_by_external_id_and_provider_type(external_id, provider_type)
+    profile = self._find_profile_by_external_id_and_provider_type(external_id, provider_type)
     if profile: raise Exception(profile, 'already exists.')
 
     profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
@@ -75,7 +89,7 @@ class Prospect(AggregateBase):
 
     if not _eo_service: _eo_service = eo_service
 
-    eo = self._get_eo_by_external_id_and_provider_type(external_id, provider_type)
+    eo = self._find_eo_by_external_id_and_provider_type(external_id, provider_type)
     if eo: raise Exception(eo, 'already exists.')
 
     attrs = _eo_service.prepare_attrs_from_engagement_opportunity(attrs)
@@ -120,8 +134,10 @@ class Prospect(AggregateBase):
 
     return profile
 
-  def _get_profile_by_external_id_and_provider_type(self, external_id, provider_type):
-    profile = next(p for p in self._profiles if p.external_id == external_id and p.provider_type == provider_type)
+  def _find_profile_by_external_id_and_provider_type(self, external_id, provider_type):
+    profile = next(
+        (p for p in self._profiles if p.external_id == external_id and p.provider_type == provider_type),
+        None)
 
     return profile
 
@@ -132,11 +148,11 @@ class Prospect(AggregateBase):
 
     return eo
 
-  def _get_eo_by_external_id_and_provider_type(self, external_id, provider_type):
+  def _find_eo_by_external_id_and_provider_type(self, external_id, provider_type):
     profiles = self._profiles
 
     eos = chain.from_iterable(p._engagement_opportunities for p in profiles)
-    eo = next(eo for eo in eos if eo.external_id == external_id and eo.provider_type == provider_type)
+    eo = next((eo for eo in eos if eo.external_id == external_id and eo.provider_type == provider_type), None)
 
     return eo
 

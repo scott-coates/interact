@@ -1,8 +1,9 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from src.apps.relational.prospect.service import get_profile_lookup_from_provider_info, \
-  get_engagement_opportunity_lookup_from_provider_info, get_engagement_opportunity_lookup, get_profile_lookup
-from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO, MarkProspectAsDuplicate
+  get_engagement_opportunity_lookup_from_provider_info, get_engagement_opportunity_lookup
+from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO, MarkProspectAsDuplicate, \
+  ConsumeDuplicateProspect
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
 
@@ -91,6 +92,18 @@ def handle_duplicate_profile(duplicate_prospect_id, existing_external_id, existi
 
   existing_prospect_id = existing_profile.prospect_id
 
-  _dispatcher.send_command(duplicate_prospect_id, existing_prospect_id)
+  duplicate_prospect_command = MarkProspectAsDuplicate(existing_prospect_id)
+
+  _dispatcher.send_command(duplicate_prospect_id, duplicate_prospect_command)
 
   return duplicate_prospect_id
+
+
+def consume_duplicate_prospect(existing_prospect_id, duplicate_prospect_id, _dispatcher=None):
+  if not _dispatcher: _dispatcher = dispatcher
+
+  consume_duplicate_prospect = ConsumeDuplicateProspect(duplicate_prospect_id)
+
+  _dispatcher.send_command(existing_prospect_id, consume_duplicate_prospect)
+
+  return existing_prospect_id

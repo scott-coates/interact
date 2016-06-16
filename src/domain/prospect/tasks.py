@@ -91,3 +91,16 @@ def handle_duplicate_profile_task(duplicate_prospect_id, existing_external_id, e
                                                existing_provider_type)
 
     return ret_val
+
+
+@job('default')
+def consume_duplicate_prospect_task(existing_prospect_id, duplicate_prospect_id):
+  log_message = (
+    "existing_prospect_id: %s, duplicate_prospect_id: %s",
+    existing_prospect_id, duplicate_prospect_id
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    ret_val = service.consume_duplicate_prospect(existing_prospect_id, duplicate_prospect_id)
+
+    return ret_val

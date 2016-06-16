@@ -19,6 +19,14 @@ class MarkProspectAsDuplicate(DomainCommand):
     pass
 
 
+class ConsumeDuplicateProspect(DomainCommand):
+  command_signal = CommandSignal()
+
+  @initializer
+  def __init__(self, duplicate_prospect_id):
+    pass
+
+
 class AddProfile(DomainCommand):
   command_signal = CommandSignal()
 
