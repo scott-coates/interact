@@ -40,4 +40,5 @@ def execute_prospect_duplicate_1(**kwargs):
   duplicate_prospect_id = kwargs['aggregate_id']
   event = kwargs['event']
   existing_prospect_id = event.existing_prospect_id
-  tasks.consume_duplicate_prospect_task.delay(existing_prospect_id, duplicate_prospect_id)
+  if existing_prospect_id:
+    tasks.consume_duplicate_prospect_task.delay(existing_prospect_id, duplicate_prospect_id)

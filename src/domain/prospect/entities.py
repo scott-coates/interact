@@ -15,7 +15,7 @@ from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 class Prospect(AggregateBase):
   def __init__(self):
     super().__init__()
-    self.is_deleted = False
+    self.is_duplicated = False
     self.is_deleted = False
     self.existing_prospect_id = None
     self._profiles = []
@@ -45,9 +45,6 @@ class Prospect(AggregateBase):
 
     for p in duplicate_prospect_profiles:
       existing_profile = self._find_profile_by_external_id_and_provider_type(p.external_id, p.provider_type)
-      if not existing_profile:
-        self._raise_event(ProspectAddedProfile1(p.id, p.external_id, p.provider_type, p.attrs, self.is_duplicated,
-                                                self.existing_prospect_id))
 
       for eo in p._engagement_opportunities:
         existing_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
@@ -55,7 +52,7 @@ class Prospect(AggregateBase):
           self._raise_event(EngagementOpportunityAddedToProfile1(eo.id, eo.external_id, eo.attrs, eo.provider_type,
                                                                  eo.provider_action_type, eo.created_date,
                                                                  self.is_duplicated,
-                                                                 self.existing_prospect_id, p.id))
+                                                                 self.existing_prospect_id, existing_profile.id))
 
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
@@ -87,8 +84,7 @@ class Prospect(AggregateBase):
       websites = get_unique_urls_from_iterable(combined_sites)
       p_attrs[constants.WEBSITES].extend(websites)
 
-    self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs, self.is_duplicated,
-                                            self.existing_prospect_id))
+    self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))
     self._raise_event(ProspectUpdatedAttrsFromProfile1(p_attrs, id))
 
   def add_eo(self, id, external_id, attrs, provider_type,
@@ -169,7 +165,7 @@ class Prospect(AggregateBase):
 
 
 class Profile:
-  def __init__(self, id, external_id, provider_type, attrs):
+  def __init__(self, id, external_id, provider_type, attrs, **kwargs):
     self._engagement_opportunities = []
 
     if not id:
@@ -190,8 +186,8 @@ class Profile:
     self.attrs = attrs
 
   # noinspection PyUnusedLocal
-  def _add_eo(self, id, external_id, provider_type, attrs, **kwargs):
-    eo = EngagementOpportunity(id, external_id, provider_type, attrs)
+  def _add_eo(self, id, external_id, attrs, provider_type, provider_action_type, created_date, **kwargs):
+    eo = EngagementOpportunity(id, external_id, attrs, provider_type, provider_action_type, created_date)
     self._engagement_opportunities.append(eo)
 
   def _get_eo_by_id(self, eo_id):
@@ -204,7 +200,7 @@ class Profile:
 
 
 class EngagementOpportunity:
-  def __init__(self, id, external_id, provider_type, attrs):
+  def __init__(self, id, external_id, attrs, provider_type, provider_action_type, created_date):
     self._topic_ids = []
 
     if not id:
@@ -219,10 +215,18 @@ class EngagementOpportunity:
     if not provider_type:
       raise TypeError("provider_type is required")
 
+    if not provider_action_type:
+      raise TypeError("provider_action_type is required")
+
+    if not created_date:
+      raise TypeError("created_date is required")
+
     self.id = id
     self.external_id = external_id
-    self.provider_type = provider_type
     self.attrs = attrs
+    self.provider_type = provider_type
+    self.provider_action_type = provider_action_type
+    self.created_date = created_date
 
   def _add_topic_id(self, topic_id):
 
