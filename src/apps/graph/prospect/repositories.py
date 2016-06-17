@@ -80,7 +80,7 @@ def write_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id, _graph_db_
   gdb = _graph_db_provider.get_graph_client()
 
   q = '''
-      MATCH (topic:Topic {id:{topic_id}}), (eo:EngagementOpportunity {id:eo_id})
+      MATCH (topic:Topic {id:{topic_id}}), (eo:EngagementOpportunity {id:{eo_id}})
       MERGE (eo)-[r:ENGAGEMENT_OPPORTUNITY_TOPIC]->(topic)
       RETURN r
   '''

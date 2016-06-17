@@ -21,7 +21,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     if geocode:
       kwargs['geocode'] = geocode
 
-    since = ta_topic_option.option_attrs.get('since', 'q')
+    since = ta_topic_option.option_attrs.get('since', 'w')
     kwargs['since'] = since
 
     twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)

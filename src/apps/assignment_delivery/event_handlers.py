@@ -10,4 +10,4 @@ from src.libs.common_domain.decorators import event_idempotent
 def execute_ea_created_1(**kwargs):
   event = kwargs['event']
   prospect_id = event.prospect_id
-  tasks.deliver_ea_task.delay(prospect_id, event.data)
+  # tasks.deliver_ea_task.delay(prospect_id, event.data)

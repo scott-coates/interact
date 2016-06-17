@@ -41,7 +41,8 @@ def add_eo(**kwargs):
 @event_idempotent
 @receiver(TopicAddedToEngagementOpportunity1.event_signal)
 def add_topic_to_eo(**kwargs):
+  prospect_id = kwargs['aggregate_id']
   event = kwargs['event']
   eo_id = event.engagement_opportunity_id
   topic_id = event.topic_id
-  tasks.add_topic_to_eo_in_graphdb_task.delay(eo_id, topic_id)
+  tasks.add_topic_to_eo_in_graphdb_task.delay(prospect_id, eo_id, topic_id)

@@ -3,6 +3,7 @@ import logging
 from django_rq import job
 
 from src.apps.graph.prospect import service
+from src.apps.key_value.prospect.service import prospect_is_deleted
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +29,17 @@ def create_eo_in_graphdb_task(profile_id, eo_id):
 
 
 @job('default')
-def add_topic_to_eo_in_graphdb_task(engagement_opportunity_id, topic_id):
+def add_topic_to_eo_in_graphdb_task(prospect_id, engagement_opportunity_id, topic_id):
+  ret_val = None
+
   try:
     ret_val = service.add_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id)
   except IndexError as e:
-
-    raise Exception('Error adding topic to eo. EO was not listed as being deleted. Topic id: {0}. Eo id: {1}.'.
-                    format(topic_id, engagement_opportunity_id)).with_traceback(e.__traceback__)
+    if prospect_is_deleted(prospect_id):
+      logger.debug('Prospect %s is deleted. Ignoring this error', prospect_id)
+    else:
+      raise Exception('Error adding topic to eo. Prospect was not listed as being deleted. Topic id: {0}. Eo id: {1}. '
+                      'Prospect id: {2}'.
+                      format(topic_id, engagement_opportunity_id, prospect_id)).with_traceback(e.__traceback__)
 
   return ret_val
