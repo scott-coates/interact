@@ -42,4 +42,5 @@ def _get_value(data, *keys):
 
     if isinstance(val, dict):
       val = _get_value(val, *keys[1:])
+
     return val
