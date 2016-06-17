@@ -19,6 +19,25 @@ def write_prospect_to_graphdb(prospect_id, _graph_db_provider=graphdb_provider):
   return ret_val[0][0]
 
 
+def delete_prospect_from_graphdb(prospect_id, _graph_db_provider=graphdb_provider):
+  gdb = _graph_db_provider.get_graph_client()
+
+  q = '''
+      MATCH (prospect:Prospect {id: {prospect_id}})
+      OPTIONAL MATCH (prospect)<-[:BELONGS_TO]-(profile:Profile)
+      OPTIONAL MATCH (profile)<-[:BELONGS_TO]-(eo:EngagementOpportunity)
+      DETACH DELETE prospect, profile, eo
+  '''
+
+  params = {
+    'prospect_id': prospect_id,
+  }
+
+  ret_val = gdb.query(q, params=params)
+
+  return ret_val
+
+
 def write_profile_to_graphdb(prospect_id, profile_id, _graph_db_provider=graphdb_provider):
   gdb = _graph_db_provider.get_graph_client()
 

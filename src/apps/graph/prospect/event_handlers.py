@@ -2,7 +2,7 @@ from django.dispatch import receiver
 
 from src.apps.graph.prospect import tasks
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
-  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1
+  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1, ProspectDeleted
 from src.libs.common_domain.decorators import event_idempotent
 
 
@@ -11,6 +11,13 @@ from src.libs.common_domain.decorators import event_idempotent
 def add_client(**kwargs):
   prospect_id = kwargs['aggregate_id']
   tasks.create_prospect_in_graphdb_task.delay(prospect_id)
+
+
+@event_idempotent
+@receiver(ProspectDeleted.event_signal)
+def delete_client(**kwargs):
+  prospect_id = kwargs['aggregate_id']
+  tasks.delete_prospect_in_graphdb_task.delay(prospect_id)
 
 
 @event_idempotent

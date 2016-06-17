@@ -5,47 +5,23 @@ from src.domain.client.commands import AddEA
 from src.domain.common import constants
 from src.libs.common_domain import dispatcher
 from src.libs.python_utils.id.id_utils import generate_id
-from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
 
 
-def refresh_assignments(client_id, _dispatcher=None):
+def refresh_assignments(client_id, assignment_group, _dispatcher=None):
   if not _dispatcher: _dispatcher = dispatcher
 
-  method_log_message = (
-    "Refresh assignments for client_id: %s",
-    client_id
-  )
+  prospect_id = assignment_group[constants.PROSPECT_ID]
 
-  with log_wrapper(logger.debug, *method_log_message):
-    counter = 1
+  assignment_attrs = {}
 
-    entities_to_add = get_unassigned_grouped_entities_for_client(client_id)
+  eo_ids = assignment_group.get(constants.EO_IDS)
+  if eo_ids: assignment_attrs[constants.EO_IDS] = eo_ids
 
-    total_assignments_count = len(entities_to_add)
-
-    logger.debug("Assignments to create for client_id: %s: %i", client_id, total_assignments_count)
-
-    for group in entities_to_add:
-      prospect_id = group[constants.PROSPECT_ID]
-      group_log_message = ("Assignment: %i out of %i for client_id: %s", counter, total_assignments_count, client_id)
-
-      with log_wrapper(logger.debug, *group_log_message):
-
-        assignment_attrs = {}
-
-        eo_ids = group.get(constants.EO_IDS)
-        if eo_ids: assignment_attrs[constants.EO_IDS] = eo_ids
-
-        ea_id = generate_id()
-        try:
-          add_ea = AddEA(ea_id, assignment_attrs, prospect_id)
-          _dispatcher.send_command(client_id, add_ea)
-        except Exception as e:
-          logger.warn("Error creating assignment", exc_info=True)
-
-        counter += 1
+  ea_id = generate_id()
+  add_ea = AddEA(ea_id, assignment_attrs, prospect_id)
+  _dispatcher.send_command(client_id, add_ea)
 
 
 def get_unassigned_grouped_entities_for_client(client_id):
