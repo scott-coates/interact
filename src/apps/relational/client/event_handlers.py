@@ -14,7 +14,9 @@ def execute_topic_created_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
   stem = event.snowball_stem
-  tasks.save_topic_lookup_task.delay(aggregate_id, stem)
+  name = event.name
+  tasks.save_topic_lookup_for_client_task.delay(aggregate_id, stem)
+  tasks.save_topic_lookup_for_search_task.delay(aggregate_id, name)
 
 
 @event_idempotent
@@ -24,7 +26,7 @@ def execute_added_target_audience_topic_option_1(**kwargs):
   event = kwargs['event']
 
   tasks.save_active_ta_topic_option_task.delay(
-      event.id, event.name,
+      event.id,
       event.type, event.attrs, event.ta_topic_id,
       event.topic_id, aggregate_id
   )
@@ -66,7 +68,6 @@ def execute_deleted_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
 
   tasks.delete_prospect_for_ea_task.delay(aggregate_id)
-
 
 
 @event_idempotent

@@ -23,7 +23,7 @@ class AddTopicOption(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, name, type, attrs, ta_topic_id):
+  def __init__(self, id, type, attrs, ta_topic_id):
     pass
 
 

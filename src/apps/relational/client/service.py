@@ -1,16 +1,26 @@
 import logging
 
 from src.apps.relational.client.models import ActiveTaTopicOption, ProspectLookupForEa, ProfileLookupForEa, \
-  EOLookupForEa, ClientLookupForEa, TopicLookupForClient
+  EOLookupForEa, ClientLookupForEa, TopicLookupForClient, TopicLookupForSearch
 from src.domain.common import constants
 
 logger = logging.getLogger(__name__)
 
 
-def save_topic_lookup(id, stem):
+def save_topic_lookup_for_client(id, stem):
   topic, _ = TopicLookupForClient.objects.update_or_create(
       id=id, defaults=dict(
           snowball_stem=stem
+      )
+  )
+
+  return topic
+
+
+def save_topic_lookup_for_search(id, name):
+  topic, _ = TopicLookupForSearch.objects.update_or_create(
+      id=id, defaults=dict(
+          name=name
       )
   )
 
@@ -26,10 +36,10 @@ def get_ta_topic_option(ta_topic_option_id):
   return ActiveTaTopicOption.objects.get(id=ta_topic_option_id)
 
 
-def save_active_ta_topic_option(id, option_name, option_type, option_attrs, ta_topic_id, topic_id, client_id):
+def save_active_ta_topic_option(id, option_type, option_attrs, ta_topic_id, topic_id, client_id):
   at, _ = ActiveTaTopicOption.objects.update_or_create(
       id=id, defaults=dict(
-          option_name=option_name, option_type=option_type,
+          option_type=option_type,
           option_attrs=option_attrs, ta_topic_id=ta_topic_id,
           topic_id=topic_id, client_id=client_id
       )
@@ -48,7 +58,7 @@ def save_client_ea_lookup(id, ta_attrs):
 
 def save_topic_to_client_ea_lookup(client_id, topic_id):
   client = get_client_ea_lookup(client_id)
-  topic = get_client_topic_lookup(topic_id)
+  topic = get_client_topic_lookup_for_client(topic_id)
   client.ta_topics[topic_id] = {constants.SNOWBALL_STEM: topic.snowball_stem}
   client.save()
   return client
@@ -88,8 +98,12 @@ def save_topic_to_eo_ea_lookup(eo_id, topic_id):
   return eo
 
 
-def get_client_topic_lookup(id):
+def get_client_topic_lookup_for_client(id):
   return TopicLookupForClient.objects.get(id=id)
+
+
+def get_client_topic_lookup_for_search(id):
+  return TopicLookupForSearch.objects.get(id=id)
 
 
 def get_client_ea_lookup(id):

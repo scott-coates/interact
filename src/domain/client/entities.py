@@ -48,11 +48,11 @@ class Client(AggregateBase):
   def associate_with_topic(self, id, topic_id):
     self._raise_event(ClientAssociatedWithTopic1(id, topic_id))
 
-  def add_topic_option(self, id, name, type, attrs, ta_topic_id):
+  def add_topic_option(self, id, type, attrs, ta_topic_id):
     ta_topic = self._get_ta_topic_by_id(ta_topic_id)
 
     self._raise_event(
-        ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.topic_id)
+        ClientAddedTargetAudienceTopicOption1(id, type, attrs, ta_topic_id, ta_topic.topic_id)
     )
 
   def add_ea(self, id, prospect_id, attrs, _calculator=None):

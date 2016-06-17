@@ -9,20 +9,28 @@ logger = logging.getLogger(__name__)
 
 
 @job('high')
-def save_topic_lookup_task(id, stem):
+def save_topic_lookup_for_client_task(id, stem):
   log_message = ("topic_id: %s stem: %s", id, stem)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_topic_lookup(id, stem)
+    return service.save_topic_lookup_for_client(id, stem)
 
 
 @job('high')
-def save_active_ta_topic_option_task(id, option_name, option_type, option_attrs, ta_topic_id, topic_id, client_id):
+def save_topic_lookup_for_search_task(id, name):
+  log_message = ("topic_id: %s name: %s", id, name)
+
+  with log_wrapper(logger.info, *log_message):
+    service.save_topic_lookup_for_search(id, name)
+
+
+@job('high')
+def save_active_ta_topic_option_task(id, option_type, option_attrs, ta_topic_id, topic_id, client_id):
   log_message = ("Save ta topic option task for ta_topic_option_id: %s", id)
 
   with log_wrapper(logger.info, *log_message):
     return service.save_active_ta_topic_option(
-        id, option_name, option_type, option_attrs, ta_topic_id, topic_id, client_id
+        id, option_type, option_attrs, ta_topic_id, topic_id, client_id
     ).id
 
 
