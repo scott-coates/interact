@@ -42,8 +42,7 @@ def write_profile_to_graphdb(prospect_id, profile_id, _graph_db_provider=graphdb
   gdb = _graph_db_provider.get_graph_client()
 
   q = '''
-    MATCH (prospect:Prospect)
-    WHERE prospect.id = { prospect_id }
+    MATCH (prospect:Prospect {id: { prospect_id }})
     MERGE (profile:Profile {id: {profile_id}})
     MERGE (profile)-[:BELONGS_TO]->(prospect)
     RETURN profile
@@ -62,8 +61,7 @@ def write_eo_to_graphdb(profile_id, eo_id, _graph_db_provider=graphdb_provider):
   gdb = _graph_db_provider.get_graph_client()
 
   q = '''
-    MATCH (profile:Profile)
-    WHERE profile.id = { profile_id }
+    MATCH (profile:Profile {id:{profile_id}})
     MERGE (eo:EngagementOpportunity {id: {eo_id}})
     MERGE (eo)-[:BELONGS_TO]->(profile)
     RETURN eo
@@ -82,10 +80,8 @@ def write_topic_to_eo_in_graphdb(engagement_opportunity_id, topic_id, _graph_db_
   gdb = _graph_db_provider.get_graph_client()
 
   q = '''
-      MATCH (topic:Topic), (engagement_opportunity:EngagementOpportunity)
-      WHERE engagement_opportunity.id = { eo_id }
-      AND topic.id = { topic_id }
-      MERGE (engagement_opportunity)-[r:ENGAGEMENT_OPPORTUNITY_TOPIC]->(topic)
+      MATCH (topic:Topic {id:{topic_id}}), (eo:EngagementOpportunity {id:eo_id})
+      MERGE (eo)-[r:ENGAGEMENT_OPPORTUNITY_TOPIC]->(topic)
       RETURN r
   '''
   params = {

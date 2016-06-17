@@ -9,6 +9,7 @@ from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, 
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 from src.libs.geo_utils.services import geo_location_service
+from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 
@@ -50,10 +51,12 @@ class Prospect(AggregateBase):
       for eo in p._engagement_opportunities:
         existing_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
         if not existing_eo:
-          self._raise_event(EngagementOpportunityAddedToProfile1(eo.id, eo.external_id, eo.attrs, eo.provider_type,
+          new_eo_id = generate_id()
+          self._raise_event(EngagementOpportunityAddedToProfile1(new_eo_id, eo.external_id, eo.attrs, eo.provider_type,
                                                                  eo.provider_action_type, eo.created_date,
                                                                  self.is_duplicated,
-                                                                 self.existing_prospect_id, existing_profile.id))
+                                                                 self.existing_prospect_id, True,
+                                                                 eo.id, existing_profile.id))
 
         # this part ensures that all eo's have their updated topics - this can happen if eo's are merged to an
         # existing prospect and then later have a topic attached to it.
@@ -114,7 +117,7 @@ class Prospect(AggregateBase):
     self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
                                                            attrs, provider_type,
                                                            provider_action_type, created_date, self.is_duplicated,
-                                                           self.existing_prospect_id, profile_id))
+                                                           self.existing_prospect_id, False, None, profile_id))
 
   def add_topic_to_eo(self, eo_id, topic_id):
     self._raise_event(

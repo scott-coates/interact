@@ -59,7 +59,8 @@ class EngagementOpportunityAddedToProfile1(DomainEvent):
 
   @initializer
   def __init__(self, id, external_id, attrs, provider_type,
-               provider_action_type, created_date, prospect_is_duplicated, existing_prospect_id, profile_id):
+               provider_action_type, created_date, prospect_is_duplicated, existing_prospect_id, eo_is_duplicated,
+               existing_eo_id, profile_id):
     super().__init__()
 
 
