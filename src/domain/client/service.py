@@ -39,11 +39,8 @@ def refresh_assignments(client_id, _dispatcher=None):
         if eo_ids: assignment_attrs[constants.EO_IDS] = eo_ids
 
         ea_id = generate_id()
-        try:
-          add_ea = AddEA(ea_id, assignment_attrs, prospect_id)
-          _dispatcher.send_command(client_id, add_ea)
-        except Exception as e:
-          logger.warn("Error creating assignment", exc_info=True)
+        add_ea = AddEA(ea_id, assignment_attrs, prospect_id)
+        _dispatcher.send_command(client_id, add_ea)
 
         counter += 1
 
