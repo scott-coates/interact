@@ -27,6 +27,7 @@ def find_tweets_from_keyword(keyword, _twitter_client_service=None, **kwargs):
         keyword,
         include_entities=True,
         exclude_retweets=True,
+        exclude_replies=True,
         **kwargs
     )
 

@@ -37,4 +37,4 @@ def test_twitter_service_excludes_retweets():
   twitter_client_service.search_twitter_by_keywords('python', exclude_retweets=True,
                                             _twitter_client_provider=twitter_click_provider_mock)
 
-  assert '+exclude:retweets -"rt" -"mt" python' == twitter_client_mock.search.call_args_list[0][1]['q']
+  assert 'exclude:retweets python' == twitter_client_mock.search.call_args_list[0][1]['q']

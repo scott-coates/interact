@@ -2,7 +2,10 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from src.libs.social_utils.providers.twitter import twitter_client_provider
 
-_EXCLUDE_RT = '+exclude:retweets -"rt" -"mt"'
+# http://stackoverflow.com/questions/13643823/exclude-replies-from-official-twitter-search-widget
+# http://stackoverflow.com/questions/27941940/how-to-exclude-retweets-and-replies-in-a-search-api
+_EXCLUDE_RT = 'exclude:retweets'
+_EXCLUDE_RP = 'exclude:replies'
 
 
 def get_time_period_back(since):
@@ -45,7 +48,7 @@ def search_twitter_by_user(screen_name,
 def search_twitter(query,
                    screen_name=None,
                    geocode=None,
-                   exclude_retweets=False, since=None,
+                   exclude_retweets=False, exclude_replies=False, since=None,
                    lang="en", include_entities=False, count=100, result_type='recent',
                    _twitter_client_provider=twitter_client_provider):
   client = _twitter_client_provider.get_twitter_client()
@@ -54,6 +57,9 @@ def search_twitter(query,
 
   if exclude_retweets:
     query = "{0} {1}".format(_EXCLUDE_RT, query)
+
+  if exclude_replies:
+    query = "{0} {1}".format(_EXCLUDE_RP, query)
 
   if screen_name:
     search_params["from"] = screen_name
