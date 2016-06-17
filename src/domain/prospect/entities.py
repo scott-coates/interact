@@ -57,11 +57,13 @@ class Prospect(AggregateBase):
 
         # this part ensures that all eo's have their updated topics - this can happen if eo's are merged to an
         # existing prospect and then later have a topic attached to it.
-        fetched_eo = self._get_eo_by_id(eo.id)
+
+        # re-fetch in case it was newly added. we cannot fetch by id in case it was already added with a different id.
+        fetched_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
         for t in eo._topic_ids:
           if t not in fetched_eo._topic_ids:
             self._raise_event(
-              TopicAddedToEngagementOpportunity1(fetched_eo.id, self.is_duplicated, self.existing_prospect_id, t))
+                TopicAddedToEngagementOpportunity1(fetched_eo.id, self.is_duplicated, self.existing_prospect_id, t))
 
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
