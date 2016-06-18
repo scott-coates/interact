@@ -3,7 +3,6 @@ import logging
 from src.apps.engagement_discovery.engagement_discovery_objects import EngagementOpportunityDiscoveryObject
 from src.apps.engagement_discovery.providers.twitter import twitter_client_service
 from src.apps.engagement_discovery.signals import engagement_opportunity_discovered
-from src.apps.relational.client.service import get_client_topic_lookup_for_search
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
@@ -25,11 +24,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     since = ta_topic_option.option_attrs.get('since', 'q')
     kwargs['since'] = since
 
-    topic_id = ta_topic_option.topic_id
-    topic = get_client_topic_lookup_for_search(topic_id)
-    keyword = topic.name
-
-    twitter_eos = _twitter_client_service.find_tweets_from_keyword(keyword, **kwargs)
+    twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)
 
     total_eos_count = len(twitter_eos)
     counter = 1
