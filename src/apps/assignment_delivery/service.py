@@ -11,6 +11,7 @@ def deliver_ea(prospect_id, ea_data):
   profiles = get_profile_ea_lookups_by_prospect_id(prospect_id)
   profile = profiles[0]
 
+  event_data[constants.PROSPECT_ID] = prospect_id
   event_data[constants.NAME] = _get_value(prospect.attrs, constants.NAMES)
   event_data[constants.BIO] = _get_value(prospect.attrs, constants.BIOS)
   event_data[constants.LOCATION] = _get_value(prospect.attrs, constants.LOCATIONS, 'formatted_address')
@@ -19,6 +20,7 @@ def deliver_ea(prospect_id, ea_data):
   event_data[constants.EO] = _get_value(profile.profile_attrs, constants.URL)
 
   event_data[constants.SCORE] = _get_value(ea_data, constants.SCORE)
+  event_data[constants.ID] = _get_value(ea_data, constants.ID)
 
   assigned_entities = []
   for assignment_attr, assigned_entity_ids in ea_data[constants.ATTRS].items():
