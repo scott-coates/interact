@@ -52,11 +52,15 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
         for k, v in topic_keywords.items():
           tweet_keyword_score = v[constants.RELEVANCE]
           k_stemmed = v[constants.SNOWBALL_STEM]
+
           if k_stemmed in tweet_text_stemmed:
             score += tweet_keyword_score
             counter[constants.EO_KEYWORD_SCORE] += tweet_keyword_score
 
-        if counter[constants.EO_KEYWORD_SCORE]:
-          score_attrs[constants.EO_KEYWORD_SCORE] = counter[constants.EO_KEYWORD_SCORE]
+            score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS][k] = {
+              constants.RELEVANCE: tweet_keyword_score
+            }
+
+            score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE] = counter[constants.EO_KEYWORD_SCORE]
 
     return score, score_attrs

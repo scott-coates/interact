@@ -58,7 +58,7 @@ class ProspectRulesEngine(BaseRulesEngine):
           score += location_score
           counter[constants.LOCATION_SCORE] += location_score
 
-      if counter[constants.LOCATION_SCORE]: score_attrs[constants.LOCATION_SCORE] = counter[constants.LOCATION_SCORE]
+          score_attrs[constants.LOCATION_SCORE][constants.SCORE] = counter[constants.LOCATION_SCORE]
 
     return score, score_attrs
 
@@ -76,6 +76,7 @@ class ProspectRulesEngine(BaseRulesEngine):
 
       keywords = self.rules_data.get(constants.KEYWORDS)
       if keywords:
+
         for k, v in keywords.items():
           bio_keyword_score = v[constants.RELEVANCE]
           k_stemmed = v[constants.SNOWBALL_STEM]
@@ -83,11 +84,15 @@ class ProspectRulesEngine(BaseRulesEngine):
             score += bio_keyword_score
             counter[constants.BIO_KEYWORD_SCORE] += bio_keyword_score
 
-        if counter[constants.BIO_KEYWORD_SCORE]:
-          score_attrs[constants.BIO_KEYWORD_SCORE] = counter[constants.BIO_KEYWORD_SCORE]
+            score_attrs[constants.BIO_KEYWORD_SCORE][constants.SCORE_ATTRS][k] = {
+              constants.RELEVANCE: bio_keyword_score
+            }
+
+            score_attrs[constants.BIO_KEYWORD_SCORE][constants.SCORE] = counter[constants.BIO_KEYWORD_SCORE]
 
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
       if avoid_words:
+
         bio_avoid_keyword_score = -1
         # iterate through bio tokens to be less inclusive and prevent false positives (consider the word mass)
         for b in bio_tokens:
@@ -95,8 +100,11 @@ class ProspectRulesEngine(BaseRulesEngine):
             score += bio_avoid_keyword_score
             counter[constants.BIO_AVOID_KEYWORD_SCORE] += bio_avoid_keyword_score
 
-        if counter[constants.BIO_AVOID_KEYWORD_SCORE]:
-          score_attrs[constants.BIO_AVOID_KEYWORD_SCORE] = counter[constants.BIO_AVOID_KEYWORD_SCORE]
+            score_attrs[constants.BIO_AVOID_KEYWORD_SCORE][constants.SCORE_ATTRS][b] = {
+              constants.RELEVANCE: bio_avoid_keyword_score
+            }
+
+            score_attrs[constants.BIO_AVOID_KEYWORD_SCORE][constants.SCORE] = counter[constants.BIO_AVOID_KEYWORD_SCORE]
 
     return score, score_attrs
 
@@ -110,6 +118,6 @@ class ProspectRulesEngine(BaseRulesEngine):
     if not new_prospect_for_client:
       new_prospect_score = 1
       score += new_prospect_score
-      score_attrs[constants.NEW_PROSPECT_SCORE] = new_prospect_score
+      score_attrs[constants.NEW_PROSPECT_SCORE][constants.SCORE] = new_prospect_score
 
     return score, score_attrs
