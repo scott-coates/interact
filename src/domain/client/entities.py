@@ -45,8 +45,8 @@ class Client(AggregateBase):
 
     return ret_val
 
-  def associate_with_topic(self, id, topic_id):
-    self._raise_event(ClientAssociatedWithTopic1(id, topic_id))
+  def associate_with_topic(self, id, relevance, topic_id):
+    self._raise_event(ClientAssociatedWithTopic1(id, relevance, topic_id))
 
   def add_topic_option(self, id, name, type, attrs, ta_topic_id):
     ta_topic = self._get_ta_topic_by_id(ta_topic_id)
@@ -77,7 +77,7 @@ class Client(AggregateBase):
     self.ta_attrs = event.ta_attrs
 
   def _handle_associated_with_topic_1_event(self, event):
-    self._ta_topics.append(TargetAudienceTopic(event.id, event.topic_id))
+    self._ta_topics.append(TargetAudienceTopic(event.id, event.relevance, event.topic_id))
 
   def _handle_added_target_audience_topic_option_1_event(self, event):
     ta_topic = self._get_ta_topic_by_id(event.ta_topic_id)
@@ -95,16 +95,20 @@ class Client(AggregateBase):
 
 
 class TargetAudienceTopic:
-  def __init__(self, id, topic_id):
+  def __init__(self, id, relevance, topic_id):
     self._ta_topic_options = []
 
     if not id:
       raise TypeError("id is required")
 
+    if relevance is None:
+      raise TypeError("relevance is required")
+
     if not topic_id:
       raise TypeError("topic_id is required")
 
     self.id = id
+    self.relevance = relevance
     self.topic_id = topic_id
 
   # noinspection PyUnusedLocal

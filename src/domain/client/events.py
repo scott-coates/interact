@@ -17,7 +17,7 @@ class ClientAssociatedWithTopic1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, topic_id):
+  def __init__(self, id, relevance, topic_id):
     super().__init__()
 
 

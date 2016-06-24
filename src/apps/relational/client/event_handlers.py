@@ -7,16 +7,6 @@ from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, 
 from src.domain.topic.events import TopicCreated1
 from src.libs.common_domain.decorators import event_idempotent
 
-
-@event_idempotent
-@receiver(TopicCreated1.event_signal)
-def execute_topic_created_1(**kwargs):
-  aggregate_id = kwargs['aggregate_id']
-  event = kwargs['event']
-  stem = event.snowball_stem
-  tasks.save_topic_lookup_task.delay(aggregate_id, stem)
-
-
 @event_idempotent
 @receiver(ClientAddedTargetAudienceTopicOption1.event_signal)
 def execute_added_target_audience_topic_option_1(**kwargs):
@@ -46,8 +36,9 @@ def execute_client_created_1(**kwargs):
 def execute_ta_topic_created_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
+  relevance = event.relevance
   topic_id = event.topic_id
-  tasks.save_topic_to_client_ea_lookup_task.delay(aggregate_id, topic_id)
+  tasks.save_topic_to_client_ea_lookup_task.delay(aggregate_id, relevance, topic_id)
 
 
 @event_idempotent
@@ -66,7 +57,6 @@ def execute_deleted_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
 
   tasks.delete_prospect_for_ea_task.delay(aggregate_id)
-
 
 
 @event_idempotent

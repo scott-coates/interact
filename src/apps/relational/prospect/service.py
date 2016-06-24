@@ -29,9 +29,9 @@ def get_profile_lookup(profile_id):
   return ProfileLookupByProvider.objects.get(id=profile_id)
 
 
-def get_engagement_opportunity_lookup_from_provider_info(external_id, provider_type):
+def get_engagement_opportunity_lookup_from_provider_info(external_id, provider_type, prospect_id):
   return EoLookupByProvider.objects.get(
-      external_id=external_id, provider_type=provider_type)
+      external_id=external_id, provider_type=provider_type, prospect_id=prospect_id)
 
 
 def delete_prospect(prospect_id):

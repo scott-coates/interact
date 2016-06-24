@@ -76,9 +76,10 @@ class ProspectRulesEngine(BaseRulesEngine):
 
       keywords = self.rules_data.get(constants.KEYWORDS)
       if keywords:
-        bio_keyword_score = 1
-        for k in keywords:
-          if k in bio_stemmed:
+        for k, v in keywords.items():
+          bio_keyword_score = v[constants.RELEVANCE]
+          k_stemmed = v[constants.SNOWBALL_STEM]
+          if k_stemmed in bio_stemmed:
             score += bio_keyword_score
             counter[constants.BIO_KEYWORD_SCORE] += bio_keyword_score
 

@@ -20,9 +20,6 @@ class EoLookupByProvider(ReadModel):
   provider_type = models.CharField(max_length=2400)
   prospect_id = models.CharField(max_length=8)
 
-  class Meta:
-    unique_together = ("external_id", "provider_type")
-
   def __str__(self):
     return 'EoLookupByProvider {id}: {provider_type}'.format(id=self.id,
                                                                                 provider_type=self.provider_type)

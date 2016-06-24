@@ -58,7 +58,7 @@ def populate_engagement_opportunity_id_from_engagement_discovery(profile_id,
 
   try:
     eo = get_engagement_opportunity_lookup_from_provider_info(discovery.engagement_opportunity_external_id,
-                                                              provider_type)
+                                                              provider_type, prospect_id)
 
     eo_id = eo.id
 

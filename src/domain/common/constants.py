@@ -32,6 +32,7 @@ FOLLOWING_COUNT = 'following_count'
 KEYWORDS = 'keywords'
 TOPIC_KEYWORDS = 'topic_keywords'
 
+RELEVANCE = 'relevance'
 SNOWBALL_STEM = 'snowball_stem'
 
 NEW_PROSPECT_SCORE = 'new_prospect_score'

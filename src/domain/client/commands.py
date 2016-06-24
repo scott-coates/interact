@@ -15,7 +15,7 @@ class AssociateWithTopic(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, topic_id, ):
+  def __init__(self, id, relevance, topic_id):
     pass
 
 
