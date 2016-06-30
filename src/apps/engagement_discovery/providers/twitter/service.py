@@ -12,7 +12,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
                                                                    **kwargs):
   if not _twitter_client_service: _twitter_client_service = twitter_client_service
 
-  log_message = ('Discovery for ta topic option %s', ta_topic_option)
+  log_message = ('Discovery for ta topic option %s. kwargs: %s', ta_topic_option, kwargs)
 
   with log_wrapper(logger.debug, *log_message):
 
@@ -24,7 +24,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     since = ta_topic_option.option_attrs.get('since', 'q')
     kwargs['since'] = since
 
-    kwargs['count'] = 3
+    kwargs['count'] = 1
 
     twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)
 

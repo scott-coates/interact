@@ -1,5 +1,7 @@
 import logging
 
+from django.db import transaction
+
 from src.apps.relational.client.models import ActiveTaTopicOption, ProspectLookupForEa, ProfileLookupForEa, \
   EOLookupForEa, ClientLookupForEa
 from src.apps.relational.topic.service import get_topic_lookup
@@ -39,14 +41,17 @@ def save_client_ea_lookup(id, ta_attrs):
 
 
 def save_topic_to_client_ea_lookup(client_id, relevance, topic_id):
-  client = get_client_ea_lookup(client_id)
-  topic = get_topic_lookup(topic_id)
-  client.ta_topics[topic_id] = {
-    constants.NAME: topic.name,
-    constants.SNOWBALL_STEM: topic.snowball_stem,
-    constants.RELEVANCE: relevance
-  }
-  client.save()
+  with transaction.atomic():
+    client = get_client_ea_lookup(client_id)
+    topic = get_topic_lookup(topic_id)
+    client.ta_topics[topic_id] = {
+      constants.NAME: topic.name,
+      constants.SNOWBALL_STEM: topic.snowball_stem,
+      constants.RELEVANCE: relevance
+    }
+
+    client.save()
+
   return client
 
 
