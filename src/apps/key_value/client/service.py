@@ -21,15 +21,16 @@ def get_active_client_ids():
 
 def save_client_assigned_prospect(client_id, prospect_id):
   kdb = get_key_value_client()
-
-  ret_val = kdb.sadd(get_key_name('client_assigned_prospects:{0}', client_id), prospect_id)
-
+  ret_val = kdb.incr(get_key_name('client_assigned_prospects:{0}:{1}', client_id, prospect_id))
   return ret_val
 
 
-def client_contains_assigned_prospect(client_id, prospect_id):
+def get_client_assigned_prospect_count(client_id, prospect_id):
+  ret_val = 0
   kdb = get_key_value_client()
 
-  ret_val = kdb.sismember(get_key_name('client_assigned_prospects:{0}', client_id), prospect_id)
+  count = kdb.get(get_key_name('client_assigned_prospects:{0}:{1}', client_id, prospect_id))
+  if count:
+    ret_val = int(count)
 
   return ret_val

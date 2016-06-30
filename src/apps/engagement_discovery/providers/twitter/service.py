@@ -24,6 +24,8 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     since = ta_topic_option.option_attrs.get('since', 'q')
     kwargs['since'] = since
 
+    kwargs['count'] = 10
+
     twitter_eos = _twitter_client_service.find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)
 
     total_eos_count = len(twitter_eos)

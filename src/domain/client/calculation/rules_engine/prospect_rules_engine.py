@@ -1,6 +1,6 @@
 import logging
 
-from src.apps.key_value.client.service import client_contains_assigned_prospect
+from src.apps.key_value.client.service import get_client_assigned_prospect_count
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.domain.common import constants
 from src.libs.geo_utils.services.geo_distance_service import mi_distance
@@ -114,7 +114,7 @@ class ProspectRulesEngine(BaseRulesEngine):
     client_id = self.rules_data[constants.CLIENT_ID]
     prospect_id = self.prospect_id
 
-    new_prospect_for_client = client_contains_assigned_prospect(client_id, prospect_id)
+    new_prospect_for_client = get_client_assigned_prospect_count(client_id, prospect_id)
     if not new_prospect_for_client:
       new_prospect_score = 1
       score += new_prospect_score
