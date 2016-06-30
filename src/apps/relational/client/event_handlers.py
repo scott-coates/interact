@@ -7,6 +7,7 @@ from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, 
 from src.domain.topic.events import TopicCreated1
 from src.libs.common_domain.decorators import event_idempotent
 
+
 @event_idempotent
 @receiver(ClientAddedTargetAudienceTopicOption1.event_signal)
 def execute_added_target_audience_topic_option_1(**kwargs):
@@ -15,7 +16,7 @@ def execute_added_target_audience_topic_option_1(**kwargs):
 
   tasks.save_active_ta_topic_option_task.delay(
       event.id, event.name,
-      event.type, event.attrs, event.ta_topic_id,
+      event.type, event.attrs, event.ta_topic_id, event.ta_topic_relevance,
       event.topic_id, aggregate_id
   )
 

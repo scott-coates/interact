@@ -9,6 +9,7 @@ class ActiveTaTopicOption(ReadModel):
   option_type = models.CharField(max_length=2400)
   option_attrs = JSONField()
   ta_topic_id = models.CharField(max_length=8)
+  ta_topic_relevance = models.PositiveSmallIntegerField()
   topic_id = models.CharField(max_length=8)
   client_id = models.CharField(max_length=8)
 
