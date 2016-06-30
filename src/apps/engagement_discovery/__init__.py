@@ -1,0 +1,1 @@
+default_app_config = 'src.apps.engagement_discovery.engagement_discovery_config.EngagementDiscoveryConfig'
