@@ -29,7 +29,7 @@ def create_events(stream_id, starting_sequence, event_type, events):
       for i, e in enumerate(events, 1)
       ]
 
-  events = Event.objects.bulk_create(event_data)
+    events = Event.objects.bulk_create(event_data)
 
   return events
 
