@@ -58,6 +58,7 @@ default.db
 .scrapy
 .idea/vagrant.xml
 .vagrant
+.cache
 
 dev_override.py
 

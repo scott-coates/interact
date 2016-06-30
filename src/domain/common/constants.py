@@ -31,6 +31,7 @@ FOLLOWING_COUNT = 'following_count'
 
 KEYWORDS = 'keywords'
 TOPIC_KEYWORDS = 'topic_keywords'
+TOPIC_ID = 'topic_id'
 
 RELEVANCE = 'relevance'
 SNOWBALL_STEM = 'snowball_stem'

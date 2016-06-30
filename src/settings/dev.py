@@ -67,7 +67,7 @@ LOGGING['handlers']['file_handler'] = {
   'class': 'logging.handlers.RotatingFileHandler',
   'filename': 'logs/app.log',
   'maxBytes': 1024 * 1024 * 5,  # 5 MB
-  'backupCount': 5,
+  'backupCount': 10,
   'encoding': 'UTF-8',
   'formatter': 'local_standard'
 }
@@ -77,7 +77,7 @@ LOGGING['handlers']['exception_handler'] = {
   'class': 'logging.handlers.RotatingFileHandler',
   'filename': 'logs/error.log',
   'maxBytes': 1024 * 1024 * 5,  # 5 MB
-  'backupCount': 5,
+  'backupCount': 10,
   'encoding': 'UTF-8',
   'formatter': 'local_standard'
 }

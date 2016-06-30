@@ -15,7 +15,7 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
 
   assigned_calc_objects = _get_assigned_calc_objects(assignment_attrs)
 
-  rules_data = _rules_data_provider.provide_rules_data(client_id, assigned_calc_objects)
+  rules_data = _rules_data_provider.provide_rules_data(client_id)
 
   prospect_id = assigned_calc_objects[0].prospect_id
   prospect = get_prospect_ea_lookup(prospect_id)
