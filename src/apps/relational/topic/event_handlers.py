@@ -11,5 +11,5 @@ def execute_topic_created_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
   name = event.name
-  stem = event.snowball_stem
+  stem = event.stem
   tasks.save_topic_lookup_task.delay(aggregate_id, name, stem)

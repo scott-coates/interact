@@ -1,16 +1,20 @@
+import logging
+
 from collections import defaultdict
 from itertools import chain
 
 from src.domain.common import constants
 from src.domain.prospect.engagement_opportunity import service  as eo_service
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
-  EngagementOpportunityAddedToProfile1, TopicAddedToEngagementOpportunity1, ProspectUpdatedAttrsFromProfile1, \
+  EngagementOpportunityAddedToProfile1, ProspectUpdatedAttrsFromProfile1, \
   ProspectMarkedAsDuplicate, ProspectDeleted
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 from src.libs.geo_utils.services import geo_location_service
 from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
+
+logger = logging.getLogger(__name__)
 
 
 class Prospect(AggregateBase):
@@ -52,21 +56,12 @@ class Prospect(AggregateBase):
         existing_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
         if not existing_eo:
           new_eo_id = generate_id()
-          self._raise_event(EngagementOpportunityAddedToProfile1(new_eo_id, eo.external_id, eo.attrs, eo.provider_type,
+          self._raise_event(EngagementOpportunityAddedToProfile1(new_eo_id, eo.external_id, eo.attrs,
+                                                                 eo.topic_ids, eo.provider_type,
                                                                  eo.provider_action_type, eo.created_date,
                                                                  self.is_duplicated,
                                                                  self.existing_prospect_id, True,
                                                                  eo.id, existing_profile.id))
-
-        # this part ensures that all eo's have their updated topics - this can happen if eo's are merged to an
-        # existing prospect and then later have a topic attached to it.
-
-        # re-fetch in case it was newly added. we cannot fetch by id in case it was already added with a different id.
-        fetched_eo = self._find_eo_by_external_id_and_provider_type(eo.external_id, eo.provider_type)
-        for t in eo._topic_ids:
-          if t not in fetched_eo._topic_ids:
-            self._raise_event(
-                TopicAddedToEngagementOpportunity1(fetched_eo.id, self.is_duplicated, self.existing_prospect_id, t))
 
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
@@ -107,21 +102,24 @@ class Prospect(AggregateBase):
   def add_eo(self, id, external_id, attrs, provider_type,
              provider_action_type, created_date, profile_id, _eo_service=None):
 
+    ret_val = False
     if not _eo_service: _eo_service = eo_service
 
     eo = self._find_eo_by_external_id_and_provider_type(external_id, provider_type)
     if eo: raise Exception(eo, 'already exists.')
 
     attrs = _eo_service.prepare_attrs_from_engagement_opportunity(attrs)
+    topic_ids = _eo_service.get_topic_ids_from_engagement_opportunity(attrs)
 
-    self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
-                                                           attrs, provider_type,
-                                                           provider_action_type, created_date, self.is_duplicated,
-                                                           self.existing_prospect_id, False, None, profile_id))
-
-  def add_topic_to_eo(self, eo_id, topic_id):
-    self._raise_event(
-        TopicAddedToEngagementOpportunity1(eo_id, self.is_duplicated, self.existing_prospect_id, topic_id))
+    if topic_ids:
+      self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
+                                                             attrs, topic_ids, provider_type,
+                                                             provider_action_type, created_date, self.is_duplicated,
+                                                             self.existing_prospect_id, False, None, profile_id))
+      ret_val = True
+    else:
+      logger.debug('skipping %s: no topics found', attrs)
+    return ret_val
 
   def _handle_created_1_event(self, event):
     self.id = event.id
@@ -138,10 +136,6 @@ class Prospect(AggregateBase):
   def _handle_eo_added_to_profile_1_event(self, event):
     profile = self._get_profile_by_id(event.profile_id)
     profile._add_eo(**event.data)
-
-  def _handle_topic_added_to_eo_1_event(self, event):
-    eo = self._get_eo_by_id(event.engagement_opportunity_id)
-    eo._add_topic_id(event.topic_id)
 
   def _handle_marked_as_duplicate_1_event(self, event):
     self.is_duplicated = True
@@ -204,8 +198,8 @@ class Profile:
     self.attrs = attrs
 
   # noinspection PyUnusedLocal
-  def _add_eo(self, id, external_id, attrs, provider_type, provider_action_type, created_date, **kwargs):
-    eo = EngagementOpportunity(id, external_id, attrs, provider_type, provider_action_type, created_date)
+  def _add_eo(self, id, external_id, attrs, topic_ids, provider_type, provider_action_type, created_date, **kwargs):
+    eo = EngagementOpportunity(id, external_id, attrs, topic_ids, provider_type, provider_action_type, created_date)
     self._engagement_opportunities.append(eo)
 
   def _get_eo_by_id(self, eo_id):
@@ -218,9 +212,7 @@ class Profile:
 
 
 class EngagementOpportunity:
-  def __init__(self, id, external_id, attrs, provider_type, provider_action_type, created_date):
-    self._topic_ids = []
-
+  def __init__(self, id, external_id, attrs, topic_ids, provider_type, provider_action_type, created_date):
     if not id:
       raise TypeError("id is required")
 
@@ -229,6 +221,9 @@ class EngagementOpportunity:
 
     if not attrs:
       raise TypeError("attrs is required")
+
+    if not topic_ids:
+      raise TypeError("topic_ids is required")
 
     if not provider_type:
       raise TypeError("provider_type is required")
@@ -242,19 +237,10 @@ class EngagementOpportunity:
     self.id = id
     self.external_id = external_id
     self.attrs = attrs
+    self._topic_ids = topic_ids
     self.provider_type = provider_type
     self.provider_action_type = provider_action_type
     self.created_date = created_date
-
-  def _add_topic_id(self, topic_id):
-
-    if not topic_id:
-      raise TypeError("topic_id is required")
-
-    if topic_id in self._topic_ids:
-      raise Exception("{0} already has topic: {1}".format(self, topic_id))
-
-    self._topic_ids.append(topic_id)
 
   def __str__(self):
     return 'EngagementOpportunity {id}: {external_id}'.format(id=self.id,

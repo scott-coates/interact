@@ -58,16 +58,9 @@ class EngagementOpportunityAddedToProfile1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, external_id, attrs, provider_type,
+  def __init__(self, id, external_id, attrs, topic_ids, provider_type,
                provider_action_type, created_date, prospect_is_duplicated, existing_prospect_id, eo_is_duplicated,
                existing_eo_id, profile_id):
     super().__init__()
 
 
-class TopicAddedToEngagementOpportunity1(DomainEvent):
-  event_func_name = 'topic_added_to_eo_1'
-  event_signal = EventSignal()
-
-  @initializer
-  def __init__(self, engagement_opportunity_id, prospect_is_duplicated, existing_prospect_id, topic_id):
-    super().__init__()

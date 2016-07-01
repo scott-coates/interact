@@ -40,7 +40,6 @@ class ProfileLookupForEa(ReadModel):
 
 class EOLookupForEa(ReadModel):
   eo_attrs = JSONField()
-  topic_ids = JSONField(default=dict)
   profile_id = models.CharField(max_length=8)
   prospect_id = models.CharField(max_length=8)
   provider_type = models.CharField(max_length=2400)

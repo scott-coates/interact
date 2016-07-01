@@ -72,14 +72,14 @@ class ProspectRulesEngine(BaseRulesEngine):
 
       bio_tokens = self._token_utils.tokenize_string(bio)
 
-      bio_stemmed = self._token_utils.stemmify_snowball_string(bio)
+      bio_stemmed = self._token_utils.stemmify_string(bio)
 
       keywords = self.rules_data.get(constants.KEYWORDS)
       if keywords:
 
         for k, v in keywords.items():
           bio_keyword_score = v[constants.RELEVANCE]
-          k_stemmed = v[constants.SNOWBALL_STEM]
+          k_stemmed = v[constants.STEM]
           if k_stemmed in bio_stemmed:
             score += bio_keyword_score
             counter[constants.BIO_KEYWORD_SCORE] += bio_keyword_score

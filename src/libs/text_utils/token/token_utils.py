@@ -3,12 +3,12 @@ import nltk
 snowball = nltk.SnowballStemmer('english')
 
 
-def stemmify_snowball_string(string):
+def stemmify_string(string):
   tokens = tokenize_string(string)
-  return " ".join([find_snowball_stem(token) for token in tokens])
+  return " ".join([find_stem(token) for token in tokens])
 
 
-def find_snowball_stem(token):
+def find_stem(token):
   token = token.lower()
 
   stem = snowball.stem(token)

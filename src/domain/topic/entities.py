@@ -15,15 +15,15 @@ class Topic(AggregateBase):
     if not name:
       raise TypeError("name is required")
 
-    snowball_stem = _token_utils.stemmify_snowball_string(name)
-    ret_val._raise_event(TopicCreated1(id, name, snowball_stem))
+    stem = _token_utils.stemmify_string(name)
+    ret_val._raise_event(TopicCreated1(id, name, stem))
 
     return ret_val
 
   def _handle_created_1_event(self, event):
     self.id = event.id
     self.name = event.name
-    self.snowball_stem = event.snowball_stem
+    self.stem = event.stem
 
   def __str__(self):
     return 'Topic {id}: {name}'.format(id=self.id, name=self.name)

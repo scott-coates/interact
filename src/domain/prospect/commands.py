@@ -42,11 +42,3 @@ class AddEO(DomainCommand):
   def __init__(self, id, external_id, attrs, provider_type,
                provider_action_type, created_date, profile_id, ):
     pass
-
-
-class AddTopicToEO(DomainCommand):
-  command_signal = CommandSignal()
-
-  @initializer
-  def __init__(self, eo_id, topic_id):
-    pass

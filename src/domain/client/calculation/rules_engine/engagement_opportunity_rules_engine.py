@@ -9,13 +9,12 @@ logger = logging.getLogger(__name__)
 
 
 class EngagementOpportunityRulesEngine(BaseRulesEngine):
-  def __init__(self, eo_id, eo_attrs, eo_topic_ids, rules_data, _token_utils=None):
+  def __init__(self, eo_id, eo_attrs, rules_data, _token_utils=None):
     if not _token_utils: _token_utils = token_utils
     self._token_utils = _token_utils
 
     self.eo_id = eo_id
     self.eo_attrs = eo_attrs
-    self.eo_topic_ids = eo_topic_ids
     self.rules_data = rules_data
 
   def score_it(self):
@@ -44,27 +43,24 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
     tweet_text = self.eo_attrs.get(constants.TEXT)
 
     if tweet_text:
-      tweet_text_stemmed = self._token_utils.stemmify_snowball_string(tweet_text)
+      tweet_text_stemmed = self._token_utils.stemmify_string(tweet_text)
 
-      topic_keywords = self.rules_data.get(constants.TOPIC_KEYWORDS)
+      keywords = self.rules_data.get(constants.KEYWORDS)
 
-      if topic_keywords:
+      if keywords:
 
-        for k, v in topic_keywords.items():
-          # we don't want to give extra points for eo's that are already tied to a topic
-          if v[constants.TOPIC_ID] not in self.eo_topic_ids:
+        for k, v in keywords.items():
+          tweet_keyword_score = v[constants.RELEVANCE]
+          k_stemmed = v[constants.STEM]
 
-            tweet_keyword_score = v[constants.RELEVANCE]
-            k_stemmed = v[constants.SNOWBALL_STEM]
+          if k_stemmed in tweet_text_stemmed:
+            score += tweet_keyword_score
+            counter[constants.EO_KEYWORD_SCORE] += tweet_keyword_score
 
-            if k_stemmed in tweet_text_stemmed:
-              score += tweet_keyword_score
-              counter[constants.EO_KEYWORD_SCORE] += tweet_keyword_score
+            score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS][k] = {
+              constants.RELEVANCE: tweet_keyword_score
+            }
 
-              score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS][k] = {
-                constants.RELEVANCE: tweet_keyword_score
-              }
-
-              score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE] = counter[constants.EO_KEYWORD_SCORE]
+            score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE] = counter[constants.EO_KEYWORD_SCORE]
 
     return score, score_attrs

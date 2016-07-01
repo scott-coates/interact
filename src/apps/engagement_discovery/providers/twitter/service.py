@@ -40,8 +40,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
           twitter_eo.twitter_obj_attrs,
           twitter_eo.created_date,
           twitter_eo.provider_type,
-          twitter_eo.provider_action_type,
-          ta_topic_option.topic_id
+          twitter_eo.provider_action_type
       )
 
       logger.debug('Sending discovery object %i out of %i. Username: %s. Tweet: %s', counter, total_eos_count,

@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from src.apps.relational.prospect.service import get_profile_lookup_from_provider_info, \
   get_engagement_opportunity_lookup_from_provider_info
-from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, AddTopicToEO, MarkProspectAsDuplicate, \
+from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, MarkProspectAsDuplicate, \
   ConsumeDuplicateProspect
 from src.domain.prospect.exceptions import DuplicateProspectError
 from src.libs.common_domain import dispatcher
@@ -72,14 +72,6 @@ def populate_engagement_opportunity_id_from_engagement_discovery(profile_id,
                       profile_id)
 
     _dispatcher.send_command(prospect_id, create_eo)
-
-  return eo_id
-
-
-def add_topic_to_eo(eo_id, topic_id, prospect_id):
-  add_topic = AddTopicToEO(eo_id, topic_id)
-
-  dispatcher.send_command(prospect_id, add_topic)
 
   return eo_id
 

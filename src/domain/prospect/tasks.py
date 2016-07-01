@@ -3,7 +3,6 @@ import logging
 from django_rq import job
 from rq import get_current_job
 
-from src.apps.key_value.prospect.service import eo_contains_topic
 from src.domain.prospect import service
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
@@ -41,7 +40,7 @@ def populate_profile_from_provider_info_task(external_id, provider_type):
     return profile_id, prospect_id
 
 
-@job('default', result_ttl=-1)
+@job('default')
 def populate_engagement_opportunity_id_from_engagement_discovery_task(engagement_opportunity_discovery_object):
   job = get_current_job()
 
@@ -56,26 +55,6 @@ def populate_engagement_opportunity_id_from_engagement_discovery_task(engagement
     ret_val = service.populate_engagement_opportunity_id_from_engagement_discovery(profile_id, prospect_id,
                                                                                    engagement_opportunity_discovery_object)
     job.dependency.delete()
-    return (ret_val, profile_id, prospect_id)
-
-
-@job('default')
-def add_topic_to_eo_task(topic_id):
-  job = get_current_job()
-  eo_id, profile_id, prospect_id = job.dependency.result
-  log_message = (
-    "eo_id: %s, topic_id: %s, profile_id: %s, prospect_id: %s",
-    eo_id, topic_id, profile_id, prospect_id
-  )
-
-  with log_wrapper(logger.info, *log_message):
-    ret_val = None
-
-    if not eo_contains_topic(eo_id, topic_id):
-      ret_val = service.add_topic_to_eo(eo_id, topic_id, prospect_id)
-
-    job.dependency.delete()
-
     return ret_val
 
 
