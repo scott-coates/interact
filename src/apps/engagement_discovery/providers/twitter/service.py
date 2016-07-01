@@ -8,14 +8,17 @@ from src.domain.common import constants
 from src.libs.datetime_utils import datetime_parser
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 from src.libs.social_utils.providers.twitter import twitter_client_service
+from src.libs.social_utils.providers.twitter import twitter_search_utils
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 logger = logging.getLogger(__name__)
 _twitter_url_prefix = "https://twitter.com/{0}"
 
 
-def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_option, **kwargs):
-  log_message = ('Discovery for ta topic option %s. kwargs: %s', ta_topic_option, kwargs)
+def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_option):
+  log_message = ('Discovery for ta topic option %s', ta_topic_option)
+
+  kwargs = {}
 
   with log_wrapper(logger.debug, *log_message):
 
@@ -27,7 +30,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     since = ta_topic_option.option_attrs.get('since', 'q')
     kwargs['since'] = since
 
-    kwargs['count'] = 1
+    kwargs['count'] = 1  # todo remove me
 
     twitter_eos = _find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)
 
@@ -37,35 +40,49 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     logger.debug("EO's to create for ta topic option %s %i", ta_topic_option, total_eos_count)
 
     for twitter_eo in twitter_eos:
-      discovery_object = EngagementOpportunityDiscoveryObject(
-          twitter_eo.username,
-          twitter_eo.twitter_obj['id_str'],
-          twitter_eo.twitter_obj_attrs,
-          twitter_eo.created_date,
-          twitter_eo.provider_type,
-          twitter_eo.provider_action_type
-      )
-
-      logger.debug('Sending discovery object %i out of %i. Username: %s. Tweet: %s', counter, total_eos_count,
-                   twitter_eo.username,
-                   twitter_eo.twitter_obj['text'])
-
-      engagement_opportunity_discovered.send(
-          EngagementOpportunityDiscoveryObject,
-          engagement_opportunity_discovery_object=discovery_object)
-
+      _send_eo_discovery(twitter_eo, counter, total_eos_count)
       counter += 1
 
 
-def _find_tweets_from_keyword(keyword, _twitter_client_service=None, **kwargs):
-  ret_val = []
-  if not _twitter_client_service:
-    _twitter_client_service = twitter_client_service
+def discover_engagement_opportunities_from_twitter_user(screen_name):
+  log_message = ('Discovery for user %s', screen_name)
 
-  search_log_message = (
-    "Searching twitter for keyword: %s",
-    keyword
+  with log_wrapper(logger.debug, *log_message):
+    twitter_eos = _find_tweets_from_user(screen_name)
+
+    total_eos_count = len(twitter_eos)
+    counter = 1
+
+    logger.debug("EO's to create for user %s %i", screen_name, total_eos_count)
+
+    for twitter_eo in twitter_eos:
+      _send_eo_discovery(twitter_eo, counter, total_eos_count)
+      counter += 1
+
+
+def _send_eo_discovery(twitter_eo, counter, total_eos_count):
+  discovery_object = EngagementOpportunityDiscoveryObject(
+      twitter_eo.username,
+      twitter_eo.twitter_obj['id_str'],
+      twitter_eo.twitter_obj_attrs,
+      twitter_eo.created_date,
+      twitter_eo.provider_type,
+      twitter_eo.provider_action_type
   )
+
+  logger.debug('Sending discovery object %i out of %i. Username: %s. Tweet: %s', counter, total_eos_count,
+               twitter_eo.username,
+               twitter_eo.twitter_obj['text'])
+
+  engagement_opportunity_discovered.send(
+      EngagementOpportunityDiscoveryObject,
+      engagement_opportunity_discovery_object=discovery_object)
+
+
+def _find_tweets_from_keyword(keyword, _twitter_client_service=None, **kwargs):
+  if not _twitter_client_service:    _twitter_client_service = twitter_client_service
+
+  search_log_message = ("Searching twitter for keyword: %s", keyword)
 
   with log_wrapper(logger.debug, *search_log_message):
     tweets_from_keywords = _twitter_client_service.search_twitter_by_keywords(
@@ -76,7 +93,28 @@ def _find_tweets_from_keyword(keyword, _twitter_client_service=None, **kwargs):
         **kwargs
     )
 
-  for tweet in tweets_from_keywords:
+  ret_val = _create_tweet_eo_object(tweets_from_keywords)
+
+  return ret_val
+
+
+def _find_tweets_from_user(screen_name, _twitter_search_utils=None):
+  if not _twitter_search_utils:    _twitter_search_utils = twitter_search_utils
+
+  search_log_message = ("Searching user timeline: %s", screen_name)
+
+  with log_wrapper(logger.debug, *search_log_message):
+    tweets_from_user = _twitter_search_utils.search_twitter_by_user(screen_name, since='y', count=100)
+
+  ret_val = _create_tweet_eo_object(tweets_from_user)
+
+  return ret_val
+
+
+def _create_tweet_eo_object(tweets):
+  ret_val = []
+
+  for tweet in tweets:
     username = tweet['user']['screen_name']
 
     profile_url = _twitter_url_prefix.format(username)
