@@ -31,6 +31,7 @@ class RulesEngine():
 
     rules_instance = rules_class(assigned_entity_object.assigned_entity_id,
                                  assigned_entity_object.assigned_entity_attrs,
+                                 assigned_entity_object.topic_ids,
                                  rules_data)
 
     return rules_instance.score_it()

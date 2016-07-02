@@ -104,7 +104,7 @@ def _find_tweets_from_user(screen_name, _twitter_search_utils=None):
   search_log_message = ("Searching user timeline: %s", screen_name)
 
   with log_wrapper(logger.debug, *search_log_message):
-    tweets_from_user = _twitter_search_utils.search_twitter_by_user(screen_name, since='y', count=100)
+    tweets_from_user = _twitter_search_utils.search_twitter_by_user(screen_name, since='y', count=1)
 
   ret_val = _create_tweet_eo_object(tweets_from_user)
 

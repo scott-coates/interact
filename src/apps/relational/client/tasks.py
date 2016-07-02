@@ -53,19 +53,20 @@ def save_profile_ea_lookup_task(id, profile_attrs, provider_type, prospect_id):
 
 
 @job('default')
-def save_eo_ea_lookup_task(id, eo_attrs, provider_type, profile_id, prospect_id):
+def save_eo_ea_lookup_task(id, eo_attrs, topic_ids, provider_type, profile_id, prospect_id):
   log_message = ("id: %s", id)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id).id
+    return service.save_eo_ea_lookup(id, eo_attrs, topic_ids, provider_type, profile_id, prospect_id).id
+
 
 @job('default')
-def delete_prospect_for_ea_task(prospect_id):
+def delete_prospect_task(prospect_id):
   log_message = (
     "prospect_id: %s",
     prospect_id
   )
 
   with log_wrapper(logger.info, *log_message):
-    service.delete_prospect_for_ea(prospect_id)
+    service.delete_prospect(prospect_id)
     return prospect_id

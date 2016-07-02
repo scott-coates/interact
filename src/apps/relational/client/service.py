@@ -73,10 +73,12 @@ def save_profile_ea_lookup(id, profile_attrs, provider_type, prospect_id):
   return profile
 
 
-def save_eo_ea_lookup(id, eo_attrs, provider_type, profile_id, prospect_id):
+def save_eo_ea_lookup(id, eo_attrs, topic_ids, provider_type, profile_id, prospect_id):
   eo, _ = EOLookupForEa.objects.update_or_create(
       id=id, defaults=dict(
-          eo_attrs=eo_attrs, provider_type=provider_type, profile_id=profile_id, prospect_id=prospect_id
+          eo_attrs=eo_attrs, topic_ids=topic_ids,
+          provider_type=provider_type, profile_id=profile_id,
+          prospect_id=prospect_id
       )
   )
   return eo
@@ -98,6 +100,7 @@ def get_eo_ea_lookup(id):
   return EOLookupForEa.objects.get(id=id)
 
 
-def delete_prospect_for_ea(prospect_id):
+def delete_prospect(prospect_id):
   ProfileLookupForEa.objects.filter(prospect_id=prospect_id).delete()
+  EOLookupForEa.objects.filter(prospect_id=prospect_id).delete()
   ProspectLookupForEa.objects.filter(id=prospect_id).delete()

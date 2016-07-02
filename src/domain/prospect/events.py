@@ -26,7 +26,7 @@ class ProspectMarkedAsDuplicate(DomainEvent):
     super().__init__()
 
 
-class ProspectDeleted(DomainEvent):
+class ProspectDeleted1(DomainEvent):
   event_func_name = 'deleted_1'
   event_signal = EventSignal()
 
@@ -62,5 +62,3 @@ class EngagementOpportunityAddedToProfile1(DomainEvent):
                provider_action_type, created_date, prospect_is_duplicated, existing_prospect_id, eo_is_duplicated,
                existing_eo_id, profile_id):
     super().__init__()
-
-

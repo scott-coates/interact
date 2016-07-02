@@ -27,8 +27,9 @@ def _provide_stemmed_keywords(client):
   ret_val[constants.KEYWORDS] = {
     v[constants.NAME]: {
       constants.STEM: v[constants.STEM],
-      constants.RELEVANCE: v[constants.RELEVANCE]
-    } for k, v in client.ta_topics.items()
+      constants.RELEVANCE: v[constants.RELEVANCE],
+      constants.ID: k,
+    } for k, v in client.ta_topics.items() if v[constants.RELEVANCE] > 0
     }
 
   return ret_val

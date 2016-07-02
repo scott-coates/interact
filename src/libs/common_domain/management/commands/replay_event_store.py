@@ -10,8 +10,6 @@ class Command(BaseCommand):
     parser.add_argument('-an', '--app-names', nargs='*', default=None)
 
   def handle(self, *args, **options):
-    print(options)
-
     event_names = options['event_names']
 
     app_names = options['app_names']

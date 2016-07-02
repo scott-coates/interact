@@ -7,7 +7,7 @@ from src.domain.common import constants
 from src.domain.prospect.engagement_opportunity import service  as eo_service
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
   EngagementOpportunityAddedToProfile1, ProspectUpdatedAttrsFromProfile1, \
-  ProspectMarkedAsDuplicate, ProspectDeleted
+  ProspectMarkedAsDuplicate, ProspectDeleted1
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 from src.libs.geo_utils.services import geo_location_service
@@ -43,7 +43,7 @@ class Prospect(AggregateBase):
     if self.is_duplicated: raise Exception(self, 'already marked as duplicate.')
     self._raise_event(ProspectMarkedAsDuplicate(existing_prospect_id))
     if self.is_deleted: raise Exception(self, 'already marked as deleted.')
-    self._raise_event(ProspectDeleted('Duplicate prospect. Existing prospect id: {0}.'.format(existing_prospect_id)))
+    self._raise_event(ProspectDeleted1('Duplicate prospect. Existing prospect id: {0}.'.format(existing_prospect_id)))
 
   def consume_duplicate_prospect(self, duplicate_prospect):
     duplicate_prospect_profiles = duplicate_prospect._profiles

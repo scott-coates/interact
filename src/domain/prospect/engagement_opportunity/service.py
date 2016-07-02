@@ -30,6 +30,9 @@ def get_topic_ids_from_engagement_opportunity(attrs, _token_utils=None):
   text = attrs.get(constants.TEXT)
   text_stemmed = _token_utils.stemmify_string(text)
 
+  # remove hashtags - this logic will need to be substantially improved at some point.
+  text_stemmed = text_stemmed.replace('#', '')
+
   topics = get_topic_lookups()
 
   for topic in topics:
