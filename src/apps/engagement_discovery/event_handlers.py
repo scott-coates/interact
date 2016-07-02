@@ -9,7 +9,6 @@ from src.domain.prospect.events import ProspectAddedProfile1
 
 @receiver(ProspectAddedProfile1.event_signal)
 def execute_prospect_added_profile_1(**kwargs):
-  print('*****scheduler********')
   scheduler = django_rq.get_scheduler('default')
 
   prospect_id = kwargs['aggregate_id']
