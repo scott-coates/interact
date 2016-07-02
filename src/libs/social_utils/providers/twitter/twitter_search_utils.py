@@ -32,7 +32,7 @@ def get_time_period_back(since):
 def search_twitter_by_user(screen_name,
                            since=None,
                            lang="en",
-                           count=50, _twitter_client_provider=twitter_client_provider):
+                           count=100, _twitter_client_provider=twitter_client_provider):
   client = _twitter_client_provider.get_twitter_client()
 
   search_params = {"lang": lang, "count": count}
