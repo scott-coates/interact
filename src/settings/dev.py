@@ -30,6 +30,10 @@ DATABASES = {
     'PASSWORD': '',
     'HOST': '',
     'PORT': '',
+    # https://docs.djangoproject.com/en/dev/ref/databases/#database-is-locked-errors
+    'OPTIONS': {
+      'timeout': 20,
+    }
   }
 }
 
