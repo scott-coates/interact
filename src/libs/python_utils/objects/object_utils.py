@@ -22,7 +22,8 @@ def initializer(func):
     for name, arg in list(zip(names[1:], args)) + list(kargs.items()):
       setattr(self, name, arg)
 
-    # http://stackoverflow.com/questions/1389180/python-automatically-initialize-instance-variables#comment43290363_1389216
+    # http://stackoverflow.com/questions/1389180/python-automatically-initialize-instance-variables
+    # #comment43290363_1389216
     for name, default in zip(reversed(names), reversed(defaults or [])):
       if not hasattr(self, name):
         setattr(self, name, default)
@@ -30,3 +31,13 @@ def initializer(func):
     func(self, *args, **kargs)
 
   return wrapper
+
+
+# http://stackoverflow.com/questions/2466191/set-attributes-from-dictionary-in-python
+class DynamicObject(object):
+  def __init__(self, *initial_data, **kwargs):
+    for dictionary in initial_data:
+      for key in dictionary:
+        setattr(self, key, dictionary[key])
+    for key in kwargs:
+      setattr(self, key, kwargs[key])
