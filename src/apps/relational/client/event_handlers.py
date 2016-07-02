@@ -53,7 +53,7 @@ def execute_added_prospect_1(**kwargs):
 
 @event_idempotent
 @receiver(ProspectUpdatedTopicsFromProfile1.event_signal)
-def execute_added_prospect_1(**kwargs):
+def execute_prospect_topics_1(**kwargs):
   aggregate_id = kwargs['aggregate_id']
   event = kwargs['event']
 

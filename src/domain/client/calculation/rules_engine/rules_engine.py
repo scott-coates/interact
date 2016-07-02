@@ -13,7 +13,7 @@ class RulesEngine():
   def get_prospect_score(self, prospect, rules_data):
     rules_class = self._get_rules_engine_by_type_and_name(constants.PROSPECT)
 
-    rules_instance = rules_class(prospect.id, prospect.attrs, rules_data)
+    rules_instance = rules_class(prospect.id, prospect.attrs, prospect.topic_ids, rules_data)
 
     return rules_instance.score_it()
 

@@ -17,8 +17,13 @@ def get_profile_attrs_from_provider(external_id, provider_type):
 
 def get_topic_ids_from_profile_attrs(attrs, _topic_service=None):
   if not _topic_service: _topic_service = topic_service
-  text = attrs.get(constants.TEXT)
-  ret_val = _topic_service.get_topic_ids_from_text(text)
+
+  ret_val = None
+
+  bio = attrs.get(constants.BIO)
+  if bio:
+    ret_val = _topic_service.get_topic_ids_from_text(bio)
+
   return ret_val
 
 

@@ -10,13 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class ProspectRulesEngine(BaseRulesEngine):
-  def __init__(self, prospect_id, prospect_attrs, rules_data, _token_utils=None):
+  def __init__(self, prospect_id, prospect_attrs, prospect_topic_ids, rules_data, _token_utils=None):
 
     if not _token_utils: _token_utils = token_utils
     self._token_utils = _token_utils
 
     self.prospect_id = prospect_id
     self.prospect_attrs = prospect_attrs
+    self.prospect_topic_ids = prospect_topic_ids
 
     self.rules_data = rules_data
 
@@ -65,22 +66,17 @@ class ProspectRulesEngine(BaseRulesEngine):
   def _apply_bio_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    bios = self.prospect_attrs.get(constants.BIOS)
+    keywords = self.rules_data.get(constants.KEYWORDS)
+    if keywords:
 
-    if bios:
-      bio = ' '.join(bios)
+      for k, v in keywords.items():
+        bio_keyword_score = v[constants.RELEVANCE]
 
-      bio_tokens = self._token_utils.tokenize_string(bio)
+        # if the relevance is > 0
+        if bio_keyword_score:
 
-      bio_stemmed = self._token_utils.stemmify_string(bio)
-
-      keywords = self.rules_data.get(constants.KEYWORDS)
-      if keywords:
-
-        for k, v in keywords.items():
-          bio_keyword_score = v[constants.RELEVANCE]
-          k_stemmed = v[constants.STEM]
-          if k_stemmed in bio_stemmed:
+          topic_id = v[constants.ID]
+          if topic_id in self.prospect_topic_ids:
             score += bio_keyword_score
             counter[constants.BIO_KEYWORD_SCORE] += bio_keyword_score
 
@@ -90,11 +86,18 @@ class ProspectRulesEngine(BaseRulesEngine):
 
             score_attrs[constants.BIO_KEYWORD_SCORE][constants.SCORE] = counter[constants.BIO_KEYWORD_SCORE]
 
+    bios = self.prospect_attrs.get(constants.BIOS)
+
+    if bios:
+      bio = ' '.join(bios)
+
+      bio_tokens = self._token_utils.tokenize_string(bio)
+
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
       if avoid_words:
 
         bio_avoid_keyword_score = -1
-        # iterate through bio tokens to be less inclusive and prevent false positives (consider the word mass)
+        # iterate through bio tokens to be less inclusive and prevent false positives (consider the word 'mass')
         for b in bio_tokens:
           if b in avoid_words:
             score += bio_avoid_keyword_score

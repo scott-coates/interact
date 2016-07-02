@@ -69,8 +69,6 @@ class Prospect(AggregateBase):
     if not _profile_service: _profile_service = profile_service
     if not _geo_service: _geo_service = geo_location_service
 
-    topic_ids = None
-
     profile = self._find_profile_by_external_id_and_provider_type(external_id, provider_type)
     if profile: raise Exception(profile, 'already exists.')
 
@@ -78,12 +76,11 @@ class Prospect(AggregateBase):
 
     prospect_attrs = defaultdict(list)
 
-    bio = profile_attrs.pop(constants.BIO, None)
+    bio = profile_attrs.get(constants.BIO)
     if bio:
       prospect_attrs[constants.BIOS].append(bio)
-      topic_ids = _profile_service.get_topic_ids_from_profile_attrs(profile_attrs)
 
-    location = profile_attrs.pop(constants.LOCATION, None)
+    location = profile_attrs.get(constants.LOCATION)
     if location:
       try:
         location = _geo_service.get_geocoded_address_dict(location)
@@ -91,11 +88,11 @@ class Prospect(AggregateBase):
       except:
         pass
 
-    name = profile_attrs.pop(constants.NAME, None)
+    name = profile_attrs.get(constants.NAME)
     if name:
       prospect_attrs[constants.NAMES].append(name)
 
-    websites = profile_attrs.pop(constants.WEBSITES, None)
+    websites = profile_attrs.get(constants.WEBSITES)
     if websites:
       combined_sites = self.attrs[constants.WEBSITES] + websites
       websites = get_unique_urls_from_iterable(combined_sites)
@@ -105,6 +102,7 @@ class Prospect(AggregateBase):
 
     self._raise_event(ProspectUpdatedAttrsFromProfile1(prospect_attrs, id))
 
+    topic_ids = _profile_service.get_topic_ids_from_profile_attrs(profile_attrs)
     if topic_ids:
       self._raise_event(ProspectUpdatedTopicsFromProfile1(topic_ids, id))
 
@@ -252,7 +250,7 @@ class EngagementOpportunity:
     self.id = id
     self.external_id = external_id
     self.attrs = attrs
-    self._topic_ids = topic_ids
+    self.topic_ids = topic_ids
     self.provider_type = provider_type
     self.provider_action_type = provider_action_type
     self.created_date = created_date

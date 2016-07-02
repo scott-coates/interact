@@ -24,7 +24,7 @@ class ClientLookupForEa(ReadModel):
 
 class ProspectLookupForEa(ReadModel):
   attrs = JSONField()
-  topic_ids = JSONField()
+  topic_ids = JSONField(default=list)
 
   def __str__(self):
     return 'ProspectLookupForEa {id}'.format(id=self.id)
