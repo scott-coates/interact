@@ -33,7 +33,6 @@ KEYWORDS = 'keywords'
 TOPIC_ID = 'topic_id'
 
 RELEVANCE = 'relevance'
-STEM = 'stem'
 
 NEW_PROSPECT_SCORE = 'new_prospect_score'
 BIO_AVOID_KEYWORD_SCORE = 'bio_avoid_keyword_score'

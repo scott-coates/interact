@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 
 @job('high')
-def save_topic_lookup_task(id, name, stem):
+def save_topic_lookup_task(id, name, stem, collapsed_stem):
   log_message = ("topic_id: %s name: %s, stem: %s", id, name, stem)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_topic_lookup(id, name, stem)
+    return service.save_topic_lookup(id, name, stem, collapsed_stem)

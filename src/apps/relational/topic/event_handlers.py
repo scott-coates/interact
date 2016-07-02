@@ -12,4 +12,5 @@ def execute_topic_created_1(**kwargs):
   event = kwargs['event']
   name = event.name
   stem = event.stem
-  tasks.save_topic_lookup_task.delay(aggregate_id, name, stem)
+  collapsed_stem = event.collapsed_stem
+  tasks.save_topic_lookup_task.delay(aggregate_id, name, stem, collapsed_stem)

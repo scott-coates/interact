@@ -46,7 +46,6 @@ def save_topic_to_client_ea_lookup(client_id, relevance, topic_id):
     topic = get_topic_lookup(topic_id)
     client.ta_topics[topic_id] = {
       constants.NAME: topic.name,
-      constants.STEM: topic.stem,
       constants.RELEVANCE: relevance
     }
 
@@ -61,6 +60,15 @@ def save_prospect_ea_lookup(id, attrs):
           attrs=attrs
       )
   )
+  return prospect
+
+
+def save_topics_to_prospect_ea_lookup(prospect_id, topic_ids):
+  with transaction.atomic():
+    prospect = get_prospect_ea_lookup(prospect_id)
+    prospect.topic_ids.extend(topic_ids)
+    prospect.save()
+
   return prospect
 
 

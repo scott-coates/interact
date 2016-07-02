@@ -45,6 +45,14 @@ def save_prospect_ea_lookup_task(id, attrs):
 
 
 @job('default')
+def save_topics_to_prospect_ea_lookup_task(prospect_id, topic_ids):
+  log_message = ("id: %s", prospect_id)
+
+  with log_wrapper(logger.info, *log_message):
+    return service.save_topics_to_prospect_ea_lookup(prospect_id, topic_ids).id
+
+
+@job('default')
 def save_profile_ea_lookup_task(id, profile_attrs, provider_type, prospect_id):
   log_message = ("id: %s", id)
 

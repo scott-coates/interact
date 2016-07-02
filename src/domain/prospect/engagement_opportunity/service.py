@@ -1,6 +1,5 @@
-from src.apps.relational.topic.service import get_topic_lookups
 from src.domain.common import constants
-from src.libs.text_utils.token import token_utils
+from src.domain.topic import service as topic_service
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 
@@ -23,20 +22,8 @@ def _clean_attrs(attrs):
   return ret_val
 
 
-def get_topic_ids_from_engagement_opportunity(attrs, _token_utils=None):
-  if not _token_utils: _token_utils = token_utils
-
-  ret_val = []
+def get_topic_ids_from_engagement_opportunity_attrs(attrs, _topic_service=None):
+  if not _topic_service: _topic_service = topic_service
   text = attrs.get(constants.TEXT)
-  text_stemmed = _token_utils.stemmify_string(text)
-
-  # remove hashtags - this logic will need to be substantially improved at some point.
-  text_stemmed = text_stemmed.replace('#', '')
-
-  topics = get_topic_lookups()
-
-  for topic in topics:
-    if topic.stem in text_stemmed:
-      ret_val.append(topic.id)
-
+  ret_val = _topic_service.get_topic_ids_from_text(text)
   return ret_val

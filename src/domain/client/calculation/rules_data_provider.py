@@ -11,7 +11,7 @@ def provide_rules_data(client_id):
 
   client = get_client_ea_lookup(client_id)
 
-  client_keywords = _provide_stemmed_keywords(client)
+  client_keywords = _provide_keywords(client)
   ret_val.update(client_keywords)
 
   locations = client.ta_attrs.get(constants.LOCATIONS)
@@ -21,12 +21,11 @@ def provide_rules_data(client_id):
   return ret_val
 
 
-def _provide_stemmed_keywords(client):
+def _provide_keywords(client):
   ret_val = {}
 
   ret_val[constants.KEYWORDS] = {
     v[constants.NAME]: {
-      constants.STEM: v[constants.STEM],
       constants.RELEVANCE: v[constants.RELEVANCE],
       constants.ID: k,
     } for k, v in client.ta_topics.items() if v[constants.RELEVANCE] > 0

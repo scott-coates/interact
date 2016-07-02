@@ -1,12 +1,11 @@
 from src.domain.topic.events import TopicCreated1
+from src.domain.topic.service import get_topic_stems
 from src.libs.common_domain.aggregate_base import AggregateBase
-from src.libs.text_utils.token import token_utils
 
 
 class Topic(AggregateBase):
   @classmethod
-  def from_attrs(cls, id, name, _token_utils=None):
-    if not _token_utils: _token_utils = token_utils
+  def from_attrs(cls, id, name):
     ret_val = cls()
 
     if not id:
@@ -15,15 +14,15 @@ class Topic(AggregateBase):
     if not name:
       raise TypeError("name is required")
 
-    stem = _token_utils.stemmify_string(name)
-    ret_val._raise_event(TopicCreated1(id, name, stem))
+    stem, collapsed_stem = get_topic_stems(name)
+
+    ret_val._raise_event(TopicCreated1(id, name, stem, collapsed_stem))
 
     return ret_val
 
   def _handle_created_1_event(self, event):
     self.id = event.id
     self.name = event.name
-    self.stem = event.stem
 
   def __str__(self):
     return 'Topic {id}: {name}'.format(id=self.id, name=self.name)

@@ -13,7 +13,7 @@ class ProspectCreated1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, attrs):
+  def __init__(self, id, attrs, topic_ids):
     super().__init__()
 
 
@@ -50,6 +50,15 @@ class ProspectUpdatedAttrsFromProfile1(DomainEvent):
 
   @initializer
   def __init__(self, attrs, profile_id):
+    super().__init__()
+
+
+class ProspectUpdatedTopicsFromProfile1(DomainEvent):
+  event_func_name = 'topics_updated_from_profile_1'
+  event_signal = EventSignal()
+
+  @initializer
+  def __init__(self, topic_ids, profile_id):
     super().__init__()
 
 

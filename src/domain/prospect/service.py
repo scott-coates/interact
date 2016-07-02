@@ -19,7 +19,7 @@ def populate_prospect_id_from_provider_info_(external_id, provider_type, _dispat
     # at some point in the future,  we could get initial prospect info from a 3rd party api. We could get email
     # addresses, etc.
     prospect_id = generate_id()
-    create_prospect = CreateProspect(prospect_id, {})
+    create_prospect = CreateProspect(prospect_id, {}, [])
     _dispatcher.send_command(-1, create_prospect)
 
   return prospect_id

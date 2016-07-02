@@ -7,7 +7,7 @@ class CreateProspect(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, attrs):
+  def __init__(self, id, attrs, topic_ids):
     pass
 
 

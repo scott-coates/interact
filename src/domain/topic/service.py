@@ -16,16 +16,22 @@ def get_topic_ids_from_text(text, _topic_read_service=None, _token_utils=None):
   topics = _topic_read_service.get_topic_lookups()
 
   for topic in topics:
-    topic_stem = _token_utils.stemmify_string(topic.name)
 
-    if ' ' in topic_stem:
-      if only_alpha_numeric(topic_stem) in text_alnum:
+    if ' ' in topic.stem:
+      if only_alpha_numeric(topic.stem) in text_alnum:
         ret_val.append(topic.id)
       else:
-        collapsed_topic_stem = _token_utils.stemmify_string(only_alpha_numeric(topic.name))
-        if only_alpha_numeric(collapsed_topic_stem) in text_alnum:
+        if only_alpha_numeric(topic.collapsed_stem) in text_alnum:
           ret_val.append(topic.id)
-    elif only_alpha_numeric(topic_stem) in text_words:
+    elif only_alpha_numeric(topic.stem) in text_words:
       ret_val.append(topic.id)
 
   return ret_val
+
+
+def get_topic_stems(name, _token_utils=None):
+  if not _token_utils: _token_utils = token_utils
+  topic_stem = _token_utils.stemmify_string(name)
+  collapsed_topic_stem = _token_utils.stemmify_string(only_alpha_numeric(name))
+
+  return topic_stem, collapsed_topic_stem

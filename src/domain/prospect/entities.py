@@ -1,5 +1,4 @@
 import logging
-
 from collections import defaultdict
 from itertools import chain
 
@@ -7,7 +6,7 @@ from src.domain.common import constants
 from src.domain.prospect.engagement_opportunity import service  as eo_service
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
   EngagementOpportunityAddedToProfile1, ProspectUpdatedAttrsFromProfile1, \
-  ProspectMarkedAsDuplicate, ProspectDeleted1
+  ProspectMarkedAsDuplicate, ProspectDeleted1, ProspectUpdatedTopicsFromProfile1
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 from src.libs.geo_utils.services import geo_location_service
@@ -26,7 +25,7 @@ class Prospect(AggregateBase):
     self._profiles = []
 
   @classmethod
-  def from_attrs(cls, id, attrs):
+  def from_attrs(cls, id, attrs, topic_ids):
     ret_val = cls()
 
     if not id:
@@ -35,7 +34,10 @@ class Prospect(AggregateBase):
     if attrs is None:
       raise TypeError("attrs is required")
 
-    ret_val._raise_event(ProspectCreated1(id, attrs))
+    if topic_ids is None:
+      raise TypeError("topic_ids is required")
+
+    ret_val._raise_event(ProspectCreated1(id, attrs, topic_ids))
 
     return ret_val
 
@@ -67,37 +69,44 @@ class Prospect(AggregateBase):
     if not _profile_service: _profile_service = profile_service
     if not _geo_service: _geo_service = geo_location_service
 
+    topic_ids = None
+
     profile = self._find_profile_by_external_id_and_provider_type(external_id, provider_type)
     if profile: raise Exception(profile, 'already exists.')
 
     profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
 
-    p_attrs = defaultdict(list)
+    prospect_attrs = defaultdict(list)
 
     bio = profile_attrs.pop(constants.BIO, None)
     if bio:
-      p_attrs[constants.BIOS].append(bio)
+      prospect_attrs[constants.BIOS].append(bio)
+      topic_ids = _profile_service.get_topic_ids_from_profile_attrs(profile_attrs)
 
     location = profile_attrs.pop(constants.LOCATION, None)
     if location:
       try:
         location = _geo_service.get_geocoded_address_dict(location)
-        p_attrs[constants.LOCATIONS].append(location)
+        prospect_attrs[constants.LOCATIONS].append(location)
       except:
         pass
 
     name = profile_attrs.pop(constants.NAME, None)
     if name:
-      p_attrs[constants.NAMES].append(name)
+      prospect_attrs[constants.NAMES].append(name)
 
     websites = profile_attrs.pop(constants.WEBSITES, None)
     if websites:
       combined_sites = self.attrs[constants.WEBSITES] + websites
       websites = get_unique_urls_from_iterable(combined_sites)
-      p_attrs[constants.WEBSITES].extend(websites)
+      prospect_attrs[constants.WEBSITES].extend(websites)
 
     self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))
-    self._raise_event(ProspectUpdatedAttrsFromProfile1(p_attrs, id))
+
+    self._raise_event(ProspectUpdatedAttrsFromProfile1(prospect_attrs, id))
+
+    if topic_ids:
+      self._raise_event(ProspectUpdatedTopicsFromProfile1(topic_ids, id))
 
   def add_eo(self, id, external_id, attrs, provider_type,
              provider_action_type, created_date, profile_id, _eo_service=None):
@@ -109,7 +118,7 @@ class Prospect(AggregateBase):
     if eo: raise Exception(eo, 'already exists.')
 
     attrs = _eo_service.prepare_attrs_from_engagement_opportunity(attrs)
-    topic_ids = _eo_service.get_topic_ids_from_engagement_opportunity(attrs)
+    topic_ids = _eo_service.get_topic_ids_from_engagement_opportunity_attrs(attrs)
 
     if topic_ids:
       self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
@@ -125,6 +134,7 @@ class Prospect(AggregateBase):
     self.id = event.id
     # noinspection PyArgumentList
     self.attrs = defaultdict(list, event.attrs)
+    self.topic_ids = event.topic_ids
 
   def _handle_profile_added_to_prospect_1_event(self, event):
     self._profiles.append(Profile(**event.data))
@@ -132,6 +142,10 @@ class Prospect(AggregateBase):
   def _handle_attrs_updated_from_profile_1_event(self, event):
     attrs = event.attrs
     self.attrs = attrs
+
+  def _handle_topics_updated_from_profile_1_event(self, event):
+    topic_ids = event.topic_ids
+    self.topic_ids.extend(topic_ids)
 
   def _handle_eo_added_to_profile_1_event(self, event):
     profile = self._get_profile_by_id(event.profile_id)
@@ -177,6 +191,7 @@ class Prospect(AggregateBase):
 
 
 class Profile:
+  # noinspection PyUnusedLocal
   def __init__(self, id, external_id, provider_type, attrs, **kwargs):
     self._engagement_opportunities = []
 

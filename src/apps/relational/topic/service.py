@@ -5,8 +5,9 @@ from src.apps.relational.topic.models import TopicLookup
 logger = logging.getLogger(__name__)
 
 
-def save_topic_lookup(id, name, stem):
-  topic, _ = TopicLookup.objects.update_or_create(id=id, defaults=dict(name=name, stem=stem))
+def save_topic_lookup(id, name, stem, collapsed_stem):
+  topic, _ = TopicLookup.objects.update_or_create(id=id,
+                                                  defaults=dict(name=name, stem=stem, collapsed_stem=collapsed_stem))
 
   return topic
 
