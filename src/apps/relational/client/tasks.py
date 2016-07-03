@@ -2,6 +2,7 @@ import logging
 
 from django_rq import job
 
+from src.apps.key_value.prospect.service import prospect_is_deleted
 from src.apps.relational.client import service
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
@@ -49,7 +50,10 @@ def save_topics_to_prospect_ea_lookup_task(prospect_id, topic_ids):
   log_message = ("id: %s", prospect_id)
 
   with log_wrapper(logger.info, *log_message):
-    return service.save_topics_to_prospect_ea_lookup(prospect_id, topic_ids).id
+    if prospect_is_deleted(prospect_id):
+      logger.info('prospect %s is deleted. aborting task', prospect_id)
+    else:
+      return service.save_topics_to_prospect_ea_lookup(prospect_id, topic_ids).id
 
 
 @job('default')
