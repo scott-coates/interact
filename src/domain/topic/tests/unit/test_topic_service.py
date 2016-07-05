@@ -3,8 +3,9 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.apps.relational.topic import service as topic_read_service
+from src.apps.relational.topic.models import TopicLookup
 from src.domain.topic import service
-from src.libs.python_utils.objects.object_utils import DynamicObject
+from src.domain.topic.service import get_topic_stems
 
 
 @pytest.mark.parametrize(("content", "ret_val"), [
@@ -25,11 +26,16 @@ def test_topic_service_finds_topics_in_tweet(content, ret_val):
 
   _topic_read_service.get_topic_lookups = MagicMock(
       return_value=[
-        DynamicObject(id=1, name='real estate'),
-        DynamicObject(id=2, name='software development'),
-        DynamicObject(id=3, name='entrepreneurship'),
+        _get_topic_mock(1, 'real estate'),
+        _get_topic_mock(2, 'software development'),
+        _get_topic_mock(3, 'entrepreneurship'),
       ]
   )
 
   topic_ids = service.get_topic_ids_from_text(content, _topic_read_service=_topic_read_service)
   assert ret_val == topic_ids
+
+
+def _get_topic_mock(id, name):
+  stem, collapsed_stem = get_topic_stems(name)
+  return MagicMock(spec=TopicLookup, id=id, name=name, stem=stem, collapsed_stem=collapsed_stem)

@@ -21,7 +21,8 @@ def get_topic_ids_from_text(text, _topic_read_service=None, _token_utils=None):
       if only_alpha_numeric(topic.stem) in text_alnum:
         ret_val.append(topic.id)
       else:
-        if only_alpha_numeric(topic.collapsed_stem) in text_alnum:
+        # collapsed_stem is already only_alpha_numeric
+        if topic.collapsed_stem in text_alnum:
           ret_val.append(topic.id)
     elif only_alpha_numeric(topic.stem) in text_words:
       ret_val.append(topic.id)
