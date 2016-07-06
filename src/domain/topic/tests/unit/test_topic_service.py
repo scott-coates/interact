@@ -28,7 +28,7 @@ def test_topic_service_finds_topics_in_tweet(content, ret_val):
       return_value=[
         _get_topic_mock(1, 'real estate'),
         _get_topic_mock(2, 'software development'),
-        _get_topic_mock(3, 'entrepreneurship'),
+        _get_topic_mock(3, 'entrepreneur'),
       ]
   )
 
