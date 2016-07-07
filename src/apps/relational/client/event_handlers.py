@@ -1,7 +1,9 @@
 from django.dispatch import receiver
 
 from src.apps.relational.client import tasks
-from src.domain.client.events import ClientAddedTargetAudienceTopicOption1, ClientCreated1, ClientAssociatedWithTopic1
+from src.domain.client.events import ClientAddedTargetAudienceTopicOption1, ClientCreated1, \
+  ClientAssociatedWithTopic1, \
+  ClientAddedEngagementAssignment1
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, EngagementOpportunityAddedToProfile1, \
   ProspectUpdatedAttrsFromProfile1, ProspectDeleted1, ProspectUpdatedTopicsFromProfile1
 from src.libs.common_domain.decorators import event_idempotent
@@ -85,3 +87,17 @@ def execute_added_eo_1(**kwargs):
 
   tasks.save_eo_ea_lookup_task.delay(event.id, event.attrs, event.topic_ids, event.provider_type, event.profile_id,
                                      aggregate_id)
+
+
+@event_idempotent
+@receiver(ClientAddedEngagementAssignment1.event_signal)
+def execute_ea_created_1(**kwargs):
+  event = kwargs['event']
+  client_id = kwargs['aggregate_id']
+
+  ea_id = event.id
+  score = event.score
+  score_attrs = event.score_attrs
+  prospect_id = event.prospect_id
+
+  tasks.save_ea_deliver_task.delay(ea_id, score, score_attrs, client_id, prospect_id)

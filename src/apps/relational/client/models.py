@@ -39,7 +39,7 @@ class ProfileLookupForEa(ReadModel):
     return 'ProfileLookupForEa {id}'.format(id=self.id)
 
 
-class EOLookupForEa(ReadModel):
+class EoLookupForEa(ReadModel):
   eo_attrs = JSONField()
   topic_ids = JSONField()
   provider_type = models.CharField(max_length=2400)
@@ -47,4 +47,14 @@ class EOLookupForEa(ReadModel):
   prospect_id = models.CharField(max_length=8)
 
   def __str__(self):
-    return 'EOLookupForEa {id}'.format(id=self.id)
+    return 'EoLookupForEa {id}'.format(id=self.id)
+
+
+class EaToDeliver(ReadModel):
+  score = models.DecimalField(max_digits=19, decimal_places=7)
+  score_attrs = JSONField()
+  client_id = models.CharField(max_length=8)
+  prospect_id = models.CharField(max_length=8)
+
+  def __str__(self):
+    return 'EaLookup {id}'.format(id=self.id)

@@ -3,7 +3,7 @@ import logging
 from django.db import transaction
 
 from src.apps.relational.client.models import ActiveTaTopicOption, ProspectLookupForEa, ProfileLookupForEa, \
-  EOLookupForEa, ClientLookupForEa
+  EoLookupForEa, ClientLookupForEa, EaToDeliver
 from src.apps.relational.topic.service import get_topic_lookup
 from src.domain.common import constants
 
@@ -82,7 +82,7 @@ def save_profile_ea_lookup(id, profile_attrs, provider_type, prospect_id):
 
 
 def save_eo_ea_lookup(id, eo_attrs, topic_ids, provider_type, profile_id, prospect_id):
-  eo, _ = EOLookupForEa.objects.update_or_create(
+  eo, _ = EoLookupForEa.objects.update_or_create(
       id=id, defaults=dict(
           eo_attrs=eo_attrs, topic_ids=topic_ids,
           provider_type=provider_type, profile_id=profile_id,
@@ -105,10 +105,27 @@ def get_profile_ea_lookups_by_prospect_id(prospect_id):
 
 
 def get_eo_ea_lookup(id):
-  return EOLookupForEa.objects.get(id=id)
+  return EoLookupForEa.objects.get(id=id)
 
 
 def delete_prospect(prospect_id):
   ProfileLookupForEa.objects.filter(prospect_id=prospect_id).delete()
-  EOLookupForEa.objects.filter(prospect_id=prospect_id).delete()
+  EoLookupForEa.objects.filter(prospect_id=prospect_id).delete()
   ProspectLookupForEa.objects.filter(id=prospect_id).delete()
+
+
+def save_ea_deliver(ea_id, score, score_attrs, client_id, prospect_id):
+  eo, _ = EaToDeliver.objects.update_or_create(
+      id=ea_id, defaults=dict(
+          score=score, score_attrs=score_attrs,
+          client_id=client_id, prospect_id=prospect_id,
+      )
+  )
+  return eo
+
+
+def get_ea_deliver(id):
+  return EaToDeliver.objects.get(id=id)
+
+def delete_ea_deliver(id):
+  return get_ea_deliver(id).delete()

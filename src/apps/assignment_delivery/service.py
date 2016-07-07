@@ -1,11 +1,15 @@
 from src.apps.relational.client.service import get_prospect_ea_lookup, get_profile_ea_lookups_by_prospect_id, \
-  get_eo_ea_lookup
+  get_eo_ea_lookup, get_ea_deliver
 from src.domain.common import constants
 from src.libs.analytics_utils.providers.keen import keen_client_service
 
 
-def deliver_ea(prospect_id, ea_data):
+def deliver_ea(ea_id):
   event_data = {}
+
+  ea = get_ea_deliver(ea_id)
+
+  prospect_id = ea.prospect_id
 
   prospect = get_prospect_ea_lookup(prospect_id)
   profiles = get_profile_ea_lookups_by_prospect_id(prospect_id)
@@ -19,12 +23,12 @@ def deliver_ea(prospect_id, ea_data):
   event_data[constants.URL] = _get_value(profile.profile_attrs, constants.URL)
   event_data[constants.EO] = _get_value(profile.profile_attrs, constants.URL)
 
-  event_data[constants.SCORE] = _get_value(ea_data, constants.SCORE)
-  event_data[constants.ID] = _get_value(ea_data, constants.ID)
+  event_data[constants.SCORE] = float(ea.score) # decimal not json serializable by default
+  event_data[constants.ID] = ea_id
 
   assigned_entities_to_deliver = []
 
-  for assignment_entity_attr in ea_data[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES]:
+  for assignment_entity_attr in ea.score_attrs[constants.ASSIGNED_ENTITIES]:
     if assignment_entity_attr[constants.SCORE] > 0:
       if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
         eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])

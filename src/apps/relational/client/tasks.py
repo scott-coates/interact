@@ -82,3 +82,8 @@ def delete_prospect_task(prospect_id):
   with log_wrapper(logger.info, *log_message):
     service.delete_prospect(prospect_id)
     return prospect_id
+
+
+@job('default')
+def save_ea_deliver_task(ea_id, score, score_attrs, client_id, prospect_id):
+  service.save_ea_deliver(ea_id, score, score_attrs, client_id, prospect_id)
