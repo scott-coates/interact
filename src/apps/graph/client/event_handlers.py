@@ -18,8 +18,9 @@ def add_ta_topic(**kwargs):
   client_id = kwargs['aggregate_id']
   event = kwargs['event']
   ta_topic_id = event.id
+  relevance = event.relevance
   topic_id = event.topic_id
-  tasks.create_ta_topic_in_graphdb_task.delay(client_id, ta_topic_id, topic_id)
+  tasks.create_ta_topic_in_graphdb_task.delay(client_id, ta_topic_id, relevance, topic_id)
 
 
 @event_idempotent

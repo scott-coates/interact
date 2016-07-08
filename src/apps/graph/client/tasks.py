@@ -19,13 +19,13 @@ def create_client_in_graphdb_task(client_id):
 
 
 @job('high')
-def create_ta_topic_in_graphdb_task(client_id, ta_topic_id, topic_id):
+def create_ta_topic_in_graphdb_task(client_id, ta_topic_id, relevance, topic_id):
   log_message = (
     "client_id: %s, topic_id: %s",
     client_id, topic_id
   )
   with log_wrapper(logger.info, *log_message):
-    return service.create_ta_topic_in_graphdb(client_id, ta_topic_id, topic_id)['id']
+    return service.create_ta_topic_in_graphdb(client_id, ta_topic_id, relevance, topic_id)['id']
 
 
 @job('default')
