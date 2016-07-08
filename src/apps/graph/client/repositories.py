@@ -90,6 +90,7 @@ def retrieve_unassigned_grouped_entities_for_client_from_graphdb(client_id, _gra
 
       // do the filtering
       WHERE NOT (eo)-[:ASSIGNED_TO]->(:EngagementAssignment)
+      AND rel_client_has_topic.relevance > 0
 
       // make sure to call distinct because when a prospect has multiple profiles, a row will be returned for each
       // profile

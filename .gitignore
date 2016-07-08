@@ -42,7 +42,7 @@ __MACOSX
 .project
 .pydevproject
 
-default.db
+default*.db
 *.db-journal
 .idea/workspace.xml
 .idea/tasks.xml

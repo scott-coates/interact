@@ -48,19 +48,16 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
       for k, v in keywords.items():
         tweet_keyword_score = v[constants.RELEVANCE]
 
-        # if the relevance is > 0
-        if tweet_keyword_score:
+        topic_id = v[constants.ID]
 
-          topic_id = v[constants.ID]
+        if topic_id in self.eo_topic_ids:
+          score += tweet_keyword_score
+          counter[constants.EO_KEYWORD_SCORE] += tweet_keyword_score
 
-          if topic_id in self.eo_topic_ids:
-            score += tweet_keyword_score
-            counter[constants.EO_KEYWORD_SCORE] += tweet_keyword_score
+          score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS][k] = {
+            constants.RELEVANCE: tweet_keyword_score
+          }
 
-            score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS][k] = {
-              constants.RELEVANCE: tweet_keyword_score
-            }
-
-            score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE] = counter[constants.EO_KEYWORD_SCORE]
+          score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE] = counter[constants.EO_KEYWORD_SCORE]
 
     return score, score_attrs

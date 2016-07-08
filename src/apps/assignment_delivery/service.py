@@ -23,16 +23,15 @@ def deliver_ea(ea_id):
   event_data[constants.URL] = _get_value(profile.profile_attrs, constants.URL)
   event_data[constants.EO] = _get_value(profile.profile_attrs, constants.URL)
 
-  event_data[constants.SCORE] = float(ea.score) # decimal not json serializable by default
+  event_data[constants.SCORE] = float(ea.score)  # decimal not json serializable by default
   event_data[constants.ID] = ea_id
 
   assigned_entities_to_deliver = []
 
   for assignment_entity_attr in ea.score_attrs[constants.ASSIGNED_ENTITIES]:
-    if assignment_entity_attr[constants.SCORE] > 0:
-      if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
-        eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
-        assigned_entities_to_deliver.append(eo_ea_lookup.eo_attrs)
+    if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
+      eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
+      assigned_entities_to_deliver.append(eo_ea_lookup.eo_attrs)
 
   if assigned_entities_to_deliver:
     event_data[constants.EO] = [_get_value(ae, constants.TEXT) for ae in assigned_entities_to_deliver]
