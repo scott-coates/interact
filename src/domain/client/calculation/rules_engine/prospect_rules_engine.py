@@ -73,7 +73,7 @@ class ProspectRulesEngine(BaseRulesEngine):
         bio_keyword_score = v[constants.RELEVANCE]
 
         # this will 'bump' up the importance of bio topics
-        bio_keyword_score += 1
+        bio_keyword_score *= 1.5
 
         topic_id = v[constants.ID]
         if topic_id in self.prospect_topic_ids:

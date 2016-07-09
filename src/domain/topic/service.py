@@ -11,17 +11,23 @@ def get_topic_ids_from_text(text, _topic_read_service=None, _token_utils=None):
   text_stemmed = _token_utils.stemmify_string(text)
 
   text_alnum = only_alpha_numeric(text_stemmed)
+  text_words = [only_alpha_numeric(x) for x in text_stemmed.split()]
 
   topics = _topic_read_service.get_topic_lookups()
 
   for topic in topics:
 
-    if only_alpha_numeric(topic.stem) in text_alnum:
-      ret_val.append(topic.id)
-    else:
-      # collapsed_stem is already only_alpha_numeric
-      if topic.collapsed_stem in text_alnum:
+    alnum_stem = only_alpha_numeric(topic.stem)
+
+    if ' ' in topic.stem:
+      if alnum_stem in text_alnum:
         ret_val.append(topic.id)
+      else:
+        # collapsed_stem is already only_alpha_numeric
+        if topic.collapsed_stem in text_alnum:
+          ret_val.append(topic.id)
+    elif any(t for t in text_words if alnum_stem in t):
+      ret_val.append(topic.id)
 
   return ret_val
 
