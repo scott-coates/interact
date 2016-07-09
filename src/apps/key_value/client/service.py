@@ -34,3 +34,21 @@ def get_client_assigned_prospect_count(client_id, prospect_id):
     ret_val = int(count)
 
   return ret_val
+
+
+def mark_ea_batch_to_be_processed(client_id, batch_id, total_assignments_count):
+  kdb = get_key_value_client()
+  ret_val = kdb.set(get_key_name('client_assignment_batch:{0}:{1}', client_id, batch_id), total_assignments_count)
+  return ret_val
+
+
+def clear_ea_batch_to_be_processed(client_id, batch_id):
+  kdb = get_key_value_client()
+  ret_val = kdb.delete(get_key_name('client_assignment_batch:{0}:{1}', client_id, batch_id))
+  return ret_val
+
+
+def get_ea_batch_to_be_processed(client_id, batch_id):
+  kdb = get_key_value_client()
+  ret_val = int(kdb.get(get_key_name('client_assignment_batch:{0}:{1}', client_id, batch_id)))
+  return ret_val

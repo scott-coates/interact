@@ -30,10 +30,10 @@ class ClientAddedTargetAudienceTopicOption1(DomainEvent):
     super().__init__()
 
 
-class ClientAddedEngagementAssignment1(DomainEvent):
-  event_func_name = 'added_ea_1'
+class ClientProcessedEngagementAssignmentBatch1(DomainEvent):
+  event_func_name = 'processed_ea_batch_1'
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, attrs, score, score_attrs, prospect_id):
+  def __init__(self, batch_id, assigned, skipped, scores, min_score, max_score):
     super().__init__()

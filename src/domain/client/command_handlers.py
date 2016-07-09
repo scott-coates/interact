@@ -1,6 +1,6 @@
 from django.dispatch import receiver
 
-from src.domain.client.commands import CreateClient, AssociateWithTopic, AddTopicOption, AddEA
+from src.domain.client.commands import CreateClient, AssociateWithTopic, AddTopicOption, AddEaBatch
 from src.domain.client.entities import Client
 from src.libs.common_domain import aggregate_repository
 
@@ -42,7 +42,7 @@ def add_option(_aggregate_repository=None, **kwargs):
   _aggregate_repository.save(client, version)
 
 
-@receiver(AddEA.command_signal)
+@receiver(AddEaBatch.command_signal)
 def create_ea(_aggregate_repository=None, **kwargs):
   if not _aggregate_repository: _aggregate_repository = aggregate_repository
 
@@ -51,5 +51,5 @@ def create_ea(_aggregate_repository=None, **kwargs):
 
   client = _aggregate_repository.get(Client, id)
   version = client.version
-  client.add_ea(**command.data)
+  client.add_ea_batch(**command.data)
   _aggregate_repository.save(client, version)

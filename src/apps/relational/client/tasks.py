@@ -85,5 +85,5 @@ def delete_prospect_task(prospect_id):
 
 
 @job('default')
-def save_ea_deliver_task(ea_id, score, score_attrs, client_id, prospect_id):
-  service.save_ea_deliver(ea_id, score, score_attrs, client_id, prospect_id)
+def delete_batch_ea_task(client_id, batch_id):
+  service.delete_batch_ea(client_id, batch_id)

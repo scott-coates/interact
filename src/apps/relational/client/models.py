@@ -50,11 +50,14 @@ class EoLookupForEa(ReadModel):
     return 'EoLookupForEa {id}'.format(id=self.id)
 
 
-class EaToDeliver(ReadModel):
+class BatchEa(ReadModel):
+  attrs = JSONField()
   score = models.DecimalField(max_digits=19, decimal_places=7)
   score_attrs = JSONField()
   client_id = models.CharField(max_length=8)
+  batch_id = models.CharField(max_length=8)
+  counter = models.PositiveIntegerField()
   prospect_id = models.CharField(max_length=8)
 
   def __str__(self):
-    return 'EaLookup {id}'.format(id=self.id)
+    return 'BatchEa {id}'.format(id=self.id)

@@ -27,9 +27,9 @@ class AddTopicOption(DomainCommand):
     pass
 
 
-class AddEA(DomainCommand):
+class AddEaBatch(DomainCommand):
   command_signal = CommandSignal()
 
   @initializer
-  def __init__(self, id, attrs, prospect_id):
+  def __init__(self, batch_id, batch_eas):
     pass

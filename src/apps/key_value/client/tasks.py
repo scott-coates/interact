@@ -22,3 +22,8 @@ def save_client_assigned_prospect_task(client_id, prospect_id):
 
   with log_wrapper(logger.info, *log_message):
     return service.save_client_assigned_prospect(client_id, prospect_id)
+
+
+@job('default')
+def clear_ea_batch_to_be_processed_task(client_id, batch_id):
+  return service.clear_ea_batch_to_be_processed(client_id, batch_id)

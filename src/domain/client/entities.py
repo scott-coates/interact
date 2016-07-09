@@ -1,7 +1,8 @@
-from src.domain.client.calculation import calculator
+from outliers import smirnov_grubbs as grubbs
+
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
-  ClientAddedEngagementAssignment1
+  ClientProcessedEngagementAssignmentBatch1
 from src.domain.common import constants
 from src.libs.common_domain.aggregate_base import AggregateBase
 from src.libs.geo_utils.services import geo_location_service
@@ -55,21 +56,53 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.relevance, ta_topic.topic_id)
     )
 
-  def add_ea(self, id, prospect_id, attrs, _calculator=None):
-    if not _calculator: _calculator = calculator
+  def add_ea_batch(self, batch_id, batch_eas, _outlier_utils=None):
+    if not _outlier_utils: _outlier_utils = grubbs
+    if not batch_id:
+      raise TypeError("batch_id is required")
 
-    if not isinstance(attrs, dict):
-      raise TypeError("attrs must be a dict")
+    self._check_eas(batch_eas)
 
-    for v in attrs.values():
-      if not isinstance(v, (list, tuple)):
-        raise TypeError("Each value must be an iterable")
+    scores = sorted([b[constants.SCORE] for b in batch_eas])
+    accepted = _outlier_utils.test(scores, 0.01)
+    min_score, max_score = min(accepted), max(accepted)
 
-    score, score_attrs = _calculator.calculate_engagement_assignment_score(self.id, attrs)
+    assigned = []
+    skipped = []
+
+    for b in batch_eas:
+      assigned.append(b)
+      # if min_score <= b[constants.SCORE] <= max_score:
+      # else:
+      #   skipped.append(b)
 
     self._raise_event(
-        ClientAddedEngagementAssignment1(id, attrs, score, score_attrs, prospect_id)
+        ClientProcessedEngagementAssignmentBatch1(batch_id, assigned, skipped, scores, min_score, max_score)
     )
+
+  def _check_eas(self, batch_eas):
+
+    for b in batch_eas:
+
+      if not b[constants.ID]:
+        raise TypeError("id is required")
+
+      if not b[constants.PROSPECT_ID]:
+        raise TypeError("prospect_id is required")
+
+      if not b[constants.SCORE]:
+        raise TypeError("score is required")
+
+      self._check_attrs(b[constants.ATTRS])
+      self._check_attrs(b[constants.SCORE_ATTRS])
+
+  def _check_attrs(self, attr):
+    if not isinstance(attr, dict):
+      raise TypeError("attrs must be a dict")
+
+    for v in attr.values():
+      if not isinstance(v, (list, tuple, dict)):
+        raise TypeError("Each value must be an iterable")
 
   def _handle_created_1_event(self, event):
     self.id = event.id
@@ -83,8 +116,11 @@ class Client(AggregateBase):
     ta_topic = self._get_ta_topic_by_id(event.ta_topic_id)
     ta_topic._add_topic_option(**event.data)
 
-  def _handle_added_ea_1_event(self, event):
-    self._eas.append(EngagementAssignment(event.id, event.attrs, event.score, event.score_attrs, event.prospect_id))
+  def _handle_processed_ea_batch_1_event(self, event):
+    for ea in event.assigned:
+      self._eas.append(
+          EngagementAssignment(**ea)
+      )
 
   def _get_ta_topic_by_id(self, ta_topic_id):
     ta_topic = next(t for t in self._ta_topics if t.id == ta_topic_id)

@@ -1,7 +1,9 @@
 from django.dispatch import receiver
 
 from src.apps.graph.client import tasks
-from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, ClientAddedEngagementAssignment1
+from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
+  ClientProcessedEngagementAssignmentBatch1
+from src.domain.common import constants
 from src.libs.common_domain.decorators import event_idempotent
 
 
@@ -24,13 +26,13 @@ def add_ta_topic(**kwargs):
 
 
 @event_idempotent
-@receiver(ClientAddedEngagementAssignment1.event_signal)
+@receiver(ClientProcessedEngagementAssignmentBatch1.event_signal)
 def execute_ea_created_1(**kwargs):
   client_id = kwargs['aggregate_id']
 
   event = kwargs['event']
 
-  attrs = event.attrs
-  id = event.id
+  batch_eas = event.skipped + event.assigned
 
-  tasks.create_ea_in_graphdb_task.delay(id, attrs, client_id)
+  for ea in batch_eas:
+    tasks.create_ea_in_graphdb_task.delay(ea[constants.ID], ea[constants.ATTRS], client_id)

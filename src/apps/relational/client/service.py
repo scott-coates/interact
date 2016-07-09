@@ -1,9 +1,10 @@
+import json
 import logging
 
 from django.db import transaction
 
 from src.apps.relational.client.models import ActiveTaTopicOption, ProspectLookupForEa, ProfileLookupForEa, \
-  EoLookupForEa, ClientLookupForEa, EaToDeliver
+  EoLookupForEa, ClientLookupForEa, BatchEa
 from src.apps.relational.topic.service import get_topic_lookup
 from src.domain.common import constants
 
@@ -114,18 +115,45 @@ def delete_prospect(prospect_id):
   ProspectLookupForEa.objects.filter(id=prospect_id).delete()
 
 
-def save_ea_deliver(ea_id, score, score_attrs, client_id, prospect_id):
-  eo, _ = EaToDeliver.objects.update_or_create(
+def save_batch_ea(ea_id, attrs, score, score_attrs, client_id, batch_id, counter, prospect_id):
+  eo, _ = BatchEa.objects.update_or_create(
       id=ea_id, defaults=dict(
-          score=score, score_attrs=score_attrs,
-          client_id=client_id, prospect_id=prospect_id,
+          attrs=attrs, score=score, score_attrs=score_attrs,
+          client_id=client_id, batch_id=batch_id, counter=counter, prospect_id=prospect_id,
       )
   )
   return eo
 
 
-def get_ea_deliver(id):
-  return EaToDeliver.objects.get(id=id)
+def delete_batch_ea(client_id, batch_id):
+  return get_batch_ea(client_id, batch_id).delete()
 
-def delete_ea_deliver(id):
-  return get_ea_deliver(id).delete()
+
+def get_batch_ea(client_id, batch_id):
+  return BatchEa.objects.filter(client_id=client_id, batch_id=batch_id)
+
+
+def get_assignment_batch_processed_count(client_id, batch_id):
+  ret_val = get_batch_ea(client_id, batch_id).count()
+
+  return ret_val
+
+
+def get_assignment_batch(client_id, batch_id):
+  ret_val = get_batch_ea(client_id, batch_id).values(constants.ID, constants.ATTRS, constants.SCORE,
+                                                     constants.SCORE_ATTRS,
+                                                     constants.PROSPECT_ID)
+
+  loaded = [_process_batch(r) for r in ret_val]
+
+  return loaded
+
+
+def _process_batch(attrs):
+  ret_val = dict(**attrs)
+
+  ret_val[constants.ATTRS] = json.loads(ret_val[constants.ATTRS])
+  ret_val[constants.SCORE_ATTRS] = json.loads(ret_val[constants.SCORE_ATTRS])
+  ret_val[constants.SCORE] = float(ret_val[constants.SCORE])
+
+  return ret_val
