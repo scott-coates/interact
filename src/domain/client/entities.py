@@ -1,5 +1,6 @@
 from outliers import smirnov_grubbs as grubbs
 
+from src.domain.client.calculation import calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientProcessedEngagementAssignmentBatch1
@@ -79,6 +80,13 @@ class Client(AggregateBase):
     self._raise_event(
         ClientProcessedEngagementAssignmentBatch1(batch_id, assigned, skipped, scores, min_score, max_score)
     )
+
+  def calculate_engagement_assignment_score(self, assignment_attrs, _calculator=None):
+    if not _calculator: _calculator = calculator
+
+    score, score_attrs = _calculator.calculate_engagement_assignment_score(self.id, assignment_attrs)
+
+    return score, score_attrs
 
   def _check_eas(self, batch_eas):
 
