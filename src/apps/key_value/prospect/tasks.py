@@ -10,10 +10,11 @@ logger = logging.getLogger(__name__)
 
 @job('default')
 def add_prospect_to_deleted_set_task(prospect_id):
-  log_message = (
-    "prospect_id: %s",
-    prospect_id
-  )
-
-  with log_wrapper(logger.info, *log_message):
-    return service.add_prospect_to_deleted_set(prospect_id)
+  pass
+  # log_message = (
+  #   "prospect_id: %s",
+  #   prospect_id
+  # )
+  #
+  # with log_wrapper(logger.info, *log_message):
+  #   return service.add_prospect_to_deleted_set(prospect_id)

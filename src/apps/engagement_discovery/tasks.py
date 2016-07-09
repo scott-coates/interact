@@ -3,7 +3,7 @@ import logging
 from django_rq import job
 
 from src.apps.engagement_discovery import service
-from src.apps.key_value.prospect.service import prospect_is_deleted
+from src.domain.prospect.service import prospect_is_deleted
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)

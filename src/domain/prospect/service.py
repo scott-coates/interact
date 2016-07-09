@@ -4,8 +4,9 @@ from src.apps.relational.prospect.service import get_profile_lookup_from_provide
   get_engagement_opportunity_lookup_from_provider_info
 from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, MarkProspectAsDuplicate, \
   ConsumeDuplicateProspect
+from src.domain.prospect.entities import Prospect
 from src.domain.prospect.exceptions import DuplicateProspectError
-from src.libs.common_domain import dispatcher
+from src.libs.common_domain import dispatcher, aggregate_repository
 from src.libs.python_utils.id.id_utils import generate_id
 
 
@@ -99,3 +100,11 @@ def consume_duplicate_prospect(existing_prospect_id, duplicate_prospect_id, _dis
   _dispatcher.send_command(existing_prospect_id, consume_duplicate_prospect)
 
   return existing_prospect_id
+
+
+def prospect_is_deleted(prospect_id, _aggregate_repository=None):
+  if not _aggregate_repository: _aggregate_repository = aggregate_repository
+
+  prospect = _aggregate_repository.get(Prospect, prospect_id)
+  
+  return prospect.is_deleted
