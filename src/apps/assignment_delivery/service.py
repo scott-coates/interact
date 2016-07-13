@@ -18,10 +18,10 @@ def deliver_ea(ea_data):
   event_data[constants.LOCATION] = _get_value(prospect.attrs, constants.LOCATIONS, 'formatted_address')
 
   event_data[constants.URL] = _get_value(profile.profile_attrs, constants.URL)
-  event_data[constants.EO] = _get_value(profile.profile_attrs, constants.URL)
 
   event_data[constants.SCORE] = _get_value(ea_data, constants.SCORE)
   event_data[constants.ID] = _get_value(ea_data, constants.ID)
+  event_data[constants.SCORE_ATTRS] = str(_get_value(ea_data, constants.SCORE_ATTRS))
 
   assigned_entities_to_deliver = []
 
@@ -30,8 +30,7 @@ def deliver_ea(ea_data):
       eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
       assigned_entities_to_deliver.append(eo_ea_lookup.eo_attrs)
 
-  if assigned_entities_to_deliver:
-    event_data[constants.EO] = [_get_value(ae, constants.TEXT) for ae in assigned_entities_to_deliver]
+  event_data[constants.EO] = [_get_value(ae, constants.TEXT) for ae in assigned_entities_to_deliver]
 
   return keen_client_service.send_event('engagement_assigned', event_data)
 
@@ -45,6 +44,8 @@ def _get_value(data, *keys):
         val = val[0]
 
     if isinstance(val, dict):
-      val = _get_value(val, *keys[1:])
-
+      key_tail = keys[1:]
+      if key_tail:
+        val = _get_value(val, *key_tail)
+      
     return val
