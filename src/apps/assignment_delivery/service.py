@@ -21,7 +21,6 @@ def deliver_ea(ea_data):
 
   event_data[constants.SCORE] = _get_value(ea_data, constants.SCORE)
   event_data[constants.ID] = _get_value(ea_data, constants.ID)
-  event_data[constants.SCORE_ATTRS] = str(_get_value(ea_data, constants.SCORE_ATTRS))
 
   assigned_entities_to_deliver = []
 
@@ -47,5 +46,5 @@ def _get_value(data, *keys):
       key_tail = keys[1:]
       if key_tail:
         val = _get_value(val, *key_tail)
-      
+
     return val
