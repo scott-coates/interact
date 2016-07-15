@@ -8,5 +8,6 @@ class KeyValueConfig(AppConfig):
   def ready(self):
     import src.apps.key_value.client.event_handlers
     import src.apps.key_value.prospect.event_handlers
-    import src.apps.key_value.social.event_handlers
     import src.apps.key_value.topic.event_handlers
+
+
