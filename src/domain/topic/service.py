@@ -1,4 +1,4 @@
-from src.apps.relational.topic import service as topic_read_service
+from src.apps.read_model.relational.topic import service as topic_read_service
 from src.libs.text_utils.formatting.text_formatter import only_alpha_numeric
 from src.libs.text_utils.token import token_utils
 

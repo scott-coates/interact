@@ -1,4 +1,4 @@
-from src.apps.relational.client.service import get_client_ea_lookup
+from src.apps.read_model.relational.client.service import get_client_ea_lookup
 from src.domain.common import constants
 from src.libs.text_utils.filter import profanity_filter
 

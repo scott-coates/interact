@@ -14,7 +14,7 @@ def clear_read_model():
   for r in read_model_keys:
     kdb.delete(r)
 
-  read_model_types = ContentType.objects.filter(app_label='relational')
+  read_model_types = ContentType.objects.filter(app_label='read_model')
   for read_model_type in read_model_types:
     read_model_type.model_class().objects.all().delete()
 

@@ -2,8 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.apps.relational.topic import service as topic_read_service
-from src.apps.relational.topic.models import TopicLookup
+from src.apps.read_model.relational.topic import service as topic_read_service
+from src.apps.read_model.relational.topic.models import TopicLookup
 from src.domain.topic import service
 from src.domain.topic.service import get_topic_stems
 

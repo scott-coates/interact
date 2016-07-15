@@ -4,10 +4,10 @@ from datetime import timedelta
 import django_rq
 from django_rq import job
 
-from src.apps.graph.client.service import get_unassigned_grouped_entities_for_client_from_graphdb
-from src.apps.key_value.client.service import mark_ea_batch_to_be_processed, get_active_client_ids, \
+from src.apps.read_model.graph.client.service import get_unassigned_grouped_entities_for_client_from_graphdb
+from src.apps.read_model.key_value.client.service import mark_ea_batch_to_be_processed, get_active_client_ids, \
   get_ea_batch_to_be_processed
-from src.apps.relational.client.service import get_assignment_batch_processed_count
+from src.apps.read_model.relational.client.service import get_assignment_batch_processed_count
 from src.domain.client import service as client_service
 from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.python_utils.logging.logging_utils import log_wrapper

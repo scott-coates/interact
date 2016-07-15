@@ -1,6 +1,6 @@
 import logging
 
-from src.apps.relational.client.service import save_batch_ea, get_assignment_batch
+from src.apps.read_model.relational.client.service import save_batch_ea, get_assignment_batch
 from src.domain.client.commands import AddEaBatch
 from src.domain.client.entities import Client
 from src.domain.common import constants

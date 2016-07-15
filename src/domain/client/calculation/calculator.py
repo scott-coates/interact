@@ -1,5 +1,6 @@
-from src.apps.relational.client.service import get_eo_ea_lookup, get_prospect_ea_lookup, \
-  get_profile_ea_lookups_by_prospect_id
+from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
+  get_profile_ea_lookups_by_prospect_id, \
+  get_eo_ea_lookup
 from src.domain.client.calculation import score_processor, rules_data_provider
 from src.domain.client.calculation.calculation_objects import CalculationAssignedEntityObject
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine

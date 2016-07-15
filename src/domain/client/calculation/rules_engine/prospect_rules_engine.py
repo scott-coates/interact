@@ -1,6 +1,6 @@
 import logging
 
-from src.apps.key_value.client.service import get_client_assigned_prospect_count
+from src.apps.read_model.key_value.client.service import get_client_assigned_prospect_count
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.domain.common import constants
 from src.libs.geo_utils.services.geo_distance_service import mi_distance

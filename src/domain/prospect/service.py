@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from src.apps.relational.prospect.service import get_profile_lookup_from_provider_info, \
+from src.apps.read_model.relational.prospect.service import get_profile_lookup_from_provider_info, \
   get_engagement_opportunity_lookup_from_provider_info
 from src.domain.prospect.commands import CreateProspect, AddProfile, AddEO, MarkProspectAsDuplicate, \
   ConsumeDuplicateProspect

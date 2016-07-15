@@ -1,4 +1,4 @@
-from src.apps.relational.client.service import get_prospect_ea_lookup, get_profile_ea_lookups_by_prospect_id, \
+from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, get_profile_ea_lookups_by_prospect_id, \
   get_eo_ea_lookup
 from src.domain.common import constants
 from src.libs.analytics_utils.providers.keen import keen_client_service
