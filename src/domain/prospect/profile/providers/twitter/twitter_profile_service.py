@@ -1,15 +1,15 @@
 import logging
 
+from src.apps.social.providers.twitter import twitter_service
 from src.domain.common import constants
 from src.libs.python_utils.logging.logging_utils import log_wrapper
-from src.libs.social_utils.providers.twitter import twitter_search_utils
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 logger = logging.getLogger(__name__)
 _twitter_url_prefix = "https://twitter.com/{0}"
 
 
-def get_twitter_profile_attrs(external_id, _search=twitter_search_utils, **kwargs):
+def get_twitter_profile_attrs(external_id, _twitter_service=twitter_service, **kwargs):
   log_message = (
     "Get twitter profile data. twitter_id: %s",
     external_id
@@ -23,7 +23,7 @@ def get_twitter_profile_attrs(external_id, _search=twitter_search_utils, **kwarg
   with log_wrapper(logger.debug, *log_message):
 
     with log_wrapper(logger.debug, *twitter_search_log_message):
-      user_data = _search.search_twitter_by_user(external_id, count=1, **kwargs)
+      user_data = _twitter_service.search_twitter_by_user(external_id, count=1, **kwargs)
 
     profile_data = user_data[0]['user']
 

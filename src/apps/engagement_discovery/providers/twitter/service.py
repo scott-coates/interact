@@ -4,10 +4,10 @@ from src.apps.engagement_discovery.engagement_discovery_objects import Engagemen
 from src.apps.engagement_discovery.providers.twitter.twitter_engagement_discovery_objects import \
   TwitterEngagementOpportunityDiscoveryObject
 from src.apps.engagement_discovery.signals import engagement_opportunity_discovered
+from src.apps.social.providers.twitter import twitter_service
 from src.domain.common import constants
 from src.libs.datetime_utils import datetime_parser
 from src.libs.python_utils.logging.logging_utils import log_wrapper
-from src.libs.social_utils.providers.twitter import twitter_client_service
 from src.libs.social_utils.providers.twitter import twitter_search_utils
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
@@ -79,13 +79,13 @@ def _send_eo_discovery(twitter_eo, counter, total_eos_count):
       engagement_opportunity_discovery_object=discovery_object)
 
 
-def _find_tweets_from_keyword(keyword, _twitter_client_service=None, **kwargs):
-  if not _twitter_client_service:    _twitter_client_service = twitter_client_service
+def _find_tweets_from_keyword(keyword, _twitter_service=None, **kwargs):
+  if not _twitter_service:    _twitter_service = twitter_service
 
   search_log_message = ("Searching twitter for keyword: %s", keyword)
 
   with log_wrapper(logger.debug, *search_log_message):
-    tweets_from_keywords = _twitter_client_service.search_twitter_by_keywords(
+    tweets_from_keywords = _twitter_service.search_twitter_by_keywords(
         keyword,
         include_entities=True,
         exclude_retweets=True,
