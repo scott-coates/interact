@@ -108,10 +108,12 @@ LOCAL_APPS = (
   # APPS
   'src.apps.assignment_delivery',
   'src.apps.engagement_discovery',
+  'src.apps.geo',
   'src.apps.graph',
   'src.apps.key_value',
   'src.apps.maintenance',
   'src.apps.relational',
+  'src.apps.social',
 
   # LIBS
   'src.libs.common_domain',
