@@ -14,3 +14,11 @@ def record_rate_limit(key_name, expiration):
     ret_val = pipe.execute()
 
   return ret_val
+
+
+def get_rate_limit_count(key_name):
+  kdb = get_key_value_client()
+
+  ret_val = kdb.llen(key_name)
+
+  return ret_val
