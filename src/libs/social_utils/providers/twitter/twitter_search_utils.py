@@ -1,9 +1,12 @@
 import datetime
-from dateutil.relativedelta import relativedelta
-from src.libs.social_utils.providers.twitter import twitter_client_provider
 
+from dateutil.relativedelta import relativedelta
+
+from src.libs.social_utils.providers.twitter import twitter_client_provider
 # http://stackoverflow.com/questions/13643823/exclude-replies-from-official-twitter-search-widget
 # http://stackoverflow.com/questions/27941940/how-to-exclude-retweets-and-replies-in-a-search-api
+from src.libs.social_utils.providers.twitter.signals import twitter_searched
+
 _EXCLUDE_RT = 'exclude:retweets'
 _EXCLUDE_RP = 'exclude:replies'
 
@@ -42,7 +45,11 @@ def search_twitter_by_user(screen_name,
   if since:
     search_params["since"] = get_time_period_back(since)
 
-  return client.get_user_timeline(**search_params)
+  ret_val = client.get_user_timeline(**search_params)
+
+  twitter_searched.send(None)
+
+  return ret_val
 
 
 def search_twitter(query,
@@ -72,4 +79,8 @@ def search_twitter(query,
   if since:
     search_params["since"] = get_time_period_back(since)
 
-  return client.search(**search_params)
+  ret_val = client.search(**search_params)
+
+  twitter_searched.send(None)
+
+  return ret_val

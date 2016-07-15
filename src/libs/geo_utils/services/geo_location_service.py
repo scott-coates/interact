@@ -30,6 +30,7 @@ def get_geocoded_address_dict(address_str):
 
 
 def _get_cached_geocoded_address(address_str):
+  # todo move this cachign logic to an app - use a signal to send the address
   address_key = only_alpha_numeric(address_str).lower()
   address_key = 'geo_lookup:{0}'.format(address_key)
 
