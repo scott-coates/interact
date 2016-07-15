@@ -1,12 +1,12 @@
 from outliers import smirnov_grubbs as grubbs
 
+from src.apps.geo import service as geo_service
 from src.domain.client.calculation import calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientProcessedEngagementAssignmentBatch1
 from src.domain.common import constants
 from src.libs.common_domain.aggregate_base import AggregateBase
-from src.libs.geo_utils.services import geo_location_service
 
 
 class Client(AggregateBase):
@@ -17,7 +17,7 @@ class Client(AggregateBase):
 
   @classmethod
   def from_attrs(cls, id, name, ta_attrs, _geo_service=None):
-    if not _geo_service: _geo_service = geo_location_service
+    if not _geo_service: _geo_service = geo_service
 
     ret_val = cls()
 
