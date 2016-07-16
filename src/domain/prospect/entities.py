@@ -82,11 +82,8 @@ class Prospect(AggregateBase):
 
     location = profile_attrs.get(constants.LOCATION)
     if location:
-      try:
-        location = _geo_service.get_geocoded_address_dict(location)
-        prospect_attrs[constants.LOCATIONS].append(location)
-      except:
-        pass
+      location = _geo_service.get_geocoded_address_dict(location)
+      prospect_attrs[constants.LOCATIONS].append(location)
 
     name = profile_attrs.get(constants.NAME)
     if name:
