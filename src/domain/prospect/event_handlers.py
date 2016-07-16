@@ -11,12 +11,7 @@ from src.domain.prospect.tasks import handle_duplicate_profile_task
 def created_from_engagement_opportunity_callback(sender, **kwargs):
   eo = kwargs['engagement_opportunity_discovery_object']
 
-  prospect_task = tasks.populate_prospect_from_provider_info_task.delay(eo.profile_external_id, eo.provider_type)
-
-  profile_task = tasks.populate_profile_from_provider_info_task.delay(eo.profile_external_id, eo.provider_type,
-                                                                      depends_on=prospect_task)
-
-  tasks.populate_engagement_opportunity_id_from_engagement_discovery_task.delay(eo, depends_on=profile_task)
+  tasks.populate_prospect_from_provider_info_chain.delay(eo.profile_external_id, eo.provider_type, eo)
 
 
 # note: this is not a typical domain event. it is called in real-time and will not be persisted to the event store.

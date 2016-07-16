@@ -3,7 +3,8 @@ import logging
 
 from django.db import transaction
 
-from src.apps.read_model.relational.client.models import ActiveTaTopicOption, ClientLookupForEa
+from src.apps.read_model.relational.client.models import ActiveTaTopicOption, ClientLookupForEa, EoLookupForEa, \
+  ProspectLookupForEa, ProfileLookupForEa, BatchEa
 from src.apps.read_model.relational.topic.service import get_topic_lookup
 from src.domain.common import constants
 

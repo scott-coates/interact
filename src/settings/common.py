@@ -3,6 +3,8 @@ from src.libs.python_utils.logging.rq_formatter import RqFormatter
 
 """Common settings and globals."""
 
+import os
+
 from os.path import abspath, dirname, basename
 
 # from src.libs.python_utils.logging.rq_formatter import RqFormatter
@@ -167,4 +169,7 @@ RQ_QUEUES = {
 }
 
 RQ_SHOW_ADMIN_LINK = True
+
+os.environ.setdefault("RQ_RETRY_MAX_TRIES", "5")
+os.environ.setdefault("RQ_RETRY_DELAYS", "3,60,300,600,1200")
 ########## END REDIS QUEUE CONFIGURATION

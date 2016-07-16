@@ -1,7 +1,6 @@
 import logging
 
 from django_rq import job
-from rq import get_current_job
 
 from src.domain.prospect import service
 from src.libs.python_utils.logging.logging_utils import log_wrapper
@@ -9,24 +8,22 @@ from src.libs.python_utils.logging.logging_utils import log_wrapper
 logger = logging.getLogger(__name__)
 
 
-# the reason we're doing these result_ttl=-1 and job.delete() everywhere is because by default, rq only keeps results
-# for about 500 seconds and these jobs depend on each other. So sometimes they don't run for more than 500 seconds
-# in between dependencies. So keep the jobs around forever and when a dependent job runs, it'll delete it's parent task.
+# we cannot use rq job dependencies because rq-retry uses rq-scheduler which doesn't respect job dependencies.
+# this is a hack to get around that.
 
-@job('default', result_ttl=-1)
-def populate_prospect_from_provider_info_task(external_id, provider_type):
+@job('default')
+def populate_prospect_from_provider_info_chain(external_id, provider_type, engagement_opportunity_discovery_object):
   log_message = ("external_id: %s, provider_type: %s", external_id, provider_type)
 
   with log_wrapper(logger.info, *log_message):
-    return service.populate_prospect_id_from_provider_info_(external_id, provider_type)
+    prospect_id = service.populate_prospect_id_from_provider_info_(external_id, provider_type)
+    populate_profile_from_provider_info_chain.delay(prospect_id, external_id, provider_type,
+                                                    engagement_opportunity_discovery_object)
 
 
-@job('default', result_ttl=-1)
-def populate_profile_from_provider_info_task(external_id, provider_type):
-  job = get_current_job()
-
-  prospect_id = job.dependency.result
-
+@job('default')
+def populate_profile_from_provider_info_chain(prospect_id, external_id, provider_type,
+                                              engagement_opportunity_discovery_object):
   log_message = (
     "prospect_id: %s, external_id: %s, provider_type: %s",
     prospect_id, external_id, provider_type
@@ -34,18 +31,13 @@ def populate_profile_from_provider_info_task(external_id, provider_type):
 
   with log_wrapper(logger.info, *log_message):
     profile_id = service.populate_profile_id_from_provider_info(prospect_id, external_id, provider_type)
-
-    job.dependency.delete()
-
-    return profile_id, prospect_id
+    populate_engagement_opportunity_id_from_engagement_discovery_task.delay(profile_id, prospect_id,
+                                                                            engagement_opportunity_discovery_object)
 
 
 @job('default')
-def populate_engagement_opportunity_id_from_engagement_discovery_task(engagement_opportunity_discovery_object):
-  job = get_current_job()
-
-  profile_id, prospect_id = job.dependency.result
-
+def populate_engagement_opportunity_id_from_engagement_discovery_task(profile_id, prospect_id,
+                                                                      engagement_opportunity_discovery_object):
   log_message = (
     "Begin add eo. profile_id: %s, eo_external_id: %s",
     profile_id, engagement_opportunity_discovery_object.engagement_opportunity_external_id
@@ -54,7 +46,6 @@ def populate_engagement_opportunity_id_from_engagement_discovery_task(engagement
   with log_wrapper(logger.info, *log_message):
     ret_val = service.populate_engagement_opportunity_id_from_engagement_discovery(profile_id, prospect_id,
                                                                                    engagement_opportunity_discovery_object)
-    job.dependency.delete()
     return ret_val
 
 

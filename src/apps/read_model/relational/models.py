@@ -6,4 +6,5 @@ class ReadModel(models.Model):
   id = models.CharField(max_length=8, unique=True)
 
   class Meta:
+    app_label = 'read_model'
     abstract = True
