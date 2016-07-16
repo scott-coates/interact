@@ -8,10 +8,10 @@ def record_rate_limit(key_name, expiration):
     # The RPUSHX command only pushes the element if the key already exists. Prevents leaked keys.
     ret_val = kdb.rpushx(key_name, True)
   else:
-    pipe = kdb.pipeline()
-    pipe.rpush(key_name, True)
-    pipe.expire(key_name, expiration)
-    ret_val = pipe.execute()
+    with kdb.pipeline() as pipe:
+      pipe.rpush(key_name, True)
+      pipe.expire(key_name, expiration)
+      ret_val = pipe.execute()
 
   return ret_val
 

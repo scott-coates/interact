@@ -165,6 +165,9 @@ RQ_QUEUES = {
   },
   'default': {
     'USE_REDIS_CACHE': 'default',
+  },
+  'dead_letter_queue': {
+    'USE_REDIS_CACHE': 'default',
   }
 }
 
