@@ -9,7 +9,7 @@ from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, 
   ProspectMarkedAsDuplicate, ProspectDeleted1, ProspectUpdatedTopicsFromProfile1
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
-from src.libs.geo_utils.services import geo_location_service
+from src.apps.geo import service as geo_service
 from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
@@ -67,7 +67,7 @@ class Prospect(AggregateBase):
 
   def add_profile(self, id, external_id, provider_type, _profile_service=None, _geo_service=None):
     if not _profile_service: _profile_service = profile_service
-    if not _geo_service: _geo_service = geo_location_service
+    if not _geo_service: _geo_service = geo_service
 
     profile = self._find_profile_by_external_id_and_provider_type(external_id, provider_type)
     if profile: raise Exception(profile, 'already exists.')
