@@ -170,5 +170,8 @@ RQ_QUEUES = {
 
 RQ_SHOW_ADMIN_LINK = True
 
-RQ_EXCEPTION_HANDLERS = ['src.libs.rq_utils.retry_handler.retry_handler']
+RQ_EXCEPTION_HANDLERS = [
+  'src.libs.rq_utils.retry_handler.move_to_failed_queue',
+  'src.libs.rq_utils.retry_handler.retry_handler',
+]
 ########## END REDIS QUEUE CONFIGURATION
