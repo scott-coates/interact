@@ -1,4 +1,5 @@
-from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, get_profile_ea_lookups_by_prospect_id, \
+from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
+  get_profile_ea_lookups_by_prospect_id, \
   get_eo_ea_lookup
 from src.domain.common import constants
 from src.libs.analytics_utils.providers.keen import keen_client_service
@@ -27,9 +28,19 @@ def deliver_ea(ea_data):
   for assignment_entity_attr in ea_data[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES]:
     if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
       eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
-      assigned_entities_to_deliver.append(eo_ea_lookup.eo_attrs)
+      assigned_entities_to_deliver.append(
+          {
+            'eo_attrs': eo_ea_lookup.eo_attrs,
+            constants.SCORE_ATTRS: str(assignment_entity_attr['score_attrs']['eo_keyword_score']['score_attrs'])
+          }
+      )
 
-  event_data[constants.EO] = [_get_value(ae, constants.TEXT) for ae in assigned_entities_to_deliver]
+  event_data[constants.EO] = [
+    {constants.TEXT: _get_value(ae, 'eo_attrs', constants.TEXT),
+     constants.SCORE_ATTRS: _get_value(ae, constants.SCORE_ATTRS)}
+    for ae in
+    assigned_entities_to_deliver
+    ]
 
   return keen_client_service.send_event('engagement_assigned', event_data)
 
