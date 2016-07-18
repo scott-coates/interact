@@ -165,14 +165,10 @@ RQ_QUEUES = {
   },
   'default': {
     'USE_REDIS_CACHE': 'default',
-  },
-  'dead_letter_queue': {
-    'USE_REDIS_CACHE': 'default',
   }
 }
 
 RQ_SHOW_ADMIN_LINK = True
 
-os.environ.setdefault("RQ_RETRY_MAX_TRIES", "5")
-os.environ.setdefault("RQ_RETRY_DELAYS", "3,60,300,600,1200")
+RQ_EXCEPTION_HANDLERS = ['src.libs.rq_utils.retry_handler.retry_handler']
 ########## END REDIS QUEUE CONFIGURATION
