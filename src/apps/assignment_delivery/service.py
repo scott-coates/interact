@@ -1,3 +1,5 @@
+import json
+
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
   get_eo_ea_lookup
@@ -29,7 +31,7 @@ def deliver_ea(ea_data):
     if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
       eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
 
-      score_attrs = str(
+      score_attrs = json.dumps(
           assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS])
 
       assigned_entities_to_deliver.append(
