@@ -28,10 +28,14 @@ def deliver_ea(ea_data):
   for assignment_entity_attr in ea_data[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES]:
     if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
       eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
+
+      score_attrs = str(
+          assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS])
+
       assigned_entities_to_deliver.append(
           {
             'eo_attrs': eo_ea_lookup.eo_attrs,
-            constants.SCORE_ATTRS: str(assignment_entity_attr['score_attrs']['eo_keyword_score']['score_attrs'])
+            constants.SCORE_ATTRS: score_attrs
           }
       )
 
