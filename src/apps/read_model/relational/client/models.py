@@ -69,6 +69,7 @@ class DeliveredEa(ReadModel):
   location = models.CharField(max_length=2400)
   url = models.CharField(max_length=2400)
   score = models.DecimalField(max_digits=19, decimal_places=7)
+  score_attrs = JSONField()
   assigned_entities = JSONField()
   prospect_id = models.CharField(max_length=8)
 

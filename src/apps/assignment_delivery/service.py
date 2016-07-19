@@ -18,6 +18,8 @@ def deliver_ea_to_analytics_service(ea_data):
 def deliver_ea_to_read_model(ea_data):
   event_data = _convert_ea_data_to_deliverable(ea_data)
 
+  event_data[constants.SCORE_ATTRS] = _get_value(ea_data, constants.SCORE_ATTRS)
+
   ea_id = event_data.pop(constants.ID)
   event_data['ea_id'] = ea_id
 
