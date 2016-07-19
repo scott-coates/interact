@@ -4,7 +4,7 @@ import logging
 from django.db import transaction
 
 from src.apps.read_model.relational.client.models import ActiveTaTopicOption, ClientLookupForEa, EoLookupForEa, \
-  ProspectLookupForEa, ProfileLookupForEa, BatchEa
+  ProspectLookupForEa, ProfileLookupForEa, BatchEa, DeliveredEa
 from src.apps.read_model.relational.topic.service import get_topic_lookup
 from src.domain.common import constants
 
@@ -116,13 +116,23 @@ def delete_prospect(prospect_id):
 
 
 def save_batch_ea(ea_id, attrs, score, score_attrs, client_id, batch_id, counter, prospect_id):
-  eo, _ = BatchEa.objects.update_or_create(
+  ea, _ = BatchEa.objects.update_or_create(
       id=ea_id, defaults=dict(
           attrs=attrs, score=score, score_attrs=score_attrs,
           client_id=client_id, batch_id=batch_id, counter=counter, prospect_id=prospect_id,
       )
   )
-  return eo
+  return ea
+
+
+def save_delivered_ea(ea_id, name, bio, location, url, score, assigned_entities, prospect_id):
+  ea, _ = DeliveredEa.objects.update_or_create(
+      id=ea_id, defaults=dict(
+          name=name, bio=bio, location=location, url=url, score=score, assigned_entities=assigned_entities,
+          prospect_id=prospect_id,
+      )
+  )
+  return ea
 
 
 def delete_batch_ea(client_id, batch_id):

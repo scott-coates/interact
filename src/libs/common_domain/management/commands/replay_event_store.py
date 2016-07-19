@@ -15,6 +15,7 @@ class Command(BaseCommand):
     app_names = options['app_names']
     if app_names:
       for a in app_names:
+        a = a.split('.')[0]
         # just ensure this app exists and works
         apps.get_app_config(a)
 

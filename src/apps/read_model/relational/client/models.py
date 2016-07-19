@@ -61,3 +61,16 @@ class BatchEa(ReadModel):
 
   def __str__(self):
     return 'BatchEa {id}'.format(id=self.id)
+
+
+class DeliveredEa(ReadModel):
+  name = models.CharField(max_length=2400)
+  bio = models.TextField()
+  location = models.CharField(max_length=2400)
+  url = models.CharField(max_length=2400)
+  score = models.DecimalField(max_digits=19, decimal_places=7)
+  assigned_entities = JSONField()
+  prospect_id = models.CharField(max_length=8)
+
+  def __str__(self):
+    return 'DeliveredEa {id}'.format(id=self.id)
