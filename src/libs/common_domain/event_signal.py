@@ -1,8 +1,9 @@
 import inspect
+import os
+
+from django.apps import apps
 from django.dispatch import Signal
 from django.dispatch.dispatcher import NO_RECEIVERS
-from django.apps import apps
-import os
 
 
 class EventSignal(Signal):
@@ -43,7 +44,11 @@ class EventSignal(Signal):
         for a in send_to_app_names:
           app_split = a.split('.', 1)
           app_name = app_split[0]
-          handler_path = app_split[1]
+          try:
+            handler_path = app_split[1]
+          except:
+            # this will happen if they just type in the name of an app 'myapp' without a subpath like 'myapp.path'
+            handler_path = ''
           app = apps.get_app_config(app_name)
           path = os.path.join(app.path, handler_path)
           if path in inspect.getfile(receiver):

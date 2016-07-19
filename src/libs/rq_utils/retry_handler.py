@@ -4,6 +4,7 @@ from datetime import timedelta
 
 import django_rq
 from django_rq.queues import get_failed_queue
+from rq.job import JobStatus
 
 MAX_FAILURES = 3
 RETRY_DELAYS = 5 * 60
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 # https://gist.github.com/spjwebster/6521272
-def retry_handler(job, exc_type, exc_value, traceback):
+def retry_handler(job, *exc_info):
   job.meta.setdefault(FAILURES_KEY, 0)
   failures_count = job.meta[FAILURES_KEY]
   failures_count += 1
@@ -32,6 +33,9 @@ def retry_handler(job, exc_type, exc_value, traceback):
 
     scheduled_job = scheduler.enqueue_in(timedelta(seconds=RETRY_DELAYS), job.func, *job.args, **job.kwargs)
     scheduled_job.meta[FAILURES_KEY] = failures_count
+    scheduled_job.set_status(JobStatus.FAILED)
+    exc_string = _get_exc_string(exc_info)
+    scheduled_job.exc_info = exc_string
     scheduled_job.save()
 
     # remove the old job from the queue
@@ -47,7 +51,12 @@ def retry_handler(job, exc_type, exc_value, traceback):
 # https://github.com/nvie/rq/issues/711
 def move_to_failed_queue(job, *exc_info):
   """Default exception handler: move the job to the failed queue."""
-  exc_string = ''.join(traceback.format_exception(*exc_info))
+  exc_string = _get_exc_string(exc_info)
   failed_queue = get_failed_queue()
   logger.warning('Moving job to {0!r} queue'.format(failed_queue.name))
   failed_queue.quarantine(job, exc_info=exc_string)
+
+
+def _get_exc_string(exc_info):
+  exc_string = ''.join(traceback.format_exception(*exc_info))
+  return exc_string
