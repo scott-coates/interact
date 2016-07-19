@@ -31,8 +31,7 @@ def deliver_ea(ea_data):
     if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
       eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
 
-      score_attrs = json.dumps(
-          assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS])
+      score_attrs = assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS]
 
       assigned_entities_to_deliver.append(
           {
@@ -41,12 +40,14 @@ def deliver_ea(ea_data):
           }
       )
 
-  event_data[constants.EO] = [
-    {constants.TEXT: _get_value(ae, 'eo_attrs', constants.TEXT),
-     constants.SCORE_ATTRS: _get_value(ae, constants.SCORE_ATTRS)}
-    for ae in
-    assigned_entities_to_deliver
-    ]
+  event_data[constants.EO] = json.dumps(
+      [
+        {constants.TEXT: _get_value(ae, 'eo_attrs', constants.TEXT),
+         constants.SCORE_ATTRS: _get_value(ae, constants.SCORE_ATTRS)}
+        for ae in
+        assigned_entities_to_deliver
+        ]
+  )
 
   return keen_client_service.send_event('engagement_assigned', event_data)
 
