@@ -3,11 +3,12 @@ import traceback
 from datetime import timedelta
 
 import django_rq
+from django.conf import settings
 from django_rq.queues import get_failed_queue
 from rq.job import JobStatus
 
-MAX_FAILURES = 3
-RETRY_DELAYS = 5 * 60
+MAX_FAILURES = settings.RQ_MAX_FAILURES
+RETRY_DELAYS = settings.RQ_RETRY_DELAYS
 
 FAILURES_KEY = 'failures'
 logger = logging.getLogger(__name__)
