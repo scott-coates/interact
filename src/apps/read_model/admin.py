@@ -5,6 +5,7 @@ from src.apps.read_model.relational.client.models import DeliveredEa
 
 class DeliveredEaAdmin(admin.ModelAdmin):
   actions = None
+  list_display = ('name', 'bio', 'score')
 
   def has_delete_permission(self, request, obj=None):
     return False
