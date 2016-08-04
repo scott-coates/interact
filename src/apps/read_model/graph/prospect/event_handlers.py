@@ -33,7 +33,10 @@ def add_profile(**kwargs):
 @receiver(EngagementOpportunityAddedToProfile1.event_signal)
 def add_eo(**kwargs):
   event = kwargs['event']
+
+  prospect_id = kwargs['aggregate_id']
+
   eo_id = event.id
   profile_id = event.profile_id
   topic_ids = event.topic_ids
-  tasks.create_eo_in_graphdb_task.delay(profile_id, eo_id, topic_ids)
+  tasks.create_eo_in_graphdb_task.delay(prospect_id, profile_id, eo_id, topic_ids)
