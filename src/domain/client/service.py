@@ -22,8 +22,8 @@ def save_assignment_batch_from_attrs(client_id, assignment_group, batch_id, coun
   eo_ids = assignment_group.get(constants.EO_IDS)
   if eo_ids: assignment_attrs[constants.EO_IDS] = eo_ids
 
-  score, score_attrs = client.calculate_engagement_assignment_score(assignment_attrs)
-  save_batch_ea(generate_id(), assignment_attrs, score, score_attrs, client_id, batch_id, counter, prospect_id)
+  score_attrs = client.get_engagement_assignment_score_attrs(assignment_attrs)
+  save_batch_ea(generate_id(), assignment_attrs, score_attrs, client_id, batch_id, counter, prospect_id)
 
 
 def process_assignment_batch(client_id, batch_id, _dispatcher=None):

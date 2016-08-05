@@ -7,9 +7,8 @@ from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
 from src.domain.common import constants
 
 
-def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_processor=None,
-                                          _rules_data_provider=None):
-  if not _score_processor: _score_processor = score_processor
+def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_data_provider=None):
+  # todo rename me - should i be called `calculator`?
   if not _rules_data_provider: _rules_data_provider = rules_data_provider
 
   score_attrs = {}
@@ -51,9 +50,7 @@ def calculate_engagement_assignment_score(client_id, assignment_attrs, _score_pr
       constants.ASSIGNED_ENTITY_TYPE: ae.assigned_entity_type
     })
 
-  score, score_attrs = _score_processor.process_score(score_attrs)
-
-  return score, score_attrs
+  return score_attrs
 
 
 def _get_profiles(assigned_calc_objects, prospect_id):

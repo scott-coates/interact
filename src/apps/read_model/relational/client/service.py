@@ -115,11 +115,11 @@ def delete_prospect(prospect_id):
   ProspectLookupForEa.objects.filter(id=prospect_id).delete()
 
 
-def save_batch_ea(ea_id, attrs, score, score_attrs, client_id, batch_id, counter, prospect_id):
+def save_batch_ea(ea_id, attrs, score_attrs, client_id, batch_id, counter, prospect_id):
   ea, _ = BatchEa.objects.update_or_create(
       id=ea_id, defaults=dict(
-          attrs=attrs, score=score, score_attrs=score_attrs,
-          client_id=client_id, batch_id=batch_id, counter=counter, prospect_id=prospect_id,
+          attrs=attrs, score_attrs=score_attrs, client_id=client_id, batch_id=batch_id, counter=counter,
+          prospect_id=prospect_id,
       )
   )
   return ea
@@ -151,8 +151,7 @@ def get_assignment_batch_processed_count(client_id, batch_id):
 
 
 def get_assignment_batch(client_id, batch_id):
-  ret_val = get_batch_ea(client_id, batch_id).values(constants.ID, constants.ATTRS, constants.SCORE,
-                                                     constants.SCORE_ATTRS,
+  ret_val = get_batch_ea(client_id, batch_id).values(constants.ID, constants.ATTRS, constants.SCORE_ATTRS,
                                                      constants.PROSPECT_ID)
 
   loaded = [_process_batch(r) for r in ret_val]
@@ -165,6 +164,5 @@ def _process_batch(attrs):
 
   ret_val[constants.ATTRS] = json.loads(ret_val[constants.ATTRS])
   ret_val[constants.SCORE_ATTRS] = json.loads(ret_val[constants.SCORE_ATTRS])
-  ret_val[constants.SCORE] = float(ret_val[constants.SCORE])
 
   return ret_val

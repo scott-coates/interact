@@ -52,7 +52,6 @@ class EoLookupForEa(ReadModel):
 
 class BatchEa(ReadModel):
   attrs = JSONField()
-  score = models.DecimalField(max_digits=19, decimal_places=7)
   score_attrs = JSONField()
   client_id = models.CharField(max_length=8)
   batch_id = models.CharField(max_length=8)

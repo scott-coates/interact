@@ -1,7 +1,7 @@
 from outliers import smirnov_grubbs as grubbs
 
 from src.apps.geo import service as geo_service
-from src.domain.client.calculation import calculator
+from src.domain.client.calculation import calculator, score_processor
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientProcessedEngagementAssignmentBatch1
@@ -57,12 +57,17 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.relevance, ta_topic.topic_id)
     )
 
-  def add_ea_batch(self, batch_id, batch_eas, _outlier_utils=None):
+  def add_ea_batch(self, batch_id, batch_eas, _score_processor=None, _outlier_utils=None):
+    if not _score_processor: _score_processor = score_processor
     if not _outlier_utils: _outlier_utils = grubbs
+
     if not batch_id:
       raise TypeError("batch_id is required")
 
     self._check_eas(batch_eas)
+
+    for b in batch_eas:
+      b[constants.SCORE] = _score_processor.process_score(b[constants.SCORE_ATTRS])
 
     scores = sorted([b[constants.SCORE] for b in batch_eas])
     accepted = _outlier_utils.test(scores, 0.01)
@@ -81,12 +86,12 @@ class Client(AggregateBase):
         ClientProcessedEngagementAssignmentBatch1(batch_id, assigned, skipped, scores, min_score, max_score)
     )
 
-  def calculate_engagement_assignment_score(self, assignment_attrs, _calculator=None):
+  def get_engagement_assignment_score_attrs(self, assignment_attrs, _calculator=None):
     if not _calculator: _calculator = calculator
 
-    score, score_attrs = _calculator.calculate_engagement_assignment_score(self.id, assignment_attrs)
+    score_attrs = _calculator.get_engagement_assignment_score_attrs(self.id, assignment_attrs)
 
-    return score, score_attrs
+    return score_attrs
 
   def _check_eas(self, batch_eas):
 
@@ -97,9 +102,6 @@ class Client(AggregateBase):
 
       if not b[constants.PROSPECT_ID]:
         raise TypeError("prospect_id is required")
-
-      if not b[constants.SCORE]:
-        raise TypeError("score is required")
 
       self._check_attrs(b[constants.ATTRS])
       self._check_attrs(b[constants.SCORE_ATTRS])

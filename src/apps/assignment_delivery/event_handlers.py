@@ -6,7 +6,7 @@ from src.libs.common_domain.decorators import event_idempotent
 
 
 # @event_idempotent
-@receiver(ClientProcessedEngagementAssignmentBatch1.event_signal)
+# @receiver(ClientProcessedEngagementAssignmentBatch1.event_signal)
 def execute_ea_created_1(**kwargs):
   event = kwargs['event']
 
