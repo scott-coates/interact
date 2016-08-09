@@ -1,7 +1,7 @@
 from outliers import smirnov_grubbs as grubbs
 
 from src.apps.geo import service as geo_service
-from src.domain.client.calculation import calculator, score_processor
+from src.domain.client.calculation import score_processor, calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientProcessedEngagementAssignmentBatch1
@@ -57,8 +57,8 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.relevance, ta_topic.topic_id)
     )
 
-  def add_ea_batch(self, batch_id, batch_eas, _score_processor=None, _outlier_utils=None):
-    if not _score_processor: _score_processor = score_processor
+  def add_ea_batch(self, batch_id, batch_eas, _calculator=None, _outlier_utils=None):
+    if not _calculator: _calculator = calculator.ScoreCalculator
     if not _outlier_utils: _outlier_utils = grubbs
 
     if not batch_id:
@@ -66,8 +66,11 @@ class Client(AggregateBase):
 
     self._check_eas(batch_eas)
 
+    score_attrs_col = [b[constants.SCORE_ATTRS] for b in batch_eas]
+    score_calc = _calculator(score_attrs_col)
+
     for b in batch_eas:
-      b[constants.SCORE] = _score_processor.process_score(b[constants.SCORE_ATTRS])
+      b[constants.SCORE] = score_calc.calculate_score(b[constants.SCORE_ATTRS])
 
     scores = sorted([b[constants.SCORE] for b in batch_eas])
     accepted = _outlier_utils.test(scores, 0.01)
@@ -86,10 +89,10 @@ class Client(AggregateBase):
         ClientProcessedEngagementAssignmentBatch1(batch_id, assigned, skipped, scores, min_score, max_score)
     )
 
-  def get_engagement_assignment_score_attrs(self, assignment_attrs, _calculator=None):
-    if not _calculator: _calculator = calculator
+  def get_engagement_assignment_score_attrs(self, assignment_attrs, _score_processor=None):
+    if not _score_processor: _score_processor = score_processor
 
-    score_attrs = _calculator.get_engagement_assignment_score_attrs(self.id, assignment_attrs)
+    score_attrs = _score_processor.get_engagement_assignment_score_attrs(self.id, assignment_attrs)
 
     return score_attrs
 

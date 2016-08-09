@@ -1,95 +1,57 @@
-from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
-  get_profile_ea_lookups_by_prospect_id, \
-  get_eo_ea_lookup
-from src.domain.client.calculation import score_processor, rules_data_provider
-from src.domain.client.calculation.calculation_objects import CalculationAssignedEntityObject
-from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
+import numpy as np
+
 from src.domain.common import constants
 
 
-def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_data_provider=None):
-  # todo rename me - should i be called `calculator`?
-  if not _rules_data_provider: _rules_data_provider = rules_data_provider
+class ScoreCalculator:
+  def __init__(self, score_attrs_col):
+    self.prospect_scores = []
+    self.profile_scores = []
+    self.ae_scores = []
 
-  score_attrs = {}
+    for s in score_attrs_col:
+      parts = self._get_score_parts(s)
+      self.prospect_scores.append(parts[constants.PROSPECT])
+      self.profile_scores.append(parts[constants.PROFILES])
+      self.ae_scores.append(parts[constants.ASSIGNED_ENTITIES])
 
-  assigned_calc_objects = _get_assigned_calc_objects(assignment_attrs)
+    # get median
+    self.prospect_median = np.median(self.prospect_scores)
+    self.profile_median = np.median(self.profile_scores)
+    self.ae_median = np.median(self.ae_scores)
 
-  rules_data = _rules_data_provider.provide_rules_data(client_id)
+    # normalize the median for each val in the list
+    prospect_abs_data = np.abs(self.prospect_scores - self.prospect_median)
+    profile_abs_data = np.abs(self.profile_scores - self.profile_median)
+    ae_abs_data = np.abs(self.ae_scores - self.ae_median)
 
-  prospect_id = assigned_calc_objects[0].prospect_id
-  prospect = get_prospect_ea_lookup(prospect_id)
+    # refer to guidetodatamining chapter 4 for abs standard devation
+    # sample size = len(scores) - 1. chapter 6 guidetodatamining.
+    # http://stackoverflow.com/a/16562028/173957
+    self.prospect_mdev = (1 / (len(self.prospect_scores) - 1)) * prospect_abs_data.sum()
+    self.profile_mdev = (1 / (len(self.profile_scores) - 1)) * profile_abs_data.sum()
+    self.ae_mdev = (1 / (len(self.ae_scores) - 1)) * ae_abs_data.sum()
 
-  profiles = _get_profiles(assigned_calc_objects, prospect_id)
+  def calculate_score(self, score_attrs):
+    parts = self._get_score_parts(score_attrs)
 
-  rules_engine = RulesEngine(client_id)
+    prospect_score = parts[constants.PROSPECT]
+    profiles_score = parts[constants.PROFILES]
+    ae_score = parts[constants.ASSIGNED_ENTITIES]
 
-  p_score, p_score_attrs = rules_engine.get_prospect_score(prospect, rules_data)
-  score_attrs[constants.PROSPECT] = {
-    constants.SCORE: p_score,
-    constants.SCORE_ATTRS: p_score_attrs,
-    constants.ID: prospect.id
-  }
+    prospect_new = np.nan_to_num((prospect_score - self.prospect_median) / self.prospect_mdev)
+    profile_new = np.nan_to_num((profiles_score - self.profile_median) / self.profile_mdev)
+    ae_new = np.nan_to_num((ae_score - self.ae_median) / self.ae_mdev)
 
-  score_attrs[constants.PROFILES] = []
-  for profile in profiles:
-    p_score, p_score_attrs = rules_engine.get_profile_score(profile, rules_data)
-    score_attrs[constants.PROFILES].append({
-      constants.SCORE: p_score,
-      constants.SCORE_ATTRS: p_score_attrs,
-      constants.ID: profile.id
-    })
+    score = prospect_new + profile_new + ae_new
 
-  score_attrs[constants.ASSIGNED_ENTITIES] = []
-  for ae in assigned_calc_objects:
-    ae_score, ae_score_attrs = rules_engine.get_assigned_entity_score(ae, rules_data)
-    score_attrs[constants.ASSIGNED_ENTITIES].append({
-      constants.SCORE: ae_score,
-      constants.SCORE_ATTRS: ae_score_attrs,
-      constants.ID: ae.assigned_entity_id,
-      constants.ASSIGNED_ENTITY_TYPE: ae.assigned_entity_type
-    })
+    return score
 
-  return score_attrs
+  def _get_score_parts(self, score_attrs):
+    parts = {
+      constants.PROSPECT: score_attrs[constants.PROSPECT][constants.SCORE],
+      constants.PROFILES: sum([x[constants.SCORE] for x in score_attrs[constants.PROFILES]]),
+      constants.ASSIGNED_ENTITIES: sum([x[constants.SCORE] for x in score_attrs[constants.ASSIGNED_ENTITIES]])
+    }
 
-
-def _get_profiles(assigned_calc_objects, prospect_id):
-  # we used to have logic where you could assign a profile so we had to
-  # get all unique profiles except those that we're going to assign.
-  # this logic might come back in the future so lets keep this func encapsulated.
-
-  assigned_profiles = [
-    ae.assigned_entity_id for ae in assigned_calc_objects
-    if ae.assigned_entity_type == constants.PROFILE
-    ]
-
-  profiles = get_profile_ea_lookups_by_prospect_id(prospect_id).exclude(id__in=assigned_profiles)
-
-  return profiles
-
-
-def _get_assigned_calc_objects(assignment_attrs):
-  """
-  Convert the attrs into ea entities
-  """
-
-  assigned_entities = []
-  for assignment_attr, assigned_entity_ids in assignment_attrs.items():
-
-    for id in assigned_entity_ids:
-
-      if assignment_attr == constants.EO_IDS:
-        eo_ea_lookup = get_eo_ea_lookup(id)
-        assigned_entity_attrs = eo_ea_lookup.eo_attrs
-        topic_ids = eo_ea_lookup.topic_ids
-        provider_type = eo_ea_lookup.provider_type
-        prospect_id = eo_ea_lookup.prospect_id
-        entity_type = constants.EO
-      else:
-        raise ValueError("Invalid assignment attrs")
-
-      assigned_entities.append(
-          CalculationAssignedEntityObject(assigned_entity_attrs, id, entity_type, provider_type, prospect_id, topic_ids)
-      )
-
-  return assigned_entities
+    return parts
