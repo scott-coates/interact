@@ -17,3 +17,4 @@ django-rq==0.9.1
 pygeocoder==1.2.5
 shortuuid==0.4.3
 keen==0.3.23
+Pygments==2.1.3

@@ -70,7 +70,11 @@ class Client(AggregateBase):
     score_calc = _calculator(score_attrs_col)
 
     for b in batch_eas:
-      b[constants.SCORE] = score_calc.calculate_score(b[constants.SCORE_ATTRS])
+      score, parts = score_calc.calculate_score(b[constants.SCORE_ATTRS])
+      b[constants.SCORE] = score
+      b[constants.SCORE_ATTRS][constants.PROSPECT][constants.SCORE] = parts[constants.PROSPECT]
+      b[constants.SCORE_ATTRS][constants.PROFILES][constants.SCORE] = parts[constants.PROFILES]
+      b[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.SCORE] = parts[constants.ASSIGNED_ENTITIES]
 
     scores = sorted([b[constants.SCORE] for b in batch_eas])
     accepted = _outlier_utils.test(scores, 0.01)

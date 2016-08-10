@@ -30,19 +30,19 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
     constants.ID: prospect.id
   }
 
-  score_attrs[constants.PROFILES] = []
+  score_attrs[constants.PROFILES] = {constants.DATA: []}
   for profile in profiles:
     p_score, p_score_attrs = rules_engine.get_profile_score(profile, rules_data)
-    score_attrs[constants.PROFILES].append({
+    score_attrs[constants.PROFILES][constants.DATA].append({
       constants.SCORE: p_score,
       constants.SCORE_ATTRS: p_score_attrs,
       constants.ID: profile.id
     })
 
-  score_attrs[constants.ASSIGNED_ENTITIES] = []
+  score_attrs[constants.ASSIGNED_ENTITIES] = {constants.DATA: []}
   for ae in assigned_calc_objects:
     ae_score, ae_score_attrs = rules_engine.get_assigned_entity_score(ae, rules_data)
-    score_attrs[constants.ASSIGNED_ENTITIES].append({
+    score_attrs[constants.ASSIGNED_ENTITIES][constants.DATA].append({
       constants.SCORE: ae_score,
       constants.SCORE_ATTRS: ae_score_attrs,
       constants.ID: ae.assigned_entity_id,

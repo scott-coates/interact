@@ -5,6 +5,7 @@ from datetime import timedelta
 import django_rq
 from django.conf import settings
 from django_rq.queues import get_failed_queue
+from random import randint
 from rq.job import JobStatus
 
 MAX_FAILURES = settings.RQ_MAX_FAILURES
@@ -31,8 +32,8 @@ def retry_handler(job, *exc_info):
   else:
     # Requeue job and stop it from being moved into the failed queue
     scheduler = django_rq.get_scheduler(job.origin)
-
-    scheduled_job = scheduler.enqueue_in(timedelta(seconds=RETRY_DELAYS), job.func, *job.args, **job.kwargs)
+    retry_seconds = RETRY_DELAYS + randint(1, 60)
+    scheduled_job = scheduler.enqueue_in(timedelta(seconds=retry_seconds), job.func, *job.args, **job.kwargs)
     scheduled_job.meta[FAILURES_KEY] = failures_count
     scheduled_job.set_status(JobStatus.FAILED)
     exc_string = _get_exc_string(exc_info)

@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.domain.common import constants
+from src.libs.text_utils.formatting.text_formatter import only_alpha_numeric
 from src.libs.text_utils.token import token_utils
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,10 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
     score += tweet_score
     score_attrs.update(tweet_score_attrs)
 
+    mention_score, mention_score_attrs = self._apply_mention_score()
+    score += mention_score
+    score_attrs.update(mention_score_attrs)
+
     return score, score_attrs
 
   def _apply_tweet_score(self):
@@ -59,5 +64,24 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
           }
 
           score_attrs[constants.EO_KEYWORD_SCORE][constants.SCORE] = counter[constants.EO_KEYWORD_SCORE]
+
+    return score, score_attrs
+
+  def _apply_mention_score(self):
+    share_text = ('via @',)
+
+    score, score_attrs, counter = self._get_default_score_items()
+
+    is_retweet = self.eo_attrs.get(constants.IS_RETWEET)
+
+    if not is_retweet:
+      text = self.eo_attrs.get(constants.TEXT, '').lower()
+      if not any(t for t in share_text if t in text):
+        mentions = self.eo_attrs.get(constants.MENTIONS)
+
+        if mentions:
+          mention_score = len(mentions)
+          score += mention_score
+          score_attrs[constants.EO_MENTION_SCORE][constants.SCORE] = mention_score
 
     return score, score_attrs

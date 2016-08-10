@@ -8,7 +8,6 @@ from src.apps.social.providers.twitter import twitter_service
 from src.domain.common import constants
 from src.libs.datetime_utils import datetime_parser
 from src.libs.python_utils.logging.logging_utils import log_wrapper
-from src.libs.social_utils.providers.twitter import twitter_search_utils
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
 logger = logging.getLogger(__name__)
@@ -98,13 +97,13 @@ def _find_tweets_from_keyword(keyword, _twitter_service=None, **kwargs):
   return ret_val
 
 
-def _find_tweets_from_user(screen_name, _twitter_search_utils=None):
-  if not _twitter_search_utils:    _twitter_search_utils = twitter_search_utils
+def _find_tweets_from_user(screen_name, _twitter_service=None):
+  if not _twitter_service:    _twitter_service = twitter_service
 
   search_log_message = ("Searching user timeline: %s", screen_name)
 
   with log_wrapper(logger.debug, *search_log_message):
-    tweets_from_user = _twitter_search_utils.search_twitter_by_user(screen_name, since='y', count=100)
+    tweets_from_user = _twitter_service.search_twitter_by_user(screen_name, since='y', count=100)
 
   ret_val = _create_tweet_eo_object(tweets_from_user)
 
@@ -120,15 +119,19 @@ def _create_tweet_eo_object(tweets):
     profile_url = _twitter_url_prefix.format(username)
     tweet_id = tweet['id_str']
     url = "{0}/status/{1}".format(profile_url, tweet_id)
-    text = tweet['text']
+    text = tweet[constants.TEXT]
+    is_retweet = _is_retweet(tweet, text)
     tweet_created_date = tweet["created_at"]
     tweet_websites = _get_tweet_websites(tweet)
+    tweet_mentions = _get_tweet_mentions(tweet)
 
     tweet_data = {
       constants.URL: url, constants.TEXT: text,
+      constants.IS_RETWEET: is_retweet,
     }
 
     if tweet_websites: tweet_data[constants.WEBSITES] = tweet_websites
+    if tweet_mentions: tweet_data[constants.MENTIONS] = tweet_mentions
 
     ret_val.append(
         TwitterEngagementOpportunityDiscoveryObject(
@@ -145,6 +148,19 @@ def _create_tweet_eo_object(tweets):
   return ret_val
 
 
+def _is_retweet(tweet, text):
+  ret_val = False
+
+  # http://stackoverflow.com/questions/18869688/twitter-api-check-if-a-tweet-is-a-retweet
+  if 'retweeted_status' in tweet:
+    ret_val = True
+  else:
+    if text.startswith('RT '):
+      ret_val = True
+      
+  return ret_val
+
+
 def _get_tweet_websites(tweet):
   tweet_websites = []
   entities = tweet['entities']
@@ -155,3 +171,24 @@ def _get_tweet_websites(tweet):
   tweet_websites = get_unique_urls_from_iterable(tweet_websites)
 
   return tweet_websites
+
+
+def _get_tweet_mentions(tweet):
+  tweet_mentions = []
+  entities = tweet['entities']
+
+  # twitter stores mentions in a tweets's field `entities`.
+  entity_mentions_key = entities.get('user_mentions', [])
+  tweet_mentions.extend(_get_user_mention(x) for x in entity_mentions_key)
+
+  return tweet_mentions
+
+
+def _get_user_mention(mention):
+  ret_val = {
+    constants.ID: mention['id_str'],
+    constants.NAME: mention[constants.NAME],
+    constants.SCREEN_NAME: mention[constants.SCREEN_NAME]
+  }
+
+  return ret_val

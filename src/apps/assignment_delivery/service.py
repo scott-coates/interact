@@ -42,22 +42,36 @@ def _convert_ea_data_to_deliverable(ea_data):
   ret_val[constants.URL] = _get_value(profile.profile_attrs, constants.URL)
 
   ret_val[constants.SCORE] = _get_value(ea_data, constants.SCORE)
+  ret_val[constants.PROSPECT_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROSPECT, constants.SCORE)
+  ret_val[constants.PROFILE_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROFILES, constants.SCORE)
+  ret_val[constants.ASSIGNED_ENTITY_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.ASSIGNED_ENTITIES,
+                                                        constants.SCORE)
+
   ret_val[constants.ID] = _get_value(ea_data, constants.ID)
 
   assigned_entities_to_deliver = []
 
-  for assignment_entity_attr in ea_data[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES]:
+  for assignment_entity_attr in ea_data[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.DATA]:
     if assignment_entity_attr[constants.ASSIGNED_ENTITY_TYPE] == constants.EO:
       eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
 
-      score_attrs = assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_KEYWORD_SCORE][constants.SCORE_ATTRS]
+      score_attrs = {
+        constants.EO_KEYWORD_SCORE: assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_KEYWORD_SCORE][
+          constants.SCORE_ATTRS]
+      }
 
-      assigned_entities_to_deliver.append(
-          {
-            constants.ATTRS: eo_ea_lookup.eo_attrs,
-            constants.SCORE_ATTRS: score_attrs
-          }
-      )
+      if constants.EO_MENTION_SCORE in assignment_entity_attr[constants.SCORE_ATTRS]:
+        score_attrs[constants.EO_MENTION_SCORE] = assignment_entity_attr[constants.SCORE_ATTRS][
+          constants.EO_MENTION_SCORE]
+
+    # noinspection PyUnboundLocalVariable
+    # for now we can assume every EA is an EO
+    assigned_entities_to_deliver.append(
+        {
+          constants.ATTRS: eo_ea_lookup.eo_attrs,
+          constants.SCORE_ATTRS: score_attrs
+        }
+    )
 
   ret_val[constants.ASSIGNED_ENTITIES] = [
     {

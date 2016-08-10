@@ -45,13 +45,14 @@ class ScoreCalculator:
 
     score = prospect_new + profile_new + ae_new
 
-    return score
+    return score, parts
 
   def _get_score_parts(self, score_attrs):
     parts = {
       constants.PROSPECT: score_attrs[constants.PROSPECT][constants.SCORE],
-      constants.PROFILES: sum([x[constants.SCORE] for x in score_attrs[constants.PROFILES]]),
-      constants.ASSIGNED_ENTITIES: sum([x[constants.SCORE] for x in score_attrs[constants.ASSIGNED_ENTITIES]])
+      constants.PROFILES: sum([x[constants.SCORE] for x in score_attrs[constants.PROFILES][constants.DATA]]),
+      constants.ASSIGNED_ENTITIES: sum([x[constants.SCORE] for x in score_attrs[constants.ASSIGNED_ENTITIES][
+        constants.DATA]])
     }
 
     return parts
