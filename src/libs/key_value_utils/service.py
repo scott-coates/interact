@@ -22,3 +22,17 @@ def get_rate_limit_count(key_name):
   ret_val = kdb.llen(key_name)
 
   return ret_val
+
+
+# http://redis.io/commands/LTRIM
+# http://stackoverflow.com/questions/16641011/redis-capped-sorted-set-list-or-queue
+# http://highscalability.com/blog/2011/7/6/11-common-web-use-cases-solved-in-redis.html
+def push_latest(key_name, key_value, length_limit):
+  kdb = get_key_value_client()
+
+  with kdb.pipeline() as pipe:
+    pipe.lpush(key_name, key_value)
+    pipe.ltrim(key_name, 0, length_limit)
+    ret_val = pipe.execute()
+
+  return ret_val

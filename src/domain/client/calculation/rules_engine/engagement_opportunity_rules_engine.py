@@ -3,7 +3,6 @@ from abc import abstractmethod
 
 from src.domain.client.calculation.rules_engine.base_rules_engine import BaseRulesEngine
 from src.domain.common import constants
-from src.libs.text_utils.formatting.text_formatter import only_alpha_numeric
 from src.libs.text_utils.token import token_utils
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,39 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
     self.rules_data = rules_data
 
   def score_it(self):
-    score, score_attrs = self._apply_score()
+    score, score_attrs, counter = self._get_default_score_items()
+
+    topic_score, topic_score_attrs = self._apply_topic_score()
+    score += topic_score
+    score_attrs.update(topic_score_attrs)
+
+    internal_score, internal_score_attrs = self._apply_score()
+    score += internal_score
+    score_attrs.update(internal_score_attrs)
+
+    return score, score_attrs
+
+  def _apply_topic_score(self):
+    score, score_attrs, counter = self._get_default_score_items()
+
+    topics = self.rules_data.get(constants.TOPICS)
+
+    if topics:
+
+      for k, v in topics.items():
+        topic_score = v[constants.RELEVANCE]
+
+        topic_id = v[constants.ID]
+
+        if topic_id in self.eo_topic_ids:
+          score += topic_score
+          counter[constants.EO_TOPIC_SCORE] += topic_score
+
+          score_attrs[constants.EO_TOPIC_SCORE][constants.SCORE_ATTRS][k] = {
+            constants.RELEVANCE: topic_score
+          }
+
+          score_attrs[constants.EO_TOPIC_SCORE][constants.SCORE] = counter[constants.EO_TOPIC_SCORE]
 
     return score, score_attrs
 
@@ -33,37 +64,9 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
   def _apply_score(self):
     score, score_attrs = 0, {}
 
-    tweet_score, tweet_score_attrs = self._apply_tweet_score()
-    score += tweet_score
-    score_attrs.update(tweet_score_attrs)
-
     mention_score, mention_score_attrs = self._apply_mention_score()
     score += mention_score
     score_attrs.update(mention_score_attrs)
-
-    return score, score_attrs
-
-  def _apply_tweet_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
-
-    topics = self.rules_data.get(constants.TOPICS)
-
-    if topics:
-
-      for k, v in topics.items():
-        tweet_topic_score = v[constants.RELEVANCE]
-
-        topic_id = v[constants.ID]
-
-        if topic_id in self.eo_topic_ids:
-          score += tweet_topic_score
-          counter[constants.EO_TOPIC_SCORE] += tweet_topic_score
-
-          score_attrs[constants.EO_TOPIC_SCORE][constants.SCORE_ATTRS][k] = {
-            constants.RELEVANCE: tweet_topic_score
-          }
-
-          score_attrs[constants.EO_TOPIC_SCORE][constants.SCORE] = counter[constants.EO_TOPIC_SCORE]
 
     return score, score_attrs
 
