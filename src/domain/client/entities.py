@@ -1,7 +1,7 @@
 from outliers import smirnov_grubbs as grubbs
 
 from src.apps.geo import service as geo_service
-from src.domain.client.calculation import score_processor, calculator
+from src.domain.client.calculation import score_counter, score_calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientProcessedEngagementAssignmentBatch1
@@ -58,7 +58,7 @@ class Client(AggregateBase):
     )
 
   def add_ea_batch(self, batch_id, batch_eas, _calculator=None, _outlier_utils=None):
-    if not _calculator: _calculator = calculator.ScoreCalculator
+    if not _calculator: _calculator = score_calculator.ScoreCalculator
     if not _outlier_utils: _outlier_utils = grubbs
 
     if not batch_id:
@@ -94,7 +94,7 @@ class Client(AggregateBase):
     )
 
   def get_engagement_assignment_score_attrs(self, assignment_attrs, _score_processor=None):
-    if not _score_processor: _score_processor = score_processor
+    if not _score_processor: _score_processor = score_counter
 
     score_attrs = _score_processor.get_engagement_assignment_score_attrs(self.id, assignment_attrs)
 
