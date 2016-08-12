@@ -56,7 +56,7 @@ def _convert_ea_data_to_deliverable(ea_data):
       eo_ea_lookup = get_eo_ea_lookup(assignment_entity_attr[constants.ID])
 
       score_attrs = {
-        constants.EO_KEYWORD_SCORE: assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_KEYWORD_SCORE][
+        constants.EO_TOPIC_SCORE: assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_TOPIC_SCORE][
           constants.SCORE_ATTRS]
       }
 

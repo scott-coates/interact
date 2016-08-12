@@ -44,9 +44,9 @@ RELEVANCE = 'relevance'
 
 NEW_PROSPECT_SCORE = 'new_prospect_score'
 BIO_AVOID_KEYWORD_SCORE = 'bio_avoid_keyword_score'
-BIO_KEYWORD_SCORE = 'bio_keyword_score'
+BIO_TOPIC_SCORE = 'bio_topic_score'
 LOCATION_SCORE = 'location_score'
-EO_KEYWORD_SCORE = 'eo_keyword_score'
+EO_TOPIC_SCORE = 'eo_topic_score'
 EO_MENTION_SCORE = 'eo_mention_score'
 
 

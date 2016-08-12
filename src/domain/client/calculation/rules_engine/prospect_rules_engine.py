@@ -79,13 +79,13 @@ class ProspectRulesEngine(BaseRulesEngine):
         topic_id = v[constants.ID]
         if topic_id in self.prospect_topic_ids:
           score += bio_keyword_score
-          counter[constants.BIO_KEYWORD_SCORE] += bio_keyword_score
+          counter[constants.BIO_TOPIC_SCORE] += bio_keyword_score
 
-          score_attrs[constants.BIO_KEYWORD_SCORE][constants.SCORE_ATTRS][k] = {
+          score_attrs[constants.BIO_TOPIC_SCORE][constants.SCORE_ATTRS][k] = {
             constants.RELEVANCE: bio_keyword_score
           }
 
-          score_attrs[constants.BIO_KEYWORD_SCORE][constants.SCORE] = counter[constants.BIO_KEYWORD_SCORE]
+          score_attrs[constants.BIO_TOPIC_SCORE][constants.SCORE] = counter[constants.BIO_TOPIC_SCORE]
 
     bios = self.prospect_attrs.get(constants.BIOS)
 
