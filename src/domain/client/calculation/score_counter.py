@@ -3,7 +3,7 @@ from src.apps.read_model.relational.client.service import get_prospect_ea_lookup
   get_eo_ea_lookup
 from src.domain.client.calculation import rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
-from src.domain.client.calculation.score_objects import ScoreAssignedEntityObject
+from src.domain.client.calculation.score_objects import AssignedEntity
 from src.domain.common import constants
 
 
@@ -88,7 +88,7 @@ def _get_assigned_calc_objects(assignment_attrs):
         raise ValueError("Invalid assignment attrs")
 
       assigned_entities.append(
-          ScoreAssignedEntityObject(assigned_entity_attrs, id, entity_type, provider_type, prospect_id, topic_ids)
+          AssignedEntity(assigned_entity_attrs, id, entity_type, provider_type, prospect_id, topic_ids)
       )
 
   return assigned_entities
