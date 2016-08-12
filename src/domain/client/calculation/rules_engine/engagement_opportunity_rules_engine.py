@@ -46,11 +46,11 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
   def _apply_tweet_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    keywords = self.rules_data.get(constants.KEYWORDS)
+    topics = self.rules_data.get(constants.TOPICS)
 
-    if keywords:
+    if topics:
 
-      for k, v in keywords.items():
+      for k, v in topics.items():
         tweet_keyword_score = v[constants.RELEVANCE]
 
         topic_id = v[constants.ID]

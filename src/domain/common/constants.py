@@ -35,7 +35,7 @@ FOLLOWERS_COUNT = 'followers_count'
 FOLLOWING_COUNT = 'following_count'
 IS_RETWEET = 'is_retweet'
 
-KEYWORDS = 'keywords'
+TOPICS = 'topics'
 TOPIC_ID = 'topic_id'
 
 DATA = 'data'

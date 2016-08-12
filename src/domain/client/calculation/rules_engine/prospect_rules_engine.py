@@ -66,10 +66,10 @@ class ProspectRulesEngine(BaseRulesEngine):
   def _apply_bio_score(self):
     score, score_attrs, counter = self._get_default_score_items()
 
-    keywords = self.rules_data.get(constants.KEYWORDS)
-    if keywords:
+    topics = self.rules_data.get(constants.TOPICS)
+    if topics:
 
-      for k, v in keywords.items():
+      for k, v in topics.items():
         bio_keyword_score = v[constants.RELEVANCE]
 
         # this will 'bump' up the importance of bio topics

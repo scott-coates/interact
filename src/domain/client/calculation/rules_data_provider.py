@@ -24,7 +24,7 @@ def provide_rules_data(client_id):
 def _provide_keywords(client):
   ret_val = {}
 
-  ret_val[constants.KEYWORDS] = {
+  ret_val[constants.TOPICS] = {
     v[constants.NAME]: {
       constants.RELEVANCE: v[constants.RELEVANCE],
       constants.ID: k,
