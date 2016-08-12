@@ -1,6 +1,7 @@
 from django.dispatch import receiver
 
 from src.apps.read_model.key_value.prospect import tasks
+from src.domain.common import constants
 from src.domain.prospect.events import ProspectDeleted1, EngagementOpportunityAddedToProfile1
 from src.libs.common_domain.decorators import event_idempotent
 
@@ -19,7 +20,10 @@ def execute_added_eo_1(**kwargs):
 
   attrs = event.attrs
 
-  tasks.save_eo_contentent_task.delay(
-      event.id, event.external_id,
-      event.provider_type, provider_action_type, aggregate_id
-  )
+  text = attrs.get(constants.TEXT)
+
+  if text:
+    tasks.save_recent_eo_content_task.delay(
+        event.id, text, event.external_id,
+        event.provider_type, event.provider_action_type, aggregate_id
+    )

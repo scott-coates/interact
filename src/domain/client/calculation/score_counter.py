@@ -1,7 +1,7 @@
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
   get_eo_ea_lookup
-from src.domain.client.calculation import rules_data_provider
+from src.domain.client.calculation.rules_engine import rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
 from src.domain.client.calculation.score_objects import AssignedEntity
 from src.domain.common import constants
@@ -14,10 +14,10 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
 
   assigned_calc_objects = _get_assigned_calc_objects(assignment_attrs)
 
-  rules_data = _rules_data_provider.provide_rules_data(client_id)
-
   prospect_id = assigned_calc_objects[0].prospect_id
   prospect = get_prospect_ea_lookup(prospect_id)
+
+  rules_data = _rules_data_provider.provide_rules_data(client_id, prospect_id)
 
   profiles = _get_profiles(assigned_calc_objects, prospect_id)
 
