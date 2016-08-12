@@ -122,7 +122,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
             recent_eo[constants.SIMILAR_EOS].append(self.eo_id)
 
             similar_eo_count = list(chain.from_iterable(r[constants.SIMILAR_EOS] for r in recent_eos))
-            spam_score_adjustment = len(similar_eo_count) * -10
+            spam_score_adjustment = len(similar_eo_count) * -10 # todo should this be exponential or just linear?
             spam_score += spam_score_adjustment
 
       if spam_score:
