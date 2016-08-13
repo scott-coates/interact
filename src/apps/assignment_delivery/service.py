@@ -46,6 +46,13 @@ def _convert_ea_data_to_deliverable(ea_data):
   ret_val[constants.PROFILE_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROFILES, constants.SCORE)
   ret_val[constants.ASSIGNED_ENTITY_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.ASSIGNED_ENTITIES,
                                                         constants.SCORE)
+  ret_val[constants.PROSPECT_NORMALIZED_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROSPECT,
+                                                            constants.NORMALIZED_SCORE)
+  ret_val[constants.PROFILE_NORMALIZED_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROFILES,
+                                                           constants.NORMALIZED_SCORE)
+  ret_val[constants.ASSIGNED_ENTITY_NORMALIZED_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS,
+                                                                   constants.ASSIGNED_ENTITIES,
+                                                                   constants.NORMALIZED_SCORE)
 
   ret_val[constants.ID] = _get_value(ea_data, constants.ID)
 

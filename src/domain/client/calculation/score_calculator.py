@@ -42,10 +42,15 @@ class ScoreCalculator:
     prospect_new = np.nan_to_num((prospect_score - self.prospect_median) / self.prospect_mdev)
     profile_new = np.nan_to_num((profiles_score - self.profile_median) / self.profile_mdev)
     ae_new = np.nan_to_num((ae_score - self.ae_median) / self.ae_mdev)
+    normalized_parts = {
+      constants.PROSPECT: prospect_new,
+      constants.PROFILES: profile_new,
+      constants.ASSIGNED_ENTITIES: ae_new,
+    }
 
     score = prospect_new + profile_new + ae_new
 
-    return score, parts
+    return score, parts, normalized_parts
 
   def _get_score_parts(self, score_attrs):
     parts = {

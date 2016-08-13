@@ -126,11 +126,14 @@ def save_batch_ea(ea_id, attrs, score_attrs, client_id, batch_id, counter, prosp
 
 
 def save_delivered_ea(ea_id, name, bio, location, url, score, prospect_score, profile_score, assigned_entity_score,
+                      prospect_normalized_score, profile_normalized_score, assigned_entity_normalized_score,
                       score_attrs, assigned_entities, prospect_id):
   ea, _ = DeliveredEa.objects.update_or_create(
       id=ea_id, defaults=dict(
           name=name, bio=bio, location=location, url=url, score=score, prospect_score=prospect_score,
           profile_score=profile_score, assigned_entity_score=assigned_entity_score,
+          prospect_normalized_score=prospect_normalized_score, profile_normalized_score=profile_normalized_score,
+          assigned_entity_normalized_score=assigned_entity_normalized_score,
           score_attrs=score_attrs,
           assigned_entities=assigned_entities,
           prospect_id=prospect_id,
