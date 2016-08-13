@@ -67,9 +67,9 @@ def _convert_ea_data_to_deliverable(ea_data):
           constants.SCORE_ATTRS]
       }
 
-      if constants.EO_MENTION_SCORE in assignment_entity_attr[constants.SCORE_ATTRS]:
-        score_attrs[constants.EO_MENTION_SCORE] = assignment_entity_attr[constants.SCORE_ATTRS][
-          constants.EO_MENTION_SCORE]
+      if constants.EO_ENGAGEMENT_SCORE in assignment_entity_attr[constants.SCORE_ATTRS]:
+        score_attrs[constants.EO_ENGAGEMENT_SCORE] = assignment_entity_attr[constants.SCORE_ATTRS][
+          constants.EO_ENGAGEMENT_SCORE]
 
     # noinspection PyUnboundLocalVariable
     # for now we can assume every EA is an EO

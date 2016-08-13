@@ -69,9 +69,9 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
   def _apply_score(self):
     score, score_attrs = 0, {}
 
-    mention_score, mention_score_attrs = self._apply_mention_score()
-    score += mention_score
-    score_attrs.update(mention_score_attrs)
+    engagement_score, engagement_score_attrs = self._apply_engagement_score()
+    score += engagement_score
+    score_attrs.update(engagement_score_attrs)
 
     spam_score, spam_score_attrs = self._apply_spam_score()
     score += spam_score
@@ -79,7 +79,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
     return score, score_attrs
 
-  def _apply_mention_score(self):
+  def _apply_engagement_score(self):
     share_text = ('via @',)
 
     score, score_attrs, counter = self._get_default_score_items()
@@ -94,7 +94,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
         if mentions:
           mention_score = len(mentions)
           score += mention_score
-          score_attrs[constants.EO_MENTION_SCORE][constants.SCORE] = mention_score
+          score_attrs[constants.EO_ENGAGEMENT_SCORE][constants.SCORE] = mention_score
 
     return score, score_attrs
 
@@ -122,7 +122,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
             recent_eo[constants.SIMILAR_EOS].append(self.eo_id)
 
             similar_eo_count = list(chain.from_iterable(r[constants.SIMILAR_EOS] for r in recent_eos))
-            spam_score_adjustment = len(similar_eo_count) * -10 # todo should this be exponential or just linear?
+            spam_score_adjustment = len(similar_eo_count) * -10  # todo should this be exponential or just linear?
             spam_score += spam_score_adjustment
 
       if spam_score:

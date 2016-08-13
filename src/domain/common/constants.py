@@ -54,7 +54,7 @@ BIO_AVOID_KEYWORD_SCORE = 'bio_avoid_keyword_score'
 BIO_TOPIC_SCORE = 'bio_topic_score'
 LOCATION_SCORE = 'location_score'
 EO_TOPIC_SCORE = 'eo_topic_score'
-EO_MENTION_SCORE = 'eo_mention_score'
+EO_ENGAGEMENT_SCORE = 'eo_engagement_score'
 EO_SPAM_SCORE = 'eo_spam_score'
 
 PROVIDER_TYPE = 'provider_type'
