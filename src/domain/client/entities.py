@@ -1,5 +1,3 @@
-from outliers import smirnov_grubbs as grubbs
-
 from src.apps.geo import service as geo_service
 from src.domain.client.calculation import score_counter, score_calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
@@ -57,41 +55,44 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.relevance, ta_topic.topic_id)
     )
 
-  def add_ea_batch(self, batch_id, batch_eas, _calculator=None, _outlier_utils=None):
+  def add_ea_batch(self, batch_id, batch_eas, _calculator=None):
     if not _calculator: _calculator = score_calculator.ScoreCalculator
-    if not _outlier_utils: _outlier_utils = grubbs
 
     if not batch_id:
       raise TypeError("batch_id is required")
 
     self._check_eas(batch_eas)
 
-    score_attrs_col = [b[constants.SCORE_ATTRS] for b in batch_eas]
-    score_calc = _calculator(score_attrs_col)
-
-    for b in batch_eas:
-      score, parts, normalized_parts = score_calc.calculate_score(b[constants.SCORE_ATTRS])
-      b[constants.SCORE] = score
-      b[constants.SCORE_ATTRS][constants.PROSPECT][constants.SCORE] = parts[constants.PROSPECT]
-      b[constants.SCORE_ATTRS][constants.PROFILES][constants.SCORE] = parts[constants.PROFILES]
-      b[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.SCORE] = parts[constants.ASSIGNED_ENTITIES]
-      b[constants.SCORE_ATTRS][constants.PROSPECT][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROSPECT]
-      b[constants.SCORE_ATTRS][constants.PROFILES][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROFILES]
-      b[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.NORMALIZED_SCORE] = normalized_parts[
-        constants.ASSIGNED_ENTITIES]
-
-    scores = sorted([b[constants.SCORE] for b in batch_eas])
-    accepted = _outlier_utils.test(scores, 0.01)
-    min_score, max_score = min(accepted), max(accepted)
-
     assigned = []
     skipped = []
 
-    for b in batch_eas:
-      assigned.append(b)
-      # if min_score <= b[constants.SCORE] <= max_score:
-      # else:
-      #   skipped.append(b)
+    for a in batch_eas:
+      score_attrs = a[constants.SCORE_ATTRS]
+      pre_score = score_attrs[constants.PROSPECT][constants.SCORE] + \
+                  sum([x[constants.SCORE] for x in score_attrs[constants.PROFILES][constants.DATA]]) + \
+                  sum([x[constants.SCORE] for x in score_attrs[constants.ASSIGNED_ENTITIES][constants.DATA]])
+
+      if pre_score >= -30:
+        assigned.append(a)
+      else:
+        skipped.append(a)
+
+    score_attrs_col = [a[constants.SCORE_ATTRS] for a in assigned]
+    score_calc = _calculator(score_attrs_col)
+
+    for a in assigned:
+      score, parts, normalized_parts = score_calc.calculate_score(a[constants.SCORE_ATTRS])
+      a[constants.SCORE] = score
+      a[constants.SCORE_ATTRS][constants.PROSPECT][constants.SCORE] = parts[constants.PROSPECT]
+      a[constants.SCORE_ATTRS][constants.PROFILES][constants.SCORE] = parts[constants.PROFILES]
+      a[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.SCORE] = parts[constants.ASSIGNED_ENTITIES]
+      a[constants.SCORE_ATTRS][constants.PROSPECT][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROSPECT]
+      a[constants.SCORE_ATTRS][constants.PROFILES][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROFILES]
+      a[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.NORMALIZED_SCORE] = normalized_parts[
+        constants.ASSIGNED_ENTITIES]
+
+    scores = list(sorted([a[constants.SCORE] for a in assigned]))
+    min_score, max_score = min(scores), max(scores)
 
     self._raise_event(
         ClientProcessedEngagementAssignmentBatch1(batch_id, assigned, skipped, scores, min_score, max_score)
