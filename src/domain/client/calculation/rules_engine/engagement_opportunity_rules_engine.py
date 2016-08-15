@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 class EngagementOpportunityRulesEngine(BaseRulesEngine):
   def __init__(self, eo_id, eo_attrs, eo_topic_ids, prospect_id, rules_data, _token_utils=None):
+    super().__init__()
+
     if not _token_utils: _token_utils = token_utils
     self._token_utils = _token_utils
 
@@ -23,66 +25,66 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
     self.prospect_id = prospect_id
     self.rules_data = rules_data
 
-  def score_it(self):
-    score, score_attrs, counter = self._get_default_score_items()
+  def get_score_attrs(self):
+    score_attrs, counter = self._get_default_score_attr_items()
 
-    topic_score, topic_score_attrs = self._apply_topic_score()
-    score += topic_score
+    topic_score_attrs = self._get_topic_score_attrs()
     score_attrs.update(topic_score_attrs)
 
-    internal_score, internal_score_attrs = self._apply_score()
-    score += internal_score
+    internal_score_attrs = self._get_score_attrs()
     score_attrs.update(internal_score_attrs)
 
-    return score, score_attrs
+    return score_attrs
 
-  def _apply_topic_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
+  def _get_topic_score_attrs(self):
+    score_attrs, counter = self._get_default_score_attr_items()
 
     topics = self.rules_data.get(constants.TOPICS)
 
     if topics:
 
       for k, v in topics.items():
-        topic_score = v[constants.RELEVANCE]
+        # topic_score = v[constants.RELEVANCE]
 
         topic_id = v[constants.ID]
 
         if topic_id in self.eo_topic_ids:
-          score += topic_score
-          counter[constants.EO_TOPIC_SCORE] += topic_score
+          counter[constants.EO_TOPIC] += self.DEFAULT_COUNT_VALUE
 
-          score_attrs[constants.EO_TOPIC_SCORE][constants.SCORE_ATTRS][k] = {
-            constants.RELEVANCE: topic_score
+          score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
+            constants.NAME: k
           }
 
-          score_attrs[constants.EO_TOPIC_SCORE][constants.SCORE] = counter[constants.EO_TOPIC_SCORE]
+          # score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][k] = {
+          #   constants.RELEVANCE: topic_score
+          # }
+          # todo move over
 
-    return score, score_attrs
+          score_attrs[constants.EO_TOPIC][constants.COUNT] = counter[constants.EO_TOPIC]
+
+    return score_attrs
 
   @abstractmethod
-  def _apply_score(self):
+  def _get_score_attrs(self):
     pass
 
 
 class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
-  def _apply_score(self):
-    score, score_attrs = 0, {}
+  def _get_score_attrs(self):
+    score_attrs = {}
 
-    engagement_score, engagement_score_attrs = self._apply_engagement_score()
-    score += engagement_score
+    engagement_score_attrs = self._get_engagement_score_attrs()
     score_attrs.update(engagement_score_attrs)
 
-    spam_score, spam_score_attrs = self._apply_spam_score()
-    score += spam_score
+    spam_score_attrs = self._get_spam_score_attrs()
     score_attrs.update(spam_score_attrs)
 
-    return score, score_attrs
+    return score_attrs
 
-  def _apply_engagement_score(self):
+  def _get_engagement_score_attrs(self):
     share_text = ('via @',)
 
-    score, score_attrs, counter = self._get_default_score_items()
+    score_attrs, counter = self._get_default_score_attr_items()
 
     is_retweet = self.eo_attrs.get(constants.IS_RETWEET)
 
@@ -92,14 +94,12 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
         mentions = self.eo_attrs.get(constants.MENTIONS)
 
         if mentions:
-          mention_score = 1
-          score += mention_score
-          score_attrs[constants.EO_ENGAGEMENT_SCORE][constants.SCORE] = mention_score
+          score_attrs[constants.EO_ENGAGEMENT][constants.COUNT] = self.DEFAULT_COUNT_VALUE
 
-    return score, score_attrs
+    return score_attrs
 
-  def _apply_spam_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
+  def _get_spam_score_attrs(self):
+    score_attrs, counter = self._get_default_score_attr_items()
 
     text = self.eo_attrs[constants.TEXT]
 
@@ -121,8 +121,6 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
       similar_eo_count = list(chain.from_iterable(r[constants.SIMILAR_EOS] for r in recent_eos))
       if similar_eo_count:
-        spam_score = len(similar_eo_count)
-        score += spam_score
-        score_attrs[constants.EO_SPAM_SCORE][constants.SCORE] = spam_score
+        score_attrs[constants.EO_SPAM][constants.COUNT] = self.DEFAULT_COUNT_VALUE
 
-    return score, score_attrs
+    return score_attrs

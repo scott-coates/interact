@@ -55,8 +55,8 @@ class Client(AggregateBase):
         ClientAddedTargetAudienceTopicOption1(id, name, type, attrs, ta_topic_id, ta_topic.relevance, ta_topic.topic_id)
     )
 
-  def add_ea_batch(self, batch_id, batch_eas, _calculator=None):
-    if not _calculator: _calculator = score_calculator.ScoreCalculator
+  def add_ea_batch(self, batch_id, batch_eas, _calc_service=None):
+    if not _calc_service: _calc_service = calc_service
 
     if not batch_id:
       raise TypeError("batch_id is required")

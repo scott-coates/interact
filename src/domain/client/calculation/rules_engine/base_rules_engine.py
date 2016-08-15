@@ -8,6 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 class BaseRulesEngine(ABC):
-  def _get_default_score_items(self):
-    score, score_attrs, counter = 0, recursive_defaultdict(), Counter()
-    return score, score_attrs, counter
+  def __init__(self):
+    self.DEFAULT_COUNT_VALUE = 1
+
+  def _get_default_score_attr_items(self):
+    score_attrs, counter = recursive_defaultdict(), Counter()
+    return score_attrs, counter

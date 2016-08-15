@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class ProspectRulesEngine(BaseRulesEngine):
   def __init__(self, prospect_id, prospect_attrs, prospect_topic_ids, rules_data, _token_utils=None):
+    super().__init__()
 
     if not _token_utils: _token_utils = token_utils
     self._token_utils = _token_utils
@@ -21,69 +22,72 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     self.rules_data = rules_data
 
-  def score_it(self):
-    score, score_attrs = self._apply_score()
+  def get_score_attrs(self):
+    score_attrs = self._get_score_attrs()
 
-    return score, score_attrs
+    return score_attrs
 
-  def _apply_score(self):
-    score, score_attrs = 0, {}
+  def _get_score_attrs(self):
+    score_attrs = {}
 
-    location_score, location_score_attrs = self._apply_location_score()
-    score += location_score
+    location_score_attrs = self._get_location_score_attrs()
     score_attrs.update(location_score_attrs)
 
-    bio_score, bio_score_attrs = self._apply_bio_score()
-    score += bio_score
+    bio_score_attrs = self._get_bio_score_attrs()
     score_attrs.update(bio_score_attrs)
 
-    prospect_assignment_score, prospect_assignment_score_attrs = self._apply_prospect_assignment_score()
-    score += prospect_assignment_score
+    prospect_assignment_score_attrs = self._get_prospect_assignment_score_attrs()
     score_attrs.update(prospect_assignment_score_attrs)
 
-    return score, score_attrs
+    return score_attrs
 
-  def _apply_location_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
+  def _get_location_score_attrs(self):
+    score_attrs, counter = self._get_default_score_attr_items()
 
     p_locations = self.prospect_attrs.get(constants.LOCATIONS)
     r_locations = self.rules_data.get(constants.LOCATIONS)
 
     if p_locations and r_locations:
-      location_score = 1
       # iterate through all rules_locations
       # if there is any intersection within _default_location_threshold miles, award the score
       for p_loc in p_locations:
         dest = (p_loc[constants.LAT], p_loc[constants.LNG])
         if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
-          score += location_score
-          counter[constants.LOCATION_SCORE] += location_score
+          counter[constants.LOCATION] += self.DEFAULT_COUNT_VALUE
 
-          score_attrs[constants.LOCATION_SCORE][constants.SCORE] = counter[constants.LOCATION_SCORE]
+          score_attrs[constants.LOCATION][constants.COUNT] = counter[constants.LOCATION]
 
-    return score, score_attrs
+    return score_attrs
 
-  def _apply_bio_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
+  def _get_bio_score_attrs(self):
+    score_attrs, counter = self._get_default_score_attr_items()
 
     topics = self.rules_data.get(constants.TOPICS)
     if topics:
 
       for k, v in topics.items():
-        bio_keyword_score = v[constants.RELEVANCE]
+        # todo
+        # bio_keyword_score = v[constants.RELEVANCE]
 
         topic_id = v[constants.ID]
         if topic_id in self.prospect_topic_ids:
-          score += bio_keyword_score
-          counter[constants.BIO_TOPIC_SCORE] += bio_keyword_score
+          counter[constants.BIO_TOPIC] += self.DEFAULT_COUNT_VALUE
 
-          score_attrs[constants.BIO_TOPIC_SCORE][constants.SCORE_ATTRS][k] = {
-            constants.RELEVANCE: bio_keyword_score
+          score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
+            constants.NAME: k
           }
 
-          score_attrs[constants.BIO_TOPIC_SCORE][constants.SCORE] = counter[constants.BIO_TOPIC_SCORE]
+          # todo move this over
+          # score_attrs[constants.BIO_TOPIC][constants.SCORE_ATTRS][k] = {
+          #   constants.RELEVANCE: bio_keyword_score
+          # }
+
+          score_attrs[constants.BIO_TOPIC][constants.COUNT] = counter[constants.BIO_TOPIC]
 
     bios = self.prospect_attrs.get(constants.BIOS)
+
+    # todo should all attrs be returned even if empty?
+    score_attrs[constants.BIO_AVOID_KEYWORD][constants.SCORE_ATTRS][constants.NAMES] = []
 
     if bios:
       bio = ' '.join(bios)
@@ -93,31 +97,30 @@ class ProspectRulesEngine(BaseRulesEngine):
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
       if avoid_words:
 
-        bio_avoid_keyword_score = 1
         # iterate through bio tokens to be less inclusive and prevent false positives (consider the word 'mass')
         for b in bio_tokens:
           if b in avoid_words:
-            score += bio_avoid_keyword_score
-            counter[constants.BIO_AVOID_KEYWORD_SCORE] += bio_avoid_keyword_score
+            counter[constants.BIO_AVOID_KEYWORD] += self.DEFAULT_COUNT_VALUE
 
-            score_attrs[constants.BIO_AVOID_KEYWORD_SCORE][constants.SCORE_ATTRS][b] = {
-              constants.RELEVANCE: bio_avoid_keyword_score
-            }
+            score_attrs[constants.BIO_AVOID_KEYWORD][constants.SCORE_ATTRS][constants.NAMES].append(b)
 
-            score_attrs[constants.BIO_AVOID_KEYWORD_SCORE][constants.SCORE] = counter[constants.BIO_AVOID_KEYWORD_SCORE]
+            # todo move over
+            # score_attrs[constants.BIO_AVOID_KEYWORD_SCORE][constants.SCORE_ATTRS][b] = {
+            #   constants.RELEVANCE: bio_avoid_keyword_score # todo don't store relevance? perhaps NAME?
+            # }
 
-    return score, score_attrs
+            score_attrs[constants.BIO_AVOID_KEYWORD][constants.COUNT] = counter[constants.BIO_AVOID_KEYWORD]
 
-  def _apply_prospect_assignment_score(self):
-    score, score_attrs, counter = self._get_default_score_items()
+    return score_attrs
+
+  def _get_prospect_assignment_score_attrs(self):
+    score_attrs, counter = self._get_default_score_attr_items()
 
     client_id = self.rules_data[constants.CLIENT_ID]
     prospect_id = self.prospect_id
 
     new_prospect_for_client = get_client_assigned_prospect_count(client_id, prospect_id)
     if not new_prospect_for_client:
-      new_prospect_score = 1
-      score += new_prospect_score
-      score_attrs[constants.NEW_PROSPECT_SCORE][constants.SCORE] = new_prospect_score
+      score_attrs[constants.NEW_PROSPECT][constants.COUNT] = self.DEFAULT_COUNT_VALUE
 
-    return score, score_attrs
+    return score_attrs

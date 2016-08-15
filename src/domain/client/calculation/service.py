@@ -1,9 +1,9 @@
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
   get_eo_ea_lookup
+from src.domain.client.calculation.calculation_objects import AssignedEntity
 from src.domain.client.calculation.rules_engine import rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
-from src.domain.client.calculation.calculation_objects import AssignedEntity
 from src.domain.common import constants
 
 
@@ -23,27 +23,24 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
 
   rules_engine = RulesEngine(client_id)
 
-  p_score, p_score_attrs = rules_engine.get_prospect_score(prospect, rules_data)
+  p_score_attrs = rules_engine.get_prospect_score(prospect, rules_data)
   score_attrs[constants.PROSPECT] = {
-    constants.SCORE: p_score,
     constants.SCORE_ATTRS: p_score_attrs,
     constants.ID: prospect.id
   }
 
   score_attrs[constants.PROFILES] = {constants.DATA: []}
   for profile in profiles:
-    p_score, p_score_attrs = rules_engine.get_profile_score(profile, rules_data)
+    p_score_attrs = rules_engine.get_profile_score(profile, rules_data)
     score_attrs[constants.PROFILES][constants.DATA].append({
-      constants.SCORE: p_score,
       constants.SCORE_ATTRS: p_score_attrs,
       constants.ID: profile.id
     })
 
   score_attrs[constants.ASSIGNED_ENTITIES] = {constants.DATA: []}
   for ae in assigned_calc_objects:
-    ae_score, ae_score_attrs = rules_engine.get_assigned_entity_score(ae, rules_data)
+    ae_score_attrs = rules_engine.get_assigned_entity_score(ae, rules_data)
     score_attrs[constants.ASSIGNED_ENTITIES][constants.DATA].append({
-      constants.SCORE: ae_score,
       constants.SCORE_ATTRS: ae_score_attrs,
       constants.ID: ae.assigned_entity_id,
       constants.ASSIGNED_ENTITY_TYPE: ae.assigned_entity_type
