@@ -93,7 +93,7 @@ class ProspectRulesEngine(BaseRulesEngine):
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
       if avoid_words:
 
-        bio_avoid_keyword_score = -1
+        bio_avoid_keyword_score = 1
         # iterate through bio tokens to be less inclusive and prevent false positives (consider the word 'mass')
         for b in bio_tokens:
           if b in avoid_words:

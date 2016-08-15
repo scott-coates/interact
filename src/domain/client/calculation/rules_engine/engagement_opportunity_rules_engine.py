@@ -92,7 +92,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
         mentions = self.eo_attrs.get(constants.MENTIONS)
 
         if mentions:
-          mention_score = len(mentions)
+          mention_score = 1
           score += mention_score
           score_attrs[constants.EO_ENGAGEMENT_SCORE][constants.SCORE] = mention_score
 
@@ -109,8 +109,6 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
     if recent_eos:
 
-      spam_score = 0
-
       for recent_eo in recent_eos:
 
         if self.eo_id != recent_eo[constants.ID] and self.eo_id not in recent_eo[constants.SIMILAR_EOS]:
@@ -121,11 +119,9 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
           if distance < .5:
             recent_eo[constants.SIMILAR_EOS].append(self.eo_id)
 
-            similar_eo_count = list(chain.from_iterable(r[constants.SIMILAR_EOS] for r in recent_eos))
-            spam_score_adjustment = len(similar_eo_count) * -10  # todo should this be exponential or just linear?
-            spam_score += spam_score_adjustment
-
-      if spam_score:
+      similar_eo_count = list(chain.from_iterable(r[constants.SIMILAR_EOS] for r in recent_eos))
+      if similar_eo_count:
+        spam_score = len(similar_eo_count)
         score += spam_score
         score_attrs[constants.EO_SPAM_SCORE][constants.SCORE] = spam_score
 
