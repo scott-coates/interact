@@ -1,5 +1,5 @@
 from src.apps.geo import service as geo_service
-from src.domain.client.calculation import score_counter, score_calculator
+from src.domain.client.calculation import service as calc_service, score_calculator
 from src.domain.client.events import ClientCreated1, ClientAssociatedWithTopic1, \
   ClientAddedTargetAudienceTopicOption1, \
   ClientProcessedEngagementAssignmentBatch1
@@ -98,10 +98,10 @@ class Client(AggregateBase):
         ClientProcessedEngagementAssignmentBatch1(batch_id, assigned, skipped, scores, min_score, max_score)
     )
 
-  def get_engagement_assignment_score_attrs(self, assignment_attrs, _score_processor=None):
-    if not _score_processor: _score_processor = score_counter
+  def get_engagement_assignment_score_attrs(self, assignment_attrs, _calc_service=None):
+    if not _calc_service: _calc_service = calc_service
 
-    score_attrs = _score_processor.get_engagement_assignment_score_attrs(self.id, assignment_attrs)
+    score_attrs = _calc_service.get_engagement_assignment_score_attrs(self.id, assignment_attrs)
 
     return score_attrs
 
