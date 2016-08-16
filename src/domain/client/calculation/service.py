@@ -68,14 +68,15 @@ def populate_batch_ea_scores(score_attrs):
     for ae in aes:
       _increment_counter(ae[constants.SCORE_ATTRS], counter)
 
-    score_attr[constants.SCORE] = {constants.COUNT: dict(counter)}
+    counter_dict = {k: {constants.COUNT: v} for k, v in counter.items()}
+    score_attr[constants.SCORE] = {constants.SCORE_ATTRS: counter_dict}
 
   tally = defaultdict(list)
 
   for score_attr in score_attrs:
-    count = score_attr[constants.SCORE][constants.COUNT]
+    count = score_attr[constants.SCORE][constants.SCORE_ATTRS]
     for k, v in count.items():
-      tally[k].append(v)
+      tally[k].append(v[constants.COUNT])
 
   calcs = {}
   for k, v in tally.items():
@@ -84,10 +85,10 @@ def populate_batch_ea_scores(score_attrs):
 
   for score_attr in score_attrs:
     total_score = 0
-    count = score_attr[constants.SCORE][constants.COUNT]
+    count = score_attr[constants.SCORE][constants.SCORE_ATTRS]
 
     for k, v in count.items():
-      score = calcs[k].calculate_normalized_score(v)
+      score = calcs[k].calculate_normalized_score(v[constants.COUNT])
 
       if k == constants.BIO_TOPIC:
         score *= 2
@@ -98,7 +99,7 @@ def populate_batch_ea_scores(score_attrs):
       elif k == constants.BIO_AVOID_KEYWORD:
         score *= -5
 
-      score_attr[constants.SCORE][constants.DATA] = score
+      score_attr[constants.SCORE][constants.SCORE_ATTRS][k][constants.DATA] = score
 
       total_score += score
 
