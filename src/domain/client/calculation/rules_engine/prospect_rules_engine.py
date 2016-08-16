@@ -66,12 +66,9 @@ class ProspectRulesEngine(BaseRulesEngine):
     if topics:
 
       for k, v in topics.items():
-        # todo
-        # bio_keyword_score = v[constants.RELEVANCE]
-
         topic_id = v[constants.ID]
         if topic_id in self.prospect_topic_ids:
-          counter[constants.BIO_TOPIC] += self.DEFAULT_COUNT_VALUE
+          counter[constants.BIO_TOPIC] += v[constants.RELEVANCE]
 
           score_attrs[constants.BIO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
             constants.NAME: k
@@ -94,6 +91,8 @@ class ProspectRulesEngine(BaseRulesEngine):
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
 
       if avoid_words:
+        # score_attrs[constants.BIO_AVOID_KEYWORD] the namespace is only created if COUNT is provided, that's the
+        # contract
         found_avoid_names = []
 
         # iterate through bio tokens to be less inclusive and prevent false positives (consider the word 'mass')
@@ -101,11 +100,6 @@ class ProspectRulesEngine(BaseRulesEngine):
           if b in avoid_words:
             counter[constants.BIO_AVOID_KEYWORD] += self.DEFAULT_COUNT_VALUE
             found_avoid_names.append(b)
-
-            # todo move over
-            # score_attrs[constants.BIO_AVOID_KEYWORD_SCORE][constants.SCORE_ATTRS][b] = {
-            #   constants.RELEVANCE: bio_avoid_keyword_score # todo don't store relevance? perhaps NAME?
-            # }
 
             score_attrs[constants.BIO_AVOID_KEYWORD][constants.COUNT][constants.DATA] = counter[
               constants.BIO_AVOID_KEYWORD]

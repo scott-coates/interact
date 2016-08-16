@@ -54,11 +54,6 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
             constants.NAME: k
           }
 
-          # score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][k] = {
-          #   constants.RELEVANCE: topic_score
-          # }
-          # todo move over
-
           # todo provide easier way other than writing out
           # --- score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][constants.COUNT][constants.DATA] ---
           # i missed one dimension and threw the whole thing off in the calc phase cause I had:
