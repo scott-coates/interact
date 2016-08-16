@@ -61,10 +61,10 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
           # todo move over
 
           # todo provide easier way other than writing out
-          # --- score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][constants.COUNT] ---
+          # --- score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][constants.COUNT][constants.DATA] ---
           # i missed one dimension and threw the whole thing off in the calc phase cause I had:
-          # score_attrs[constants.EO_TOPIC][constants.COUNT]
-          score_attrs[constants.EO_TOPIC][constants.COUNT] = counter[constants.EO_TOPIC]
+          # score_attrs[constants.EO_TOPIC][constants.COUNT][constants.DATA]
+          score_attrs[constants.EO_TOPIC][constants.COUNT][constants.DATA] = counter[constants.EO_TOPIC]
 
     return score_attrs
 
@@ -98,7 +98,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
         mentions = self.eo_attrs.get(constants.MENTIONS)
 
         if mentions:
-          score_attrs[constants.EO_ENGAGEMENT][constants.COUNT] = self.DEFAULT_COUNT_VALUE
+          score_attrs[constants.EO_ENGAGEMENT][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
 
     return score_attrs
 
@@ -125,6 +125,6 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
       similar_eo_count = list(chain.from_iterable(r[constants.SIMILAR_EOS] for r in recent_eos))
       if similar_eo_count:
-        score_attrs[constants.EO_SPAM][constants.COUNT] = self.DEFAULT_COUNT_VALUE
+        score_attrs[constants.EO_SPAM][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
 
     return score_attrs

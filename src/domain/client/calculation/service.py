@@ -6,6 +6,7 @@ from src.apps.read_model.relational.client.service import get_prospect_ea_lookup
 from src.domain.client.calculation.calculation_objects import AssignedEntity
 from src.domain.client.calculation.rules_engine import rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
+from src.domain.client.calculation.score_calculator import ScoreCalculator
 from src.domain.common import constants
 
 
@@ -51,46 +52,68 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
   return score_attrs
 
 
-def get_popscore_attrs_counts(score_attrs):
+def populate_batch_ea_scores(score_attrs):
   # todo rename to get_score_attrs_counts
-  ret_val = score_attrs.copy()
-
-  for score_attr in ret_val:
+  for score_attr in score_attrs:
     counter = Counter()
 
     prospect = score_attr[constants.PROSPECT]
-    _increment_counter(prospect[constants.SCORE_ATTRS], constants.PROSPECT, counter)
+    _increment_counter(prospect[constants.SCORE_ATTRS], counter)
 
     profiles = score_attr[constants.PROFILES][constants.DATA]
     for profile in profiles:
-      _increment_counter(profile[constants.SCORE_ATTRS], constants.PROFILE, counter)
+      _increment_counter(profile[constants.SCORE_ATTRS], counter)
 
     aes = score_attr[constants.ASSIGNED_ENTITIES][constants.DATA]  # todo remove constants.DATA??
     for ae in aes:
-      _increment_counter(ae[constants.SCORE_ATTRS], constants.ASSIGNED_ENTITY, counter)
+      _increment_counter(ae[constants.SCORE_ATTRS], counter)
 
-    score_attr[constants.COUNT] = dict(counter)
+    score_attr[constants.SCORE] = {constants.COUNT: dict(counter)}
 
   tally = defaultdict(list)
 
-  for score_attr in ret_val:
-    count = score_attr[constants.COUNT]
+  for score_attr in score_attrs:
+    count = score_attr[constants.SCORE][constants.COUNT]
     for k, v in count.items():
       tally[k].append(v)
 
-  return ret_val
+  calcs = {}
+  for k, v in tally.items():
+    calc = ScoreCalculator(v)
+    calcs[k] = calc
+
+  for score_attr in score_attrs:
+    total_score = 0
+    count = score_attr[constants.SCORE][constants.COUNT]
+
+    for k, v in count.items():
+      score = calcs[k].calculate_normalized_score(v)
+
+      if k == constants.BIO_TOPIC:
+        score *= 2
+      elif k == constants.EO_TOPIC:
+        score *= 1.15
+      elif k == constants.EO_SPAM:
+        score *= -10
+      elif k == constants.BIO_AVOID_KEYWORD:
+        score *= -5
+
+      score_attr[constants.SCORE][constants.DATA] = score
+
+      total_score += score
+
+    print('score: ', total_score)
 
 
-def _increment_counter(score_attrs, prefix, counter):
+def _increment_counter(score_attrs, counter):
   for k, v in score_attrs.items():
-    key_name = '{0}__{1}'.format(prefix, k)
 
     # the contract here is that COUNT will exist so long as the key exists, so we don't need to rely on
     # v.get('count', 0)
     try:
-      counter[key_name] += v[constants.COUNT]
+      counter[k] += v[constants.COUNT][constants.DATA]
     except KeyError as e:
-      raise Exception('is missing', key_name).with_traceback(e.__traceback__)
+      raise Exception('is missing', k).with_traceback(e.__traceback__)
 
 
 def _get_profiles(assigned_calc_objects, prospect_id):

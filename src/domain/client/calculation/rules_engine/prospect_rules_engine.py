@@ -55,7 +55,7 @@ class ProspectRulesEngine(BaseRulesEngine):
         if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
           counter[constants.LOCATION] += self.DEFAULT_COUNT_VALUE
 
-          score_attrs[constants.LOCATION][constants.COUNT] = counter[constants.LOCATION]
+          score_attrs[constants.LOCATION][constants.COUNT][constants.DATA] = counter[constants.LOCATION]
 
     return score_attrs
 
@@ -82,7 +82,7 @@ class ProspectRulesEngine(BaseRulesEngine):
           #   constants.RELEVANCE: bio_keyword_score
           # }
 
-          score_attrs[constants.BIO_TOPIC][constants.COUNT] = counter[constants.BIO_TOPIC]
+          score_attrs[constants.BIO_TOPIC][constants.COUNT][constants.DATA] = counter[constants.BIO_TOPIC]
 
     bios = self.prospect_attrs.get(constants.BIOS)
 
@@ -107,7 +107,8 @@ class ProspectRulesEngine(BaseRulesEngine):
             #   constants.RELEVANCE: bio_avoid_keyword_score # todo don't store relevance? perhaps NAME?
             # }
 
-            score_attrs[constants.BIO_AVOID_KEYWORD][constants.COUNT] = counter[constants.BIO_AVOID_KEYWORD]
+            score_attrs[constants.BIO_AVOID_KEYWORD][constants.COUNT][constants.DATA] = counter[
+              constants.BIO_AVOID_KEYWORD]
 
         if found_avoid_names:
           score_attrs[constants.BIO_AVOID_KEYWORD][constants.SCORE_ATTRS][constants.NAMES] = found_avoid_names
@@ -122,6 +123,6 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     new_prospect_for_client = get_client_assigned_prospect_count(client_id, prospect_id)
     if not new_prospect_for_client:
-      score_attrs[constants.NEW_PROSPECT][constants.COUNT] = self.DEFAULT_COUNT_VALUE
+      score_attrs[constants.NEW_PROSPECT][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
 
     return score_attrs
