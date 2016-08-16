@@ -1,3 +1,5 @@
+from collections import Counter
+
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
   get_eo_ea_lookup
@@ -47,6 +49,34 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
     })
 
   return score_attrs
+
+
+def calculate_batch_score(score_attrs):
+  ret_val = score_attrs.copy()
+
+  for score_attr in score_attrs:
+    counter = Counter()
+
+    prospect = score_attr[constants.PROSPECT]
+    _increment_counter(prospect[constants.SCORE_ATTRS], constants.PROSPECT, counter)
+
+    profiles = score_attr[constants.PROFILES][constants.DATA]
+    for profile in profiles:
+      _increment_counter(profile[constants.SCORE_ATTRS], constants.PROFILE, counter)
+
+    aes = score_attr[constants.ASSIGNED_ENTITIES][constants.DATA]  # todo remove constants.DATA??
+    for ae in aes:
+      _increment_counter(ae[constants.SCORE_ATTRS], constants.ASSIGNED_ENTITY, counter)
+
+    x = counter
+  return ret_val
+
+
+def _increment_counter(score_attrs, prefix, counter):
+  p_score_attrs = score_attrs
+  for k, v in p_score_attrs.items():
+    key_name = '{0}__{1}'.format(prefix, k)
+    counter[key_name] += v.get(constants.COUNT, 0)  # todo shoud this be explicit?
 
 
 def _get_profiles(assigned_calc_objects, prospect_id):

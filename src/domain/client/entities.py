@@ -63,6 +63,10 @@ class Client(AggregateBase):
 
     self._check_eas(batch_eas)
 
+    score_attrs_col = [b[constants.SCORE_ATTRS] for b in batch_eas]
+
+    score_attrs = _calc_service.calculate_batch_score(score_attrs_col)
+
     assigned = []
     skipped = []
 
