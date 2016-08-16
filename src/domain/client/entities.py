@@ -66,7 +66,8 @@ class Client(AggregateBase):
     score_attrs_col = [b[constants.SCORE_ATTRS] for b in batch_eas]
 
     _calc_service.populate_batch_ea_scores(self.id, score_attrs_col)
-
+    assigned = batch_eas
+    skipped = []
     # assigned = []
     # skipped = []
     # for score_attr in score_attrs:
@@ -76,32 +77,32 @@ class Client(AggregateBase):
     #
     #   batch_ea[constants.SCORE_ATTRS] = score_attr
 
-    for a in batch_eas:
-      score_attrs = a[constants.SCORE_ATTRS]
-      pre_score = score_attrs[constants.PROSPECT][constants.SCORE] + \
-                  sum([x[constants.SCORE] for x in score_attrs[constants.PROFILES][constants.DATA]]) + \
-                  sum([x[constants.SCORE] for x in score_attrs[constants.ASSIGNED_ENTITIES][constants.DATA]])
+    # for a in batch_eas:
+    #   score_attrs = a[constants.SCORE_ATTRS]
+    #   pre_score = score_attrs[constants.PROSPECT][constants.SCORE] + \
+    #               sum([x[constants.SCORE] for x in score_attrs[constants.PROFILES][constants.DATA]]) + \
+    #               sum([x[constants.SCORE] for x in score_attrs[constants.ASSIGNED_ENTITIES][constants.DATA]])
+    #
+    #   if pre_score >= -30:
+    #     assigned.append(a)
+    #   else:
+    #     skipped.append(a)
+    #
+    # score_attrs_col = [a[constants.SCORE_ATTRS] for a in assigned]
+    # score_calc = _calculator(score_attrs_col)
+    #
+    # for a in assigned:
+    #   score, parts, normalized_parts = score_calc.calculate_score(a[constants.SCORE_ATTRS])
+    #   a[constants.SCORE] = score
+    #   a[constants.SCORE_ATTRS][constants.PROSPECT][constants.SCORE] = parts[constants.PROSPECT]
+    #   a[constants.SCORE_ATTRS][constants.PROFILES][constants.SCORE] = parts[constants.PROFILES]
+    #   a[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.SCORE] = parts[constants.ASSIGNED_ENTITIES]
+    #   a[constants.SCORE_ATTRS][constants.PROSPECT][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROSPECT]
+    #   a[constants.SCORE_ATTRS][constants.PROFILES][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROFILES]
+    #   a[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.NORMALIZED_SCORE] = normalized_parts[
+    #     constants.ASSIGNED_ENTITIES]
 
-      if pre_score >= -30:
-        assigned.append(a)
-      else:
-        skipped.append(a)
-
-    score_attrs_col = [a[constants.SCORE_ATTRS] for a in assigned]
-    score_calc = _calculator(score_attrs_col)
-
-    for a in assigned:
-      score, parts, normalized_parts = score_calc.calculate_score(a[constants.SCORE_ATTRS])
-      a[constants.SCORE] = score
-      a[constants.SCORE_ATTRS][constants.PROSPECT][constants.SCORE] = parts[constants.PROSPECT]
-      a[constants.SCORE_ATTRS][constants.PROFILES][constants.SCORE] = parts[constants.PROFILES]
-      a[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.SCORE] = parts[constants.ASSIGNED_ENTITIES]
-      a[constants.SCORE_ATTRS][constants.PROSPECT][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROSPECT]
-      a[constants.SCORE_ATTRS][constants.PROFILES][constants.NORMALIZED_SCORE] = normalized_parts[constants.PROFILES]
-      a[constants.SCORE_ATTRS][constants.ASSIGNED_ENTITIES][constants.NORMALIZED_SCORE] = normalized_parts[
-        constants.ASSIGNED_ENTITIES]
-
-    scores = list(sorted([a[constants.SCORE] for a in assigned]))
+    scores = list(sorted([a[constants.SCORE_ATTRS][constants.SCORE][constants.DATA] for a in assigned]))
     min_score, max_score = min(scores), max(scores)
 
     self._raise_event(

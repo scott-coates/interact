@@ -107,6 +107,7 @@ def populate_batch_ea_scores(client_id, score_attrs):
 
       total_score += score
 
+    score_attr[constants.SCORE][constants.DATA] = total_score
     print('score: ', total_score)
 
 
