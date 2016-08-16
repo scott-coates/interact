@@ -73,7 +73,7 @@ class ProspectRulesEngine(BaseRulesEngine):
         if topic_id in self.prospect_topic_ids:
           counter[constants.BIO_TOPIC] += self.DEFAULT_COUNT_VALUE
 
-          score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
+          score_attrs[constants.BIO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
             constants.NAME: k
           }
 
@@ -86,23 +86,21 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     bios = self.prospect_attrs.get(constants.BIOS)
 
-    # todo should all attrs be returned even if empty?
-    score_attrs[constants.BIO_AVOID_KEYWORD][constants.SCORE_ATTRS][constants.NAMES] = []
-
     if bios:
       bio = ' '.join(bios)
 
       bio_tokens = self._token_utils.tokenize_string(bio)
 
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
+
       if avoid_words:
+        found_avoid_names = []
 
         # iterate through bio tokens to be less inclusive and prevent false positives (consider the word 'mass')
         for b in bio_tokens:
           if b in avoid_words:
             counter[constants.BIO_AVOID_KEYWORD] += self.DEFAULT_COUNT_VALUE
-
-            score_attrs[constants.BIO_AVOID_KEYWORD][constants.SCORE_ATTRS][constants.NAMES].append(b)
+            found_avoid_names.append(b)
 
             # todo move over
             # score_attrs[constants.BIO_AVOID_KEYWORD_SCORE][constants.SCORE_ATTRS][b] = {
@@ -110,6 +108,9 @@ class ProspectRulesEngine(BaseRulesEngine):
             # }
 
             score_attrs[constants.BIO_AVOID_KEYWORD][constants.COUNT] = counter[constants.BIO_AVOID_KEYWORD]
+
+        if found_avoid_names:
+          score_attrs[constants.BIO_AVOID_KEYWORD][constants.SCORE_ATTRS][constants.NAMES] = found_avoid_names
 
     return score_attrs
 

@@ -65,10 +65,16 @@ class Client(AggregateBase):
 
     score_attrs_col = [b[constants.SCORE_ATTRS] for b in batch_eas]
 
-    score_attrs = _calc_service.calculate_batch_score(score_attrs_col)
+    score_attrs = _calc_service.get_score_attrs_counts(score_attrs_col)
 
-    assigned = []
-    skipped = []
+    # assigned = []
+    # skipped = []
+    # for score_attr in score_attrs:
+    #   prospect_id = score_attr[constants.PROSPECT][constants.ID]
+    #
+    #   batch_ea = next(b for b in batch_eas if b.id == prospect_id)
+    #
+    #   batch_ea[constants.SCORE_ATTRS] = score_attr
 
     for a in batch_eas:
       score_attrs = a[constants.SCORE_ATTRS]

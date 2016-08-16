@@ -60,6 +60,10 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
           # }
           # todo move over
 
+          # todo provide easier way other than writing out
+          # --- score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][constants.COUNT] ---
+          # i missed one dimension and threw the whole thing off in the calc phase cause I had:
+          # score_attrs[constants.EO_TOPIC][constants.COUNT]
           score_attrs[constants.EO_TOPIC][constants.COUNT] = counter[constants.EO_TOPIC]
 
     return score_attrs

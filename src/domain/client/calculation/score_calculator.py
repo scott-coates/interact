@@ -4,42 +4,24 @@ from src.domain.common import constants
 
 
 class ScoreCalculator:
-  def __init__(self, score_attrs_col):
-    self.prospect_scores = []
-    self.profile_scores = []
-    self.ae_scores = []
-
-    for s in score_attrs_col:
-      parts = self._get_score_parts(s)
-      self.prospect_scores.append(parts[constants.PROSPECT])
-      self.profile_scores.append(parts[constants.PROFILES])
-      self.ae_scores.append(parts[constants.ASSIGNED_ENTITIES])
+  def __init__(self, scores):
+    self.scores = scores
 
     # get median
-    self.prospect_median = np.median(self.prospect_scores)
-    self.profile_median = np.median(self.profile_scores)
-    self.ae_median = np.median(self.ae_scores)
+    self.median = np.median(self.scores)
 
     # get mean
-    self.prospect_mean = np.mean(self.prospect_scores)
-    self.profile_mean = np.mean(self.profile_scores)
-    self.ae_mean = np.mean(self.ae_scores)
+    self.mean = np.mean(self.scores)
 
     # normalize the median for each val in the list
-    prospect_abs_data = np.abs(self.prospect_scores - self.prospect_median)
-    profile_abs_data = np.abs(self.profile_scores - self.profile_median)
-    ae_abs_data = np.abs(self.ae_scores - self.ae_median)
+    abs_data = np.abs(self.scores - self.median)
 
     # refer to guidetodatamining chapter 4 for abs standard devation
     # sample size = len(scores) - 1. chapter 6 guidetodatamining.
     # http://stackoverflow.com/a/16562028/173957
-    self.prospect_mdev = (1 / (len(self.prospect_scores) - 1)) * prospect_abs_data.sum()
-    self.profile_mdev = (1 / (len(self.profile_scores) - 1)) * profile_abs_data.sum()
-    self.ae_mdev = (1 / (len(self.ae_scores) - 1)) * ae_abs_data.sum()
+    self.mdev = (1 / (len(self.scores) - 1)) * abs_data.sum()
 
-    self.prospect_sdev = np.std(self.prospect_scores)
-    self.profile_sdev = np.std(self.profile_scores)
-    self.ae_sdev = np.std(self.ae_scores)
+    self.sdev = np.std(self.scores)
 
   def calculate_score(self, score_attrs):
     parts = self._get_score_parts(score_attrs)

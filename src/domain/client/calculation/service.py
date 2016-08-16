@@ -1,4 +1,4 @@
-from collections import Counter
+from collections import Counter, defaultdict
 
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
@@ -51,10 +51,11 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
   return score_attrs
 
 
-def calculate_batch_score(score_attrs):
+def get_popscore_attrs_counts(score_attrs):
+  # todo rename to get_score_attrs_counts
   ret_val = score_attrs.copy()
 
-  for score_attr in score_attrs:
+  for score_attr in ret_val:
     counter = Counter()
 
     prospect = score_attr[constants.PROSPECT]
@@ -68,15 +69,28 @@ def calculate_batch_score(score_attrs):
     for ae in aes:
       _increment_counter(ae[constants.SCORE_ATTRS], constants.ASSIGNED_ENTITY, counter)
 
-    x = counter
+    score_attr[constants.COUNT] = dict(counter)
+
+  tally = defaultdict(list)
+
+  for score_attr in ret_val:
+    count = score_attr[constants.COUNT]
+    for k, v in count.items():
+      tally[k].append(v)
+
   return ret_val
 
 
 def _increment_counter(score_attrs, prefix, counter):
-  p_score_attrs = score_attrs
-  for k, v in p_score_attrs.items():
+  for k, v in score_attrs.items():
     key_name = '{0}__{1}'.format(prefix, k)
-    counter[key_name] += v.get(constants.COUNT, 0)  # todo shoud this be explicit?
+
+    # the contract here is that COUNT will exist so long as the key exists, so we don't need to rely on
+    # v.get('count', 0)
+    try:
+      counter[key_name] += v[constants.COUNT]
+    except KeyError as e:
+      raise Exception('is missing', key_name).with_traceback(e.__traceback__)
 
 
 def _get_profiles(assigned_calc_objects, prospect_id):
