@@ -12,7 +12,9 @@ class ScoreCalculator:
     self.mean = np.mean(self.counts)
 
     # get max
-    self.max = max(self.counts)
+    # refer to guidetodatamining chapter 4 for normalization - page 18
+    self.min = float(min(self.counts))
+    self.max = float(max(self.counts))
 
     # normalize the median for each val in the list
     abs_data = np.abs(self.counts - self.median)
@@ -25,7 +27,7 @@ class ScoreCalculator:
     self.sdev = np.std(self.counts)
 
   def calculate_normalized_score(self, value):
-    norm = float(value) / self.max
+    norm = (value - self.min) / self.max
     return norm
 
   def calculate_modified_standard_score(self, value):

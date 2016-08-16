@@ -32,6 +32,7 @@ def _provide_keywords(client):
 
   ret_val[constants.TOPICS] = {
     v[constants.NAME]: {
+      constants.RELEVANCE: v[constants.RELEVANCE],
       constants.ID: k,
     } for k, v in client.ta_topics.items() if v[constants.RELEVANCE] > 0
     }

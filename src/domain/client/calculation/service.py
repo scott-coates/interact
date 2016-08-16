@@ -2,7 +2,7 @@ from collections import Counter, defaultdict
 
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
-  get_eo_ea_lookup
+  get_eo_ea_lookup, get_client_ea_lookup
 from src.domain.client.calculation.calculation_objects import AssignedEntity
 from src.domain.client.calculation.rules_engine import rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
@@ -52,7 +52,11 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
   return score_attrs
 
 
-def populate_batch_ea_scores(score_attrs):
+def populate_batch_ea_scores(client_id, score_attrs):
+  client = get_client_ea_lookup(client_id)
+
+  topics = client.ta_topics.items()
+
   # todo rename to get_score_attrs_counts
   for score_attr in score_attrs:
     counter = Counter()

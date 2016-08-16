@@ -44,12 +44,11 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
     if topics:
 
       for k, v in topics.items():
-        # topic_score = v[constants.RELEVANCE]
 
         topic_id = v[constants.ID]
 
         if topic_id in self.eo_topic_ids:
-          counter[constants.EO_TOPIC] += self.DEFAULT_COUNT_VALUE
+          counter[constants.EO_TOPIC] += v[constants.RELEVANCE]
 
           score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
             constants.NAME: k
