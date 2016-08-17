@@ -26,7 +26,7 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
     self.rules_data = rules_data
 
   def get_score_attrs(self):
-    score_attrs, counter = self._get_default_score_attr_items()
+    score_attrs = {}
 
     topic_score_attrs = self._get_topic_score_attrs()
     score_attrs.update(topic_score_attrs)
