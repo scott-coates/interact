@@ -95,14 +95,9 @@ def populate_batch_ea_scores(score_attrs):
       if k == constants.BIO_TOPIC:
         score += .25
       elif k == constants.EO_SPAM:
-        score = math.log(1 - score) * 2
-        # eo_topic_count = len(score_attr[constants.ASSIGNED_ENTITIES][constants.DATA])
-        # spam_ratio = count / eo_topic_count
-
-        # if spam_ratio > .2:
-        #   score *= -6
-        # else:
-        #   score = None
+        eo_topic_count = len(score_attr[constants.ASSIGNED_ENTITIES][constants.DATA])
+        spam_ratio = count / eo_topic_count
+        score = math.log(max(1 - spam_ratio, .01)) * 2
 
       elif k == constants.BIO_AVOID_KEYWORD:
         score += -.10
