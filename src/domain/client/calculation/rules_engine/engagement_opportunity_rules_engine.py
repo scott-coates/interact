@@ -48,8 +48,18 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
         topic_id = v[constants.ID]
 
         if topic_id in self.eo_topic_ids:
-          counter[constants.EO_TOPIC] += v[constants.RELEVANCE]  # todo is this a good idea? or should the calculator
-          # care about relevance?
+          # should the rules engine be concerned with relevance? or should the calculator care?
+          # I started going down the route of moving over this logic to the calculator because I didn't think rules
+          # engine should care about influencing final score. However, I ran into problems right away with counting
+          # ints vs lists. We'd have to have logic to look for this key or a type `list`. Then I realized that client
+          #  preferences already seem to influence rules engines (consider location scores, or in the future,
+          # persons vs companies, etc. Also, what if we did successfully move this logic over the calculator,
+          # how would the calc factor in relevance? Once the calc computes a score based on integer counts,
+          # we'd still need to factor in topic_id relevance? But the score has already been calculated, so now what?
+          # So we probably wouldn't change the score after the fact, we'd probably bump up the counts at the very
+          # beginning, changing the input, which is essentially doing the same thing we'd be doing here, only making
+          # it way more convoluted.
+          counter[constants.EO_TOPIC] += v[constants.RELEVANCE]
 
           self._set_score_attrs_meta(score_attrs, constants.EO_TOPIC, topic_id, {constants.NAME: k})
 
