@@ -52,12 +52,7 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
   return score_attrs
 
 
-def populate_batch_ea_scores(client_id, score_attrs):
-  client = get_client_ea_lookup(client_id)
-
-  topics = client.ta_topics.items()
-
-  # todo rename to get_score_attrs_counts
+def populate_batch_ea_scores(score_attrs):
   for score_attr in score_attrs:
     counter = Counter()
 
@@ -99,16 +94,15 @@ def populate_batch_ea_scores(client_id, score_attrs):
       elif k == constants.EO_TOPIC:
         score *= 1.15
       elif k == constants.EO_SPAM:
-        score *= -10
+        score *= -3
       elif k == constants.BIO_AVOID_KEYWORD:
-        score *= -5
+        score *= -3
 
       score_attr[constants.SCORE][constants.SCORE_ATTRS][k][constants.DATA] = score
 
       total_score += score
 
     score_attr[constants.SCORE][constants.DATA] = total_score
-    print('score: ', total_score)
 
 
 def _increment_counter(score_attrs, counter):

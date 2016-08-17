@@ -42,17 +42,20 @@ def _convert_ea_data_to_deliverable(ea_data):
   ret_val[constants.URL] = _get_value(profile.profile_attrs, constants.URL)
 
   ret_val[constants.SCORE] = _get_value(ea_data, constants.SCORE)
-  ret_val[constants.PROSPECT_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROSPECT, constants.SCORE)
-  ret_val[constants.PROFILE_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROFILES, constants.SCORE)
-  ret_val[constants.ASSIGNED_ENTITY_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.ASSIGNED_ENTITIES,
-                                                        constants.SCORE)
-  ret_val[constants.PROSPECT_NORMALIZED_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROSPECT,
-                                                            constants.NORMALIZED_SCORE)
-  ret_val[constants.PROFILE_NORMALIZED_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS, constants.PROFILES,
-                                                           constants.NORMALIZED_SCORE)
-  ret_val[constants.ASSIGNED_ENTITY_NORMALIZED_SCORE] = _get_value(ea_data, constants.SCORE_ATTRS,
-                                                                   constants.ASSIGNED_ENTITIES,
-                                                                   constants.NORMALIZED_SCORE)
+  ret_val[
+    constants.PROSPECT_SCORE] = 0  # _get_value(ea_data, constants.SCORE_ATTRS, constants.PROSPECT, constants.SCORE)
+  ret_val[constants.PROFILE_SCORE] = 0  # _get_value(ea_data, constants.SCORE_ATTRS, constants.PROFILES,
+  # constants.SCORE)
+  ret_val[
+    constants.ASSIGNED_ENTITY_SCORE] = 0  # _get_value(ea_data, constants.SCORE_ATTRS, constants.ASSIGNED_ENTITIES,
+  # constants.SCORE)
+  ret_val[constants.PROSPECT_NORMALIZED_SCORE] = 0  # _get_value(ea_data, constants.SCORE_ATTRS, constants.PROSPECT,
+  #   constants.NORMALIZED_SCORE)
+  ret_val[constants.PROFILE_NORMALIZED_SCORE] = 0  # _get_value(ea_data, constants.SCORE_ATTRS, constants.PROFILES,
+  # constants.NORMALIZED_SCORE)
+  ret_val[constants.ASSIGNED_ENTITY_NORMALIZED_SCORE] = 0  # _get_value(ea_data, constants.SCORE_ATTRS,
+  # constants.ASSIGNED_ENTITIES,
+  # constants.NORMALIZED_SCORE)
 
   ret_val[constants.ID] = _get_value(ea_data, constants.ID)
 
@@ -68,13 +71,14 @@ def _convert_ea_data_to_deliverable(ea_data):
       }
 
       if constants.EO_ENGAGEMENT in assignment_entity_attr[constants.SCORE_ATTRS]:
-        score_attrs[constants.EO_ENGAGEMENT] = assignment_entity_attr[constants.SCORE_ATTRS][
-          constants.EO_ENGAGEMENT]
+        score_attrs[constants.EO_ENGAGEMENT] = assignment_entity_attr[constants.SCORE_ATTRS][constants.EO_ENGAGEMENT]
 
-    # noinspection PyUnboundLocalVariable
-    # for now we can assume every EA is an EO
+    else:
+      raise Exception('invalid type')
+
     assigned_entities_to_deliver.append(
         {
+          constants.ID: eo_ea_lookup.id,
           constants.ATTRS: eo_ea_lookup.eo_attrs,
           constants.SCORE_ATTRS: score_attrs
         }
@@ -82,6 +86,7 @@ def _convert_ea_data_to_deliverable(ea_data):
 
   ret_val[constants.ASSIGNED_ENTITIES] = [
     {
+      constants.ID: _get_value(ae, constants.ID),
       constants.TEXT: _get_value(ae, constants.ATTRS, constants.TEXT),
       constants.SCORE_ATTRS: _get_value(ae, constants.SCORE_ATTRS)
     }

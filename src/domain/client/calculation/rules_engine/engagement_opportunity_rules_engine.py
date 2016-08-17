@@ -48,7 +48,8 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
         topic_id = v[constants.ID]
 
         if topic_id in self.eo_topic_ids:
-          counter[constants.EO_TOPIC] += v[constants.RELEVANCE]
+          counter[constants.EO_TOPIC] += v[constants.RELEVANCE]  # todo is this a good idea? or should the calculator
+          # care about relevance?
 
           score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
             constants.NAME: k
@@ -117,8 +118,8 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
           if distance < .5:
             recent_eo[constants.SIMILAR_EOS].append(self.eo_id)
 
-      similar_eo_count = list(chain.from_iterable(r[constants.SIMILAR_EOS] for r in recent_eos))
-      if similar_eo_count:
+      similar_eo_ids = [r[constants.ID] for r in recent_eos if r[constants.SIMILAR_EOS]]
+      if similar_eo_ids:
         score_attrs[constants.EO_SPAM][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
-
+        score_attrs[constants.EO_SPAM][constants.SCORE_ATTRS][constants.DATA] = similar_eo_ids
     return score_attrs
