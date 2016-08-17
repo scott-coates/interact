@@ -55,7 +55,7 @@ class ProspectRulesEngine(BaseRulesEngine):
         if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
           counter[constants.LOCATION] += self.DEFAULT_COUNT_VALUE
 
-          score_attrs[constants.LOCATION][constants.COUNT][constants.DATA] = counter[constants.LOCATION]
+          self._set_score_attrs_value(score_attrs, constants.LOCATION, counter[constants.LOCATION])
 
     return score_attrs
 
@@ -70,16 +70,8 @@ class ProspectRulesEngine(BaseRulesEngine):
         if topic_id in self.prospect_topic_ids:
           counter[constants.BIO_TOPIC] += v[constants.RELEVANCE]
 
-          score_attrs[constants.BIO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
-            constants.NAME: k
-          }
-
-          # todo move this over
-          # score_attrs[constants.BIO_TOPIC][constants.SCORE_ATTRS][k] = {
-          #   constants.RELEVANCE: bio_keyword_score
-          # }
-
-          score_attrs[constants.BIO_TOPIC][constants.COUNT][constants.DATA] = counter[constants.BIO_TOPIC]
+          self._set_score_attrs_meta(score_attrs, constants.BIO_TOPIC, topic_id, {constants.NAME: k})
+          self._set_score_attrs_value(score_attrs, constants.BIO_TOPIC, counter[constants.BIO_TOPIC])
 
     bios = self.prospect_attrs.get(constants.BIOS)
 
@@ -101,11 +93,10 @@ class ProspectRulesEngine(BaseRulesEngine):
             counter[constants.BIO_AVOID_KEYWORD] += self.DEFAULT_COUNT_VALUE
             found_avoid_names.append(b)
 
-            score_attrs[constants.BIO_AVOID_KEYWORD][constants.COUNT][constants.DATA] = counter[
-              constants.BIO_AVOID_KEYWORD]
+            self._set_score_attrs_value(score_attrs, constants.BIO_AVOID_KEYWORD, counter[constants.BIO_AVOID_KEYWORD])
 
         if found_avoid_names:
-          score_attrs[constants.BIO_AVOID_KEYWORD][constants.SCORE_ATTRS][constants.NAMES] = found_avoid_names
+          self._set_score_attrs_meta(score_attrs, constants.BIO_AVOID_KEYWORD, constants.NAMES, found_avoid_names)
 
     return score_attrs
 
@@ -117,6 +108,6 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     new_prospect_for_client = get_client_assigned_prospect_count(client_id, prospect_id)
     if not new_prospect_for_client:
-      score_attrs[constants.NEW_PROSPECT][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
+      self._set_score_attrs_value(score_attrs, constants.NEW_PROSPECT, self.DEFAULT_COUNT_VALUE)
 
     return score_attrs

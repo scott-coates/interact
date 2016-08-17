@@ -51,15 +51,9 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
           counter[constants.EO_TOPIC] += v[constants.RELEVANCE]  # todo is this a good idea? or should the calculator
           # care about relevance?
 
-          score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][topic_id] = {
-            constants.NAME: k
-          }
+          self._set_score_attrs_meta(score_attrs, constants.EO_TOPIC, topic_id, {constants.NAME: k})
 
-          # todo provide easier way other than writing out
-          # --- score_attrs[constants.EO_TOPIC][constants.SCORE_ATTRS][constants.COUNT][constants.DATA] ---
-          # i missed one dimension and threw the whole thing off in the calc phase cause I had:
-          # score_attrs[constants.EO_TOPIC][constants.COUNT][constants.DATA]
-          score_attrs[constants.EO_TOPIC][constants.COUNT][constants.DATA] = counter[constants.EO_TOPIC]
+          self._set_score_attrs_value(score_attrs, constants.EO_TOPIC, counter[constants.EO_TOPIC])
 
     return score_attrs
 
@@ -93,7 +87,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
         mentions = self.eo_attrs.get(constants.MENTIONS)
 
         if mentions:
-          score_attrs[constants.EO_ENGAGEMENT][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
+          self._set_score_attrs_value(score_attrs, constants.EO_ENGAGEMENT, self.DEFAULT_COUNT_VALUE)
 
     return score_attrs
 
@@ -120,6 +114,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
       similar_eo_ids = [r[constants.ID] for r in recent_eos if self.eo_id in r[constants.SIMILAR_EOS]]
       if similar_eo_ids:
-        score_attrs[constants.EO_SPAM][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
-        score_attrs[constants.EO_SPAM][constants.SCORE_ATTRS][constants.DATA] = similar_eo_ids
+        self._set_score_attrs_value(score_attrs, constants.EO_SPAM, self.DEFAULT_COUNT_VALUE)
+        self._set_score_attrs_meta(score_attrs, constants.EO_SPAM, constants.DATA, similar_eo_ids)
+
     return score_attrs

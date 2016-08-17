@@ -61,11 +61,12 @@ def populate_batch_ea_scores(score_attrs):
     prospect = score_attr[constants.PROSPECT]
     _increment_counter(prospect[constants.SCORE_ATTRS], counter)
 
+    # putting profiles and AE's in a key called DATA because we might want other sibling keys like "length" in future.
     profiles = score_attr[constants.PROFILES][constants.DATA]
     for profile in profiles:
       _increment_counter(profile[constants.SCORE_ATTRS], counter)
 
-    aes = score_attr[constants.ASSIGNED_ENTITIES][constants.DATA]  # todo remove constants.DATA??
+    aes = score_attr[constants.ASSIGNED_ENTITIES][constants.DATA]
     for ae in aes:
       _increment_counter(ae[constants.SCORE_ATTRS], counter)
 
