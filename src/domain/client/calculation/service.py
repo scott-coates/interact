@@ -1,5 +1,7 @@
 from collections import Counter, defaultdict
 
+import math
+
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
   get_eo_ea_lookup, get_client_ea_lookup
@@ -73,8 +75,8 @@ def populate_batch_ea_scores(score_attrs):
   tally = defaultdict(list)
 
   for score_attr in score_attrs:
-    count = score_attr[constants.SCORE][constants.SCORE_ATTRS]
-    for k, v in count.items():
+    score_count_attrs = score_attr[constants.SCORE][constants.SCORE_ATTRS]
+    for k, v in score_count_attrs.items():
       tally[k].append(v[constants.COUNT])
 
   calcs = {}
@@ -84,21 +86,29 @@ def populate_batch_ea_scores(score_attrs):
 
   for score_attr in score_attrs:
     total_score = 0
-    count = score_attr[constants.SCORE][constants.SCORE_ATTRS]
+    score_count_attrs = score_attr[constants.SCORE][constants.SCORE_ATTRS]
 
-    for k, v in count.items():
-      score = calcs[k].calculate_normalized_score(v[constants.COUNT])
+    for k, v in score_count_attrs.items():
+      count = v[constants.COUNT]
+      score = calcs[k].calculate_normalized_score(count)
 
       if k == constants.BIO_TOPIC:
-        score *= 2
-      elif k == constants.EO_TOPIC:
-        score *= 1.15
+        score += .25
       elif k == constants.EO_SPAM:
-        score *= -3
-      elif k == constants.BIO_AVOID_KEYWORD:
-        score *= -3
+        score = math.log(1 - score) * 2
+        # eo_topic_count = len(score_attr[constants.ASSIGNED_ENTITIES][constants.DATA])
+        # spam_ratio = count / eo_topic_count
 
-      score_attr[constants.SCORE][constants.SCORE_ATTRS][k][constants.DATA] = score
+        # if spam_ratio > .2:
+        #   score *= -6
+        # else:
+        #   score = None
+
+      elif k == constants.BIO_AVOID_KEYWORD:
+        score += -.10
+
+      # if score is not None:
+      score_attr[constants.SCORE][constants.SCORE_ATTRS][k][constants.SCORE] = score
 
       total_score += score
 

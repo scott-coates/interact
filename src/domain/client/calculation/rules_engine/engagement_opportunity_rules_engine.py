@@ -118,7 +118,7 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
           if distance < .5:
             recent_eo[constants.SIMILAR_EOS].append(self.eo_id)
 
-      similar_eo_ids = [r[constants.ID] for r in recent_eos if r[constants.SIMILAR_EOS]]
+      similar_eo_ids = [r[constants.ID] for r in recent_eos if self.eo_id in r[constants.SIMILAR_EOS]]
       if similar_eo_ids:
         score_attrs[constants.EO_SPAM][constants.COUNT][constants.DATA] = self.DEFAULT_COUNT_VALUE
         score_attrs[constants.EO_SPAM][constants.SCORE_ATTRS][constants.DATA] = similar_eo_ids

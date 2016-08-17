@@ -85,4 +85,4 @@ def process_assignment_batch_task(client_id, batch_id):
 def _enqueue_assignment_check_(client_id, batch_id):
   scheduler = django_rq.get_scheduler('default')
   # delay this task so that we have time to check if it's a duplicate prospect before we proceed
-  scheduler.enqueue_in(timedelta(minutes=1), process_assignment_batch_task, client_id, batch_id)
+  scheduler.enqueue_in(timedelta(seconds=10), process_assignment_batch_task, client_id, batch_id)
