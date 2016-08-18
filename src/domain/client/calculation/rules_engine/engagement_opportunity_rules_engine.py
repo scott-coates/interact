@@ -59,9 +59,13 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
           # So we probably wouldn't change the score after the fact, we'd probably bump up the counts at the very
           # beginning, changing the input, which is essentially doing the same thing we'd be doing here, only making
           # it way more convoluted.
-          counter[constants.EO_TOPIC] += v[constants.RELEVANCE]
+          relevance = v[constants.RELEVANCE]
+          counter[constants.EO_TOPIC] += relevance
 
-          self._set_score_attrs_meta(score_attrs, constants.EO_TOPIC, topic_id, {constants.NAME: k})
+          self._set_score_attrs_meta(score_attrs, constants.EO_TOPIC, topic_id, {
+            constants.NAME: k,
+            constants.RELEVANCE: relevance
+          })
 
           self._set_score_attrs_value(score_attrs, constants.EO_TOPIC, counter[constants.EO_TOPIC])
 
