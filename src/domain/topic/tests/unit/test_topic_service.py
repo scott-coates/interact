@@ -23,8 +23,11 @@ from src.domain.topic.service import get_topic_stems
   ("RT @PostCrescent: .@FoxValleyTech is coming in with a 95 percent pass rate, making it a leader in the industry "
    "https://t.co/Q6SfYG4LwB",
    []),
-  ("RT @Tamaraw68415067: Go Rubio! https://t.co/iZNMG19Svt",
+  ("RT @Tamaraw68415067: Go Rubio! https://t.co/iZNMG19Svt",  # this one fails, it finds `ruby`
    []),
+  ("Join me at the Women in Technology Annual Meeting! So many great things happening in #witwisconsin "
+   "http://conta.cc/1tAAyVb  #constantcontact",
+   [6]),
 ])
 def test_topic_service_finds_topics_in_tweet(content, ret_val):
   _topic_read_service = MagicMock(spec=topic_read_service)
@@ -36,6 +39,7 @@ def test_topic_service_finds_topics_in_tweet(content, ret_val):
         _get_topic_mock(3, 'entrepreneur'),
         _get_topic_mock(4, 'techie'),
         _get_topic_mock(5, 'ruby'),
+        _get_topic_mock(6, 'women in tech'),
       ]
   )
 

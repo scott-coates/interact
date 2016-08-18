@@ -1,13 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Redis Scheduler" type="PythonConfigurationType" factoryName="Python">
-    <log_file path="$PROJECT_DIR$/logs/*.log" checked="true" skipped="true" show_all="true" alias="$PROJECT_DIR$/logs" />
+  <configuration default="false" name="unit tests" type="tests" factoryName="py.test">
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
-    <envs>
-      <env name="DJANGO_SETTINGS_MODULE" value="src.settings.dev_override" />
-      <env name="NO_PROXY" value="1" />
-      <env name="PYTHONUNBUFFERED" value="1" />
-    </envs>
+    <envs />
     <option name="SDK_HOME" value="$USER_HOME$/.virtualenvs/interact/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="true" />
@@ -15,9 +10,18 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <module name="interact-api" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-    <option name="SCRIPT_NAME" value="manage.py" />
-    <option name="PARAMETERS" value="rqscheduler" />
-    <option name="SHOW_COMMAND_LINE" value="false" />
+    <option name="SCRIPT_NAME" value="" />
+    <option name="CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="FOLDER_NAME" value="" />
+    <option name="TEST_TYPE" value="TEST_SCRIPT" />
+    <option name="PATTERN" value="" />
+    <option name="USE_PATTERN" value="false" />
+    <option name="testToRun" value="$PROJECT_DIR$" />
+    <option name="keywords" value="" />
+    <option name="params" value="" />
+    <option name="USE_PARAM" value="false" />
+    <option name="USE_KEYWORD" value="false" />
     <method />
   </configuration>
 </component>
