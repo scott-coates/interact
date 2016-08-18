@@ -41,6 +41,8 @@ class ProfileLookupForEa(ReadModel):
 
 class EoLookupForEa(ReadModel):
   eo_attrs = JSONField()
+  # for now, the entity won't allow empty topic ids, but we might want to allow
+  # empty topic ids in the future
   topic_ids = JSONField(default=list)
   provider_type = models.CharField(max_length=2400)
   profile_id = models.CharField(max_length=8)

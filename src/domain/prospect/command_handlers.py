@@ -72,5 +72,5 @@ def add_eo(_aggregate_repository=None, **kwargs):
   prospect = _aggregate_repository.get(Prospect, prospect_id)
   version = prospect.version
 
-  prospect.add_eo(**command.data)
-  _aggregate_repository.save(prospect, version)
+  if prospect.add_eo(**command.data):
+    _aggregate_repository.save(prospect, version)

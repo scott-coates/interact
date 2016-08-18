@@ -72,6 +72,8 @@ def write_eo_to_graphdb(profile_id, eo_id, topic_ids, _graph_db_provider=graphdb
   }
 
   # some eo's might not have any topics yet
+  # for now, the entity won't allow empty topic ids, but we might want to allow
+  # empty topic ids in the future
   if topic_ids:
     params['topic_ids'] = topic_ids
 

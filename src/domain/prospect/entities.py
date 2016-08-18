@@ -2,6 +2,7 @@ import logging
 from collections import defaultdict
 from itertools import chain
 
+from src.apps.geo import service as geo_service
 from src.domain.common import constants
 from src.domain.prospect.engagement_opportunity import service  as eo_service
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
@@ -9,7 +10,6 @@ from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, 
   ProspectMarkedAsDuplicate, ProspectDeleted1, ProspectUpdatedTopicsFromProfile1
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
-from src.apps.geo import service as geo_service
 from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
@@ -106,6 +106,7 @@ class Prospect(AggregateBase):
   def add_eo(self, id, external_id, attrs, provider_type,
              provider_action_type, created_date, profile_id, _eo_service=None):
 
+    ret_val = False
     if not _eo_service: _eo_service = eo_service
 
     eo = self._find_eo_by_external_id_and_provider_type(external_id, provider_type)
@@ -114,10 +115,15 @@ class Prospect(AggregateBase):
     attrs = _eo_service.prepare_attrs_from_engagement_opportunity(attrs)
     topic_ids = _eo_service.get_topic_ids_from_engagement_opportunity_attrs(attrs)
 
-    self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
-                                                           attrs, topic_ids, provider_type,
-                                                           provider_action_type, created_date, self.is_duplicated,
-                                                           self.existing_prospect_id, False, None, profile_id))
+    if topic_ids:
+      self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
+                                                             attrs, topic_ids, provider_type,
+                                                             provider_action_type, created_date, self.is_duplicated,
+                                                             self.existing_prospect_id, False, None, profile_id))
+      ret_val = True
+    else:
+      logger.debug('skipping %s: no topics found', attrs)
+    return ret_val
 
   def _handle_created_1_event(self, event):
     self.id = event.id
