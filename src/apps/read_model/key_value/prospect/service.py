@@ -6,14 +6,18 @@ from src.libs.key_value_utils.key_value_provider import get_key_value_client
 from src.libs.key_value_utils.service import push_latest
 
 
-def save_recent_eo_content(eo_id, content, external_id, provider_type, provider_action_type, prospect_id):
-  payload = {
-    constants.ID: eo_id, constants.TEXT: content, constants.EXTERNAL_ID: external_id,
-    constants.PROVIDER_TYPE: provider_type, constants.PROVIDER_ACTION_TYPE: provider_action_type
-  }
+def save_recent_eo_content(eo_id, eo_attrs, external_id, provider_type, provider_action_type, prospect_id):
+  ret_val = None
 
-  payload_str = json.dumps(payload)
-  ret_val = push_latest(get_read_model_name('prospect_recent_eos:{0}', prospect_id), payload_str, 100)
+  text = eo_attrs.get(constants.TEXT)
+  if text:
+    payload = {
+      constants.ID: eo_id, constants.TEXT: text, constants.EXTERNAL_ID: external_id,
+      constants.PROVIDER_TYPE: provider_type, constants.PROVIDER_ACTION_TYPE: provider_action_type
+    }
+
+    payload_str = json.dumps(payload)
+    ret_val = push_latest(get_read_model_name('prospect_recent_eos:{0}', prospect_id), payload_str, 100)
 
   return ret_val
 
@@ -28,25 +32,45 @@ def get_recent_eo_content(prospect_id):
   return ret_val
 
 
-def save_recent_prospect_discovery_network_connection(external_id, provider_type, prospect_id):
-  ret_val = None
+def save_recent_prospect_discovery_network_connections_from_eo(eo_attrs, provider_type, prospect_id):
+  ret_val = []
 
-  recent_discovery_network = get_recent_prospect_discovery_network(prospect_id)
+  should_add_to_discovery_network = False
 
-  existing_recent_connection = next((r for r in recent_discovery_network
-                                     if r[constants.EXTERNAL_ID] == external_id and
-                                     r[constants.PROVIDER_TYPE] == provider_type), None)
+  if provider_type == constants.Provider.TWITTER:
 
-  if existing_recent_connection is None:
-    # only add new, distinct connections
+    retweet_status = eo_attrs[constants.IS_RETWEET]
 
-    payload = {
-      constants.EXTERNAL_ID: external_id,
-      constants.PROVIDER_TYPE: provider_type,
-    }
+    if not retweet_status:
+      should_add_to_discovery_network = True
 
-    payload_str = json.dumps(payload)
-    ret_val = push_latest(get_read_model_name('prospect_recent_discovery_network:{0}', prospect_id), payload_str, 100)
+  if should_add_to_discovery_network:
+
+    mentions = eo_attrs.get(constants.MENTIONS)
+    if mentions:
+
+      recent_discovery_network = get_recent_prospect_discovery_network(prospect_id)
+
+      for mention in mentions:
+        external_id = mention[constants.EXTERNAL_ID]
+
+        existing_recent_connection = next(
+            (r for r in recent_discovery_network if
+             r[constants.EXTERNAL_ID] == external_id and r[constants.PROVIDER_TYPE] == provider_type
+             ), None)
+
+        if existing_recent_connection is None:
+          # only add new, distinct connections
+
+          payload = {
+            constants.EXTERNAL_ID: external_id,
+            constants.PROVIDER_TYPE: provider_type,
+          }
+
+          payload_str = json.dumps(payload)
+          ret_val.append(
+              push_latest(get_read_model_name('prospect_recent_discovery_network:{0}', prospect_id), payload_str, 100)
+          )
 
   return ret_val
 

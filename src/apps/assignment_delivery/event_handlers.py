@@ -22,6 +22,7 @@ def execute_ea_created_1_for_model(**kwargs):
   event = kwargs['event']
 
   batch_eas = event.assigned
+  batch_id = event.batch_id
 
   for ea in batch_eas:
-    tasks.deliver_ea_to_read_model_task.delay(ea)
+    tasks.deliver_ea_to_read_model_task.delay(ea, batch_id)

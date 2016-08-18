@@ -20,13 +20,10 @@ def execute_added_eo_1(**kwargs):
 
   attrs = event.attrs
 
-  text = attrs.get(constants.TEXT)
-
-  if text:
-    tasks.save_recent_eo_content_task.delay(
-        event.id, text, event.external_id,
-        event.provider_type, event.provider_action_type, aggregate_id
-    )
+  tasks.save_recent_eo_content_task.delay(
+      event.id, attrs, event.external_id,
+      event.provider_type, event.provider_action_type, aggregate_id
+  )
 
 
 @event_idempotent
@@ -37,15 +34,9 @@ def execute_added_eo_save_discovery_network_1(**kwargs):
 
   attrs = event.attrs
 
-  mentions = attrs.get(constants.MENTIONS)
+  provider_type = event.provider_type
+  prospect_id = aggregate_id
 
-  if mentions:
-    provider_type = event.provider_type
-    prospect_id = aggregate_id
-
-    for mention in mentions:
-      external_id = mention[constants.EXTERNAL_ID]
-
-      tasks.save_recent_prospect_discovery_network_connection_task.delay(
-          external_id, provider_type, prospect_id
-      )
+  tasks.save_recent_prospect_discovery_network_connections_from_eo_task.delay(
+      attrs, provider_type, prospect_id
+  )

@@ -13,8 +13,7 @@ class DeliveredEaAdmin(admin.ModelAdmin):
   readonly_fields = ('score_attrs_pretty',)
 
   actions = None
-  list_display = ('name', 'bio', 'score', 'prospect_score', 'prospect_normalized_score', 'assigned_entity_score',
-                  'assigned_entity_normalized_score')
+  list_display = ('name', 'bio', 'score', 'batch_id')
 
   def has_delete_permission(self, request, obj=None):
     return False

@@ -13,5 +13,5 @@ def deliver_ea_to_analytics_service_task(ea_data):
 
 
 @job('default')
-def deliver_ea_to_read_model_task(ea_data):
-  return deliver_ea_to_read_model(ea_data)
+def deliver_ea_to_read_model_task(ea_data, batch_id):
+  return deliver_ea_to_read_model(ea_data, batch_id)
