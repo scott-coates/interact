@@ -61,7 +61,7 @@ def discover_engagement_opportunities_from_twitter_user(screen_name):
 
 def _send_eo_discovery(twitter_eo, counter, total_eos_count):
   discovery_object = EngagementOpportunityDiscoveryObject(
-      twitter_eo.username,
+      twitter_eo.screen_name,
       twitter_eo.twitter_obj['id_str'],
       twitter_eo.twitter_obj_attrs,
       twitter_eo.created_date,
@@ -114,9 +114,9 @@ def _create_tweet_eo_object(tweets):
   ret_val = []
 
   for tweet in tweets:
-    username = tweet['user']['screen_name']
+    screen_name = tweet['user'][constants.SCREEN_NAME]
 
-    profile_url = _twitter_url_prefix.format(username)
+    profile_url = _twitter_url_prefix.format(screen_name)
     tweet_id = tweet['id_str']
     url = "{0}/status/{1}".format(profile_url, tweet_id)
     text = tweet[constants.TEXT]
@@ -135,7 +135,7 @@ def _create_tweet_eo_object(tweets):
 
     ret_val.append(
         TwitterEngagementOpportunityDiscoveryObject(
-            username,
+            screen_name,
             tweet_id,
             constants.Provider.TWITTER,
             constants.ProviderAction.TWITTER_TWEET,
@@ -157,7 +157,7 @@ def _is_retweet(tweet, text):
   else:
     if text.startswith('RT '):
       ret_val = True
-      
+
   return ret_val
 
 
@@ -188,7 +188,7 @@ def _get_user_mention(mention):
   ret_val = {
     constants.ID: mention['id_str'],
     constants.NAME: mention[constants.NAME],
-    constants.SCREEN_NAME: mention[constants.SCREEN_NAME]
+    constants.EXTERNAL_ID: mention[constants.SCREEN_NAME]
   }
 
   return ret_val

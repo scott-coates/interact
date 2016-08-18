@@ -1,9 +1,14 @@
 import logging
+from operator import itemgetter
 
 from django_rq import job
 
 from src.apps.engagement_discovery import service
+from src.apps.read_model.key_value.prospect.service import get_recent_prospect_discovery_network
+from src.apps.read_model.relational.client.service import get_eo_ea_lookup
+from src.domain.common import constants
 from src.domain.prospect.service import prospect_is_deleted
+from src.domain.prospect.tasks import populate_prospect_from_provider_info_chain
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
@@ -26,3 +31,16 @@ def discover_engagement_opportunities_from_profile_task(external_id, provider_ty
       logger.info('prospect %s is deleted. aborting task', prospect_id)
     else:
       service.discover_engagement_opportunities_from_profile(external_id, provider_type)
+
+
+@job('default')
+def discover_engagement_opportunities_from_batch_assignments_task(batch_id, assigned_eas):
+  log_message = ("batch_id: %s", batch_id)
+
+  with log_wrapper(logger.debug, *log_message):
+    discovery_network = service.get_discovery_network_from_batch_assignments(assigned_eas)
+
+    for recent_connection in discovery_network:
+      external_id_ = recent_connection[constants.EXTERNAL_ID]
+      provider_type = recent_connection[constants.PROVIDER_TYPE]
+      # populate_prospect_from_provider_info_chain.delay(external_id_, provider_type)

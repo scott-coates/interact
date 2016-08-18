@@ -106,5 +106,5 @@ def prospect_is_deleted(prospect_id, _aggregate_repository=None):
   if not _aggregate_repository: _aggregate_repository = aggregate_repository
 
   prospect = _aggregate_repository.get(Prospect, prospect_id)
-  
+
   return prospect.is_deleted

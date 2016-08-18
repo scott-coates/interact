@@ -28,3 +28,13 @@ def save_recent_eo_content_task(eo_id, content, external_id, provider_type, prov
 
   with log_wrapper(logger.info, *log_message):
     return service.save_recent_eo_content(eo_id, content, external_id, provider_type, provider_action_type, prospect_id)
+
+
+@job('default')
+def save_recent_prospect_discovery_network_connection_task(external_id, provider_type, prospect_id):
+  log_message = (
+    "external_id: %s, prospect_id: %s", external_id, prospect_id
+  )
+
+  with log_wrapper(logger.info, *log_message):
+    return service.save_recent_prospect_discovery_network_connection(external_id, provider_type, prospect_id)

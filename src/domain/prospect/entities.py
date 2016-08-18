@@ -106,7 +106,6 @@ class Prospect(AggregateBase):
   def add_eo(self, id, external_id, attrs, provider_type,
              provider_action_type, created_date, profile_id, _eo_service=None):
 
-    ret_val = False
     if not _eo_service: _eo_service = eo_service
 
     eo = self._find_eo_by_external_id_and_provider_type(external_id, provider_type)
@@ -115,15 +114,10 @@ class Prospect(AggregateBase):
     attrs = _eo_service.prepare_attrs_from_engagement_opportunity(attrs)
     topic_ids = _eo_service.get_topic_ids_from_engagement_opportunity_attrs(attrs)
 
-    if topic_ids:
-      self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
-                                                             attrs, topic_ids, provider_type,
-                                                             provider_action_type, created_date, self.is_duplicated,
-                                                             self.existing_prospect_id, False, None, profile_id))
-      ret_val = True
-    else:
-      logger.debug('skipping %s: no topics found', attrs)
-    return ret_val
+    self._raise_event(EngagementOpportunityAddedToProfile1(id, external_id,
+                                                           attrs, topic_ids, provider_type,
+                                                           provider_action_type, created_date, self.is_duplicated,
+                                                           self.existing_prospect_id, False, None, profile_id))
 
   def _handle_created_1_event(self, event):
     self.id = event.id
@@ -232,7 +226,7 @@ class EngagementOpportunity:
     if not attrs:
       raise TypeError("attrs is required")
 
-    if not topic_ids:
+    if topic_ids is None:
       raise TypeError("topic_ids is required")
 
     if not provider_type:

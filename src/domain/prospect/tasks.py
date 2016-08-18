@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 # this is a hack to get around that.
 
 @job('default')
-def populate_prospect_from_provider_info_chain(external_id, provider_type, engagement_opportunity_discovery_object):
+def populate_prospect_from_provider_info_chain(external_id, provider_type,
+                                               engagement_opportunity_discovery_object=None):
   log_message = ("external_id: %s, provider_type: %s", external_id, provider_type)
 
   with log_wrapper(logger.info, *log_message):
@@ -31,8 +32,11 @@ def populate_profile_from_provider_info_chain(prospect_id, external_id, provider
 
   with log_wrapper(logger.info, *log_message):
     profile_id = service.populate_profile_id_from_provider_info(prospect_id, external_id, provider_type)
-    populate_engagement_opportunity_id_from_engagement_discovery_task.delay(profile_id, prospect_id,
-                                                                            engagement_opportunity_discovery_object)
+
+    # this is why we're explicitly naming the method `chain` because rq-scheduler doesn't support chaining tasks
+    if engagement_opportunity_discovery_object:
+      populate_engagement_opportunity_id_from_engagement_discovery_task.delay(profile_id, prospect_id,
+                                                                              engagement_opportunity_discovery_object)
 
 
 @job('default')
