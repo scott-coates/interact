@@ -43,4 +43,4 @@ def discover_engagement_opportunities_from_batch_assignments_task(batch_id, assi
     for recent_connection in discovery_network:
       external_id_ = recent_connection[constants.EXTERNAL_ID]
       provider_type = recent_connection[constants.PROVIDER_TYPE]
-      # populate_prospect_from_provider_info_chain.delay(external_id_, provider_type)
+      populate_prospect_from_provider_info_chain.delay(external_id_, provider_type)

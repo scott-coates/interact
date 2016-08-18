@@ -22,7 +22,9 @@ class ScoreCalculator:
     # refer to guidetodatamining chapter 4 for abs standard devation
     # sample size = len(scores) - 1. chapter 6 guidetodatamining.
     # http://stackoverflow.com/a/16562028/173957
-    self.mdev = (1 / (len(self.counts) - 1)) * abs_data.sum()
+
+    len_counts = len(self.counts)
+    self.mdev = 0.0 if len_counts == 1 else (1 / (len_counts - 1)) * abs_data.sum()
 
     self.sdev = np.std(self.counts)
 
