@@ -22,7 +22,7 @@ def get_discovery_network_from_batch_assignments(assigned_eas):
   ret_val = []
   # get top 10% scoring assigned_eas
   total = len(assigned_eas)
-  top_eas = round(total / 10)
+  top_eas = round(total * .25)
 
   eas_to_take = sorted(assigned_eas, key=itemgetter('score'), reverse=True)[:top_eas]
   # don't get scores that negatively scored (spam, bad words, etc.) even if in 90 percentile.
@@ -30,7 +30,7 @@ def get_discovery_network_from_batch_assignments(assigned_eas):
 
   for ea in eas_to_take:
     # each ea gets own task
-    prospect_id = ea[constants.ID]
+    prospect_id = ea[constants.PROSPECT_ID]
     recent_discovery_network = get_recent_prospect_discovery_network(prospect_id)
     ret_val.extend(recent_discovery_network)
 
