@@ -30,8 +30,7 @@ def get_discovery_network_from_batch_assignments(assigned_eas):
 
   for ea in eas_to_take:
     # each ea gets own task
-    prospect = ea[constants.PROSPECT]
-    prospect_id = prospect[constants.ID]
+    prospect_id = ea[constants.ID]
     recent_discovery_network = get_recent_prospect_discovery_network(prospect_id)
     ret_val.extend(recent_discovery_network)
 
