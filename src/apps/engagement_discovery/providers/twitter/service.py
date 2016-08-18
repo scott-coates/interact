@@ -29,7 +29,7 @@ def discover_engagement_opportunities_from_twitter_ta_topic_option(ta_topic_opti
     since = ta_topic_option.option_attrs.get('since', 'q')
     kwargs['since'] = since
 
-    # kwargs['count'] = 1  # todo remove me
+    kwargs['count'] = 1  # todo remove me
 
     twitter_eos = _find_tweets_from_keyword(ta_topic_option.option_name, **kwargs)
 
@@ -70,7 +70,7 @@ def _send_eo_discovery(twitter_eo, counter, total_eos_count):
   )
 
   logger.debug('Sending discovery object %i out of %i. Username: %s. Tweet: %s', counter, total_eos_count,
-               twitter_eo.username,
+               twitter_eo.screen_name,
                twitter_eo.twitter_obj['text'])
 
   engagement_opportunity_discovered.send(
@@ -103,7 +103,7 @@ def _find_tweets_from_user(screen_name, _twitter_service=None):
   search_log_message = ("Searching user timeline: %s", screen_name)
 
   with log_wrapper(logger.debug, *search_log_message):
-    tweets_from_user = _twitter_service.search_twitter_by_user(screen_name, since='y', count=100)
+    tweets_from_user = _twitter_service.search_twitter_by_user(screen_name, since='y', count=1)
 
   ret_val = _create_tweet_eo_object(tweets_from_user)
 

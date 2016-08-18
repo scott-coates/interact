@@ -62,19 +62,29 @@ def write_eo_to_graphdb(profile_id, eo_id, topic_ids, _graph_db_provider=graphdb
 
   q = '''
     MATCH (profile:Profile {id:{profile_id}})
-    MATCH (topic:Topic)
-    WHERE topic.id IN {topic_ids}
     MERGE (eo:EngagementOpportunity {id: {eo_id}})
     MERGE (eo)-[:BELONGS_TO]->(profile)
-    MERGE (eo)-[r:ENGAGEMENT_OPPORTUNITY_TOPIC]->(topic)
-    RETURN eo
   '''
+
   params = {
     'profile_id': profile_id,
     'eo_id': eo_id,
-    'topic_ids': topic_ids,
   }
 
+  # some eo's might not have any topics yet
+  if topic_ids:
+    params['topic_ids'] = topic_ids
+
+    q += '''
+      WITH profile, eo
+      MATCH (topic:Topic)
+      WHERE topic.id IN {topic_ids}
+      MERGE (eo)-[r:ENGAGEMENT_OPPORTUNITY_TOPIC]->(topic)
+      '''
+
+  q += '''
+    RETURN eo
+  '''
   ret_val = gdb.query(q, params=params, returns=(Node,))
 
   return ret_val[0][0]

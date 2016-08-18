@@ -42,7 +42,6 @@ def save_recent_prospect_discovery_network_connection(external_id, provider_type
 
     payload = {
       constants.EXTERNAL_ID: external_id,
-      constants.PROVIDER_TYPE: provider_type,
       constants.PROSPECT_ID: prospect_id
     }
 
