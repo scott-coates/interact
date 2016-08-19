@@ -40,7 +40,7 @@ class ProspectAddedProfile1(DomainEvent):
   event_signal = EventSignal()
 
   @initializer
-  def __init__(self, id, external_id, provider_type, attrs):
+  def __init__(self, id, external_id, provider_type, is_restricted, attrs):
     super().__init__()
 
 

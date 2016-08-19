@@ -78,9 +78,11 @@ class Prospect(AggregateBase):
 
     try:
       profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
+      profile_is_restricted = False
     except ProfileRestrictedError:
       # some profiles (like on twitter) might be private
       profile_attrs = {}
+      profile_is_restricted = True
     else:
       bio = profile_attrs.get(constants.BIO)
       if bio:
@@ -104,7 +106,7 @@ class Prospect(AggregateBase):
         websites = get_unique_urls_from_iterable(combined_sites)
         prospect_attrs[constants.WEBSITES].extend(websites)
 
-    self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))
+    self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_is_restricted, profile_attrs))
 
     if profile_attrs:
       # if a profile was restricted, we might not have any profile attrs with which to update the prospect

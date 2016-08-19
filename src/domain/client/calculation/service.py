@@ -98,8 +98,7 @@ def populate_batch_ea_scores(client_id, score_attrs):
       score = calcs[k].calculate_normalized_score(count)
 
       if k == constants.LOCATION:
-        # locations is binary right now so it'll either be 0 or 2.5
-        score *= 2.5
+        score = 2.5 if count else 0
 
       if k == constants.BIO_TOPIC:
         score *= 1.25

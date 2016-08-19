@@ -16,12 +16,13 @@ def execute_prospect_added_profile_1(**kwargs):
 
   event = kwargs['event']
 
-  external_id = event.external_id
-  provider_type = event.provider_type
+  if not event.is_restricted:
+    external_id = event.external_id
+    provider_type = event.provider_type
 
-  # delay this task so that we have time to check if it's a duplicate prospect before we proceed
-  scheduler.enqueue_in(timedelta(minutes=1), tasks.discover_engagement_opportunities_from_profile_task,
-                       external_id, provider_type, prospect_id)
+    # delay this task so that we have time to check if it's a duplicate prospect before we proceed
+    scheduler.enqueue_in(timedelta(minutes=1), tasks.discover_engagement_opportunities_from_profile_task,
+                         external_id, provider_type, prospect_id)
 
 
 @receiver(ClientProcessedEngagementAssignmentBatch1.event_signal)

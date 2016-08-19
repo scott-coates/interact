@@ -29,15 +29,18 @@ class ScoreCalculator:
     self.sdev = np.std(self.counts)
 
   def calculate_normalized_score(self, value):
-    if self.min == value == self.max:
-      # min and max and value are all the same
-      # x = ScoreCalculator([1,1,1,1,1,1])
-      # x.calculate_normalized_score(1)
-      # 1.0
-      # this is so an EA doesn't get a score of 0 on the first round.
-      norm = 1
-    else:
+    try:
       norm = (value - self.min) / self.max
+    except ZeroDivisionError:
+      norm = 0
+    # I removed this logic and am explicitly placing it for specific keys in the calc service.
+    # min and max and value are all the same
+    # x = ScoreCalculator([1,1,1,1,1,1])
+    # x.calculate_normalized_score(1)
+    # 1.0
+    # this is so an EA doesn't get a score of 0 on the first round.
+    # if self.min == value == self.max:
+    #   norm = 1
     return norm
 
   def calculate_modified_standard_score(self, value):
