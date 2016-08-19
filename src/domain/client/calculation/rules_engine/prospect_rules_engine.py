@@ -68,9 +68,16 @@ class ProspectRulesEngine(BaseRulesEngine):
       for k, v in topics.items():
         topic_id = v[constants.ID]
         if topic_id in self.prospect_topic_ids:
-          counter[constants.BIO_TOPIC] += v[constants.RELEVANCE]
+          # refer to src.domain.client.calculation.rules_engine.engagement_opportunity_rules_engine.EngagementOpportunityRulesEngine#_get_topic_score_attrs
+          # on responsibility regarding relevance concerns.
+          relevance = v[constants.RELEVANCE]
+          counter[constants.BIO_TOPIC] += relevance
 
-          self._set_score_attrs_meta(score_attrs, constants.BIO_TOPIC, topic_id, {constants.NAME: k})
+          self._set_score_attrs_meta(score_attrs, constants.BIO_TOPIC, topic_id, {
+            constants.NAME: k,
+            constants.RELEVANCE: relevance
+          })
+
           self._set_score_attrs_value(score_attrs, constants.BIO_TOPIC, counter[constants.BIO_TOPIC])
 
     bios = self.prospect_attrs.get(constants.BIOS)
