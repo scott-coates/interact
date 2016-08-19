@@ -34,3 +34,14 @@ def execute_ea_processed_1(**kwargs):
   batch_id = event.batch_id
 
   tasks.clear_ea_batch_to_be_processed_task.delay(client_id, batch_id)
+
+
+@event_idempotent
+@receiver(ClientProcessedEngagementAssignmentBatch1.event_signal)
+def execute_ea_processed_store_scores_1(**kwargs):
+  client_id = kwargs['aggregate_id']
+
+  event = kwargs['event']
+  assigned = event.assigned
+
+  tasks.save_client_recent_engagement_assignment_scores_task.delay(client_id, assigned)

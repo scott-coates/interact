@@ -1,10 +1,10 @@
+import math
 from collections import Counter, defaultdict
 
-import math
-
+from src.apps.read_model.key_value.client.service import get_client_recent_engagement_assignment_scores
 from src.apps.read_model.relational.client.service import get_prospect_ea_lookup, \
   get_profile_ea_lookups_by_prospect_id, \
-  get_eo_ea_lookup, get_client_ea_lookup
+  get_eo_ea_lookup
 from src.domain.client.calculation.calculation_objects import AssignedEntity
 from src.domain.client.calculation.rules_engine import rules_data_provider
 from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
@@ -54,7 +54,7 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
   return score_attrs
 
 
-def populate_batch_ea_scores(score_attrs):
+def populate_batch_ea_scores(client_id, score_attrs):
   for score_attr in score_attrs:
     counter = Counter()
 
@@ -77,8 +77,11 @@ def populate_batch_ea_scores(score_attrs):
 
   for score_attr in score_attrs:
     score_count_attrs = score_attr[constants.SCORE][constants.SCORE_ATTRS]
-    for k, v in score_count_attrs.items():
-      tally[k].append(v[constants.COUNT])
+    _tally_counts(score_count_attrs, tally)
+
+  recent_scores = get_client_recent_engagement_assignment_scores(client_id)
+  for recent_score in recent_scores:
+    _tally_counts(recent_score, tally)
 
   calcs = {}
   for k, v in tally.items():
@@ -109,6 +112,11 @@ def populate_batch_ea_scores(score_attrs):
       total_score += score
 
     score_attr[constants.SCORE][constants.DATA] = total_score
+
+
+def _tally_counts(count_attrs, tally):
+  for k, v in count_attrs.items():
+    tally[k].append(v[constants.COUNT])
 
 
 def _increment_counter(score_attrs, counter):

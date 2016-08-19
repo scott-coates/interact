@@ -27,3 +27,9 @@ def save_client_assigned_prospect_task(client_id, prospect_id):
 @job('default')
 def clear_ea_batch_to_be_processed_task(client_id, batch_id):
   return service.clear_ea_batch_to_be_processed(client_id, batch_id)
+
+
+@job('default')
+def save_client_recent_engagement_assignment_scores_task(client_id, batch_eas):
+  for ea in batch_eas:
+    service.save_client_recent_engagement_assignment_scores(client_id, ea)
