@@ -8,6 +8,7 @@ from src.domain.prospect.engagement_opportunity import service  as eo_service
 from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, \
   EngagementOpportunityAddedToProfile1, ProspectUpdatedAttrsFromProfile1, \
   ProspectMarkedAsDuplicate, ProspectDeleted1, ProspectUpdatedTopicsFromProfile1
+from src.domain.prospect.exceptions import ProfileRestrictedError
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
 from src.libs.geo_utils.exceptions import GeocodeError
@@ -73,35 +74,41 @@ class Prospect(AggregateBase):
     profile = self._find_profile_by_external_id_and_provider_type(external_id, provider_type)
     if profile: raise Exception(profile, 'already exists.')
 
-    profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
-
     prospect_attrs = defaultdict(list)
 
-    bio = profile_attrs.get(constants.BIO)
-    if bio:
-      prospect_attrs[constants.BIOS].append(bio)
+    try:
+      profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
+    except ProfileRestrictedError:
+      # some profiles (like on twitter) might be private
+      profile_attrs = {}
+    else:
+      bio = profile_attrs.get(constants.BIO)
+      if bio:
+        prospect_attrs[constants.BIOS].append(bio)
 
-    location = profile_attrs.get(constants.LOCATION)
-    if location:
-      try:
-        location = _geo_service.get_geocoded_address_dict(location)
-        prospect_attrs[constants.LOCATIONS].append(location)
-      except GeocodeError:
-        pass
+      location = profile_attrs.get(constants.LOCATION)
+      if location:
+        try:
+          location = _geo_service.get_geocoded_address_dict(location)
+          prospect_attrs[constants.LOCATIONS].append(location)
+        except GeocodeError:
+          pass
 
-    name = profile_attrs.get(constants.NAME)
-    if name:
-      prospect_attrs[constants.NAMES].append(name)
+      name = profile_attrs.get(constants.NAME)
+      if name:
+        prospect_attrs[constants.NAMES].append(name)
 
-    websites = profile_attrs.get(constants.WEBSITES)
-    if websites:
-      combined_sites = self.attrs[constants.WEBSITES] + websites
-      websites = get_unique_urls_from_iterable(combined_sites)
-      prospect_attrs[constants.WEBSITES].extend(websites)
+      websites = profile_attrs.get(constants.WEBSITES)
+      if websites:
+        combined_sites = self.attrs[constants.WEBSITES] + websites
+        websites = get_unique_urls_from_iterable(combined_sites)
+        prospect_attrs[constants.WEBSITES].extend(websites)
 
     self._raise_event(ProspectAddedProfile1(id, external_id, provider_type, profile_attrs))
 
-    self._raise_event(ProspectUpdatedAttrsFromProfile1(prospect_attrs, id))
+    if profile_attrs:
+      # if a profile was restricted, we might not have any profile attrs with which to update the prospect
+      self._raise_event(ProspectUpdatedAttrsFromProfile1(prospect_attrs, id))
 
     topic_ids = _profile_service.get_topic_ids_from_profile_attrs(profile_attrs)
     if topic_ids:
@@ -203,7 +210,7 @@ class Profile:
     if not provider_type:
       raise TypeError("provider_type is required")
 
-    if not attrs:
+    if attrs is None:
       raise TypeError("attrs is required")
 
     self.id = id

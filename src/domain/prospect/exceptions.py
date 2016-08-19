@@ -8,3 +8,7 @@ class DuplicateProspectError(Exception):
 
   def __str__(self):
     return repr((self.existing_prospect_id, self.duplicate_prospect_id))
+
+
+class ProfileRestrictedError(Exception):
+  """Profile information could not be obtained"""
