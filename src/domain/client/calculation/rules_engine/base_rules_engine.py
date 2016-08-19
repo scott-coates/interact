@@ -19,5 +19,8 @@ class BaseRulesEngine(ABC):
   def _set_score_attrs_value(self, score_attrs, key, value):
     score_attrs[key][constants.COUNT][constants.DATA] = value
 
+  def _set_score_attrs_counter_value(self, score_attrs, key, counter):
+    self._set_score_attrs_value(score_attrs, key, counter[key])
+
   def _set_score_attrs_meta(self, score_attrs, key, meta_key, value):
     score_attrs[key][constants.SCORE_ATTRS][meta_key] = value

@@ -122,8 +122,7 @@ def _tally_counts(count_attrs, tally):
 def _increment_counter(score_attrs, counter):
   for k, v in score_attrs.items():
 
-    # the contract here is that COUNT will exist so long as the key exists, so we don't need to rely on
-    # v.get('count', 0)
+    # the contract here is that COUNT is guaranteed to exist, so we don't need to rely on v.get('count', 0)
     try:
       counter[k] += v[constants.COUNT][constants.DATA]
     except KeyError as e:

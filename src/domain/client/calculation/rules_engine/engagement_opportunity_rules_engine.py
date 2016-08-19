@@ -1,6 +1,5 @@
 import logging
 from abc import abstractmethod
-from itertools import chain
 
 from nltk.metrics.distance import jaccard_distance
 
@@ -67,7 +66,7 @@ class EngagementOpportunityRulesEngine(BaseRulesEngine):
             constants.RELEVANCE: relevance
           })
 
-          self._set_score_attrs_value(score_attrs, constants.EO_TOPIC, counter[constants.EO_TOPIC])
+    self._set_score_attrs_counter_value(score_attrs, constants.EO_TOPIC, counter)
 
     return score_attrs
 
@@ -101,8 +100,9 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
         mentions = self.eo_attrs.get(constants.MENTIONS)
 
         if mentions:
-          self._set_score_attrs_value(score_attrs, constants.EO_ENGAGEMENT, self.DEFAULT_COUNT_VALUE)
+          counter[constants.EO_ENGAGEMENT] += self.DEFAULT_COUNT_VALUE
 
+    self._set_score_attrs_counter_value(score_attrs, constants.EO_ENGAGEMENT, counter)
     return score_attrs
 
   def _get_spam_score_attrs(self):
@@ -128,7 +128,8 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
 
       similar_eo_ids = [r[constants.ID] for r in recent_eos if self.eo_id in r[constants.SIMILAR_EOS]]
       if similar_eo_ids:
-        self._set_score_attrs_value(score_attrs, constants.EO_SPAM, self.DEFAULT_COUNT_VALUE)
+        counter[constants.EO_SPAM] += self.DEFAULT_COUNT_VALUE
         self._set_score_attrs_meta(score_attrs, constants.EO_SPAM, constants.DATA, similar_eo_ids)
 
+    self._set_score_attrs_counter_value(score_attrs, constants.EO_SPAM, counter)
     return score_attrs

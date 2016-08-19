@@ -55,7 +55,7 @@ class ProspectRulesEngine(BaseRulesEngine):
         if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
           counter[constants.LOCATION] += self.DEFAULT_COUNT_VALUE
 
-          self._set_score_attrs_value(score_attrs, constants.LOCATION, counter[constants.LOCATION])
+    self._set_score_attrs_value(score_attrs, constants.LOCATION, counter)
 
     return score_attrs
 
@@ -78,7 +78,7 @@ class ProspectRulesEngine(BaseRulesEngine):
             constants.RELEVANCE: relevance
           })
 
-          self._set_score_attrs_value(score_attrs, constants.BIO_TOPIC, counter[constants.BIO_TOPIC])
+    self._set_score_attrs_value(score_attrs, constants.BIO_TOPIC, counter)
 
     bios = self.prospect_attrs.get(constants.BIOS)
 
@@ -90,8 +90,6 @@ class ProspectRulesEngine(BaseRulesEngine):
       avoid_words = self.rules_data.get(constants.PROFANITY_FILTER_WORDS)
 
       if avoid_words:
-        # score_attrs[constants.BIO_AVOID_KEYWORD] the namespace is only created if COUNT is provided, that's the
-        # contract
         found_avoid_names = []
 
         # iterate through bio tokens to be less inclusive and prevent false positives (consider the word 'mass')
@@ -100,10 +98,10 @@ class ProspectRulesEngine(BaseRulesEngine):
             counter[constants.BIO_AVOID_KEYWORD] += self.DEFAULT_COUNT_VALUE
             found_avoid_names.append(b)
 
-            self._set_score_attrs_value(score_attrs, constants.BIO_AVOID_KEYWORD, counter[constants.BIO_AVOID_KEYWORD])
-
         if found_avoid_names:
           self._set_score_attrs_meta(score_attrs, constants.BIO_AVOID_KEYWORD, constants.NAMES, found_avoid_names)
+
+    self._set_score_attrs_value(score_attrs, constants.BIO_AVOID_KEYWORD, counter)
 
     return score_attrs
 
@@ -115,6 +113,8 @@ class ProspectRulesEngine(BaseRulesEngine):
 
     new_prospect_for_client = get_client_assigned_prospect_count(client_id, prospect_id)
     if not new_prospect_for_client:
-      self._set_score_attrs_value(score_attrs, constants.NEW_PROSPECT, self.DEFAULT_COUNT_VALUE)
+      counter[constants.NEW_PROSPECT] += self.DEFAULT_COUNT_VALUE
+
+    self._set_score_attrs_counter_value(score_attrs, constants.NEW_PROSPECT, counter)
 
     return score_attrs
