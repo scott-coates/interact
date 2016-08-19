@@ -29,7 +29,15 @@ class ScoreCalculator:
     self.sdev = np.std(self.counts)
 
   def calculate_normalized_score(self, value):
-    norm = (value - self.min) / self.max
+    if self.min == value == self.max:
+      # min and max and value are all the same
+      # x = ScoreCalculator([1,1,1,1,1,1])
+      # x.calculate_normalized_score(1)
+      # 1.0
+      # this is so an EA doesn't get a score of 0 on the first round.
+      norm = 1
+    else:
+      norm = (value - self.min) / self.max
     return norm
 
   def calculate_modified_standard_score(self, value):
