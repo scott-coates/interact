@@ -1,8 +1,9 @@
 import logging
 
-from pygeocoder import Geocoder
+from pygeocoder import Geocoder, GeocoderError
 
 from src.libs.geo_utils.complete_address import CompleteAddress
+from src.libs.geo_utils.exceptions import GeocodeError
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,10 @@ def perform_geo_address_search(address_str):
   )
 
   with log_wrapper(logger.debug, *geo_log_message):
-    results = _geocoder.geocode(address_str)
+    try:
+      results = _geocoder.geocode(address_str)
+    except GeocoderError as e:
+      raise GeocodeError('invalid address', address_str).with_traceback(e.__traceback__)
 
   address_components = results.data[0]['address_components']
 

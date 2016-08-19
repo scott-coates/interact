@@ -10,6 +10,7 @@ from src.domain.prospect.events import ProspectCreated1, ProspectAddedProfile1, 
   ProspectMarkedAsDuplicate, ProspectDeleted1, ProspectUpdatedTopicsFromProfile1
 from src.domain.prospect.profile import service as profile_service
 from src.libs.common_domain.aggregate_base import AggregateBase
+from src.libs.geo_utils.exceptions import GeocodeError
 from src.libs.python_utils.id.id_utils import generate_id
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
@@ -82,8 +83,11 @@ class Prospect(AggregateBase):
 
     location = profile_attrs.get(constants.LOCATION)
     if location:
-      location = _geo_service.get_geocoded_address_dict(location)
-      prospect_attrs[constants.LOCATIONS].append(location)
+      try:
+        location = _geo_service.get_geocoded_address_dict(location)
+        prospect_attrs[constants.LOCATIONS].append(location)
+      except GeocodeError:
+        pass
 
     name = profile_attrs.get(constants.NAME)
     if name:
