@@ -55,7 +55,7 @@ class ProspectRulesEngine(BaseRulesEngine):
         if any(mi_distance((r_loc[constants.LAT], r_loc[constants.LNG]), dest) < 35 for r_loc in r_locations):
           counter[constants.LOCATION] += self.DEFAULT_COUNT_VALUE
 
-    self._set_score_attrs_value(score_attrs, constants.LOCATION, counter)
+    self._set_score_attrs_counter_value(score_attrs, constants.LOCATION, counter)
 
     return score_attrs
 
@@ -78,7 +78,7 @@ class ProspectRulesEngine(BaseRulesEngine):
             constants.RELEVANCE: relevance
           })
 
-    self._set_score_attrs_value(score_attrs, constants.BIO_TOPIC, counter)
+    self._set_score_attrs_counter_value(score_attrs, constants.BIO_TOPIC, counter)
 
     bios = self.prospect_attrs.get(constants.BIOS)
 
@@ -101,7 +101,7 @@ class ProspectRulesEngine(BaseRulesEngine):
         if found_avoid_names:
           self._set_score_attrs_meta(score_attrs, constants.BIO_AVOID_KEYWORD, constants.NAMES, found_avoid_names)
 
-    self._set_score_attrs_value(score_attrs, constants.BIO_AVOID_KEYWORD, counter)
+    self._set_score_attrs_counter_value(score_attrs, constants.BIO_AVOID_KEYWORD, counter)
 
     return score_attrs
 

@@ -111,25 +111,29 @@ class TwitterEngagementOpportunityRulesEngine(EngagementOpportunityRulesEngine):
     text = self.eo_attrs[constants.TEXT]
 
     comparative_text = get_comparative_text_from_tweet(text)
+    if comparative_text:
 
-    recent_eos = self.rules_data.get(constants.RECENT_EOS)
+      recent_eos = self.rules_data.get(constants.RECENT_EOS)
 
-    if recent_eos:
+      if recent_eos:
 
-      for recent_eo in recent_eos:
+        for recent_eo in recent_eos:
 
-        if self.eo_id != recent_eo[constants.ID] and self.eo_id not in recent_eo[constants.SIMILAR_EOS]:
-          recent_comparative_text = recent_eo[constants.COMPARATIVE_TEXT]
+          if self.eo_id != recent_eo[constants.ID] and self.eo_id not in recent_eo[constants.SIMILAR_EOS]:
 
-          distance = jaccard_distance(set(comparative_text), set(recent_comparative_text))
+            recent_comparative_text = recent_eo[constants.COMPARATIVE_TEXT]
 
-          if distance < .5:
-            recent_eo[constants.SIMILAR_EOS].append(self.eo_id)
+            if recent_comparative_text:
+              distance = jaccard_distance(set(comparative_text), set(recent_comparative_text))
 
-      similar_eo_ids = [r[constants.ID] for r in recent_eos if self.eo_id in r[constants.SIMILAR_EOS]]
-      if similar_eo_ids:
-        counter[constants.EO_SPAM] += self.DEFAULT_COUNT_VALUE
-        self._set_score_attrs_meta(score_attrs, constants.EO_SPAM, constants.DATA, similar_eo_ids)
+              if distance < .5:
+                recent_eo[constants.SIMILAR_EOS].append(self.eo_id)
+
+          similar_eo_ids = [r[constants.ID] for r in recent_eos if self.eo_id in r[constants.SIMILAR_EOS]]
+          if similar_eo_ids:
+            self._set_score_attrs_meta(score_attrs, constants.EO_SPAM, constants.DATA, similar_eo_ids)
+
+            counter[constants.EO_SPAM] += self.DEFAULT_COUNT_VALUE
 
     self._set_score_attrs_counter_value(score_attrs, constants.EO_SPAM, counter)
     return score_attrs
