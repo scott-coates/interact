@@ -55,6 +55,7 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
 
 
 def populate_batch_ea_scores(client_id, score_attrs):
+  # todo client rule providers do they go here too?
   for score_attr in score_attrs:
     counter = Counter()
 
@@ -97,10 +98,11 @@ def populate_batch_ea_scores(client_id, score_attrs):
       score = calcs[k].calculate_normalized_score(count)
 
       if k == constants.LOCATION:
-        score += 2
+        # locations is binary right now so it'll either be 0 or 2.5
+        score *= 2.5
 
       if k == constants.BIO_TOPIC:
-        score += .25
+        score *= 1.25
 
       elif k == constants.EO_SPAM:
         eo_topic_count = len(score_attr[constants.ASSIGNED_ENTITIES][constants.DATA])
@@ -108,7 +110,8 @@ def populate_batch_ea_scores(client_id, score_attrs):
         score = math.log(max(1 - spam_ratio, .01)) * 2
 
       elif k == constants.BIO_AVOID_KEYWORD:
-        score += -.10
+        # subtract for bad words
+        score *= -1.10
 
       # if score is not None:
       score_attr[constants.SCORE][constants.SCORE_ATTRS][k][constants.SCORE] = score
