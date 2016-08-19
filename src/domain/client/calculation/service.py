@@ -96,8 +96,12 @@ def populate_batch_ea_scores(client_id, score_attrs):
       count = v[constants.COUNT]
       score = calcs[k].calculate_normalized_score(count)
 
+      if k == constants.LOCATION:
+        score += 2
+
       if k == constants.BIO_TOPIC:
         score += .25
+
       elif k == constants.EO_SPAM:
         eo_topic_count = len(score_attr[constants.ASSIGNED_ENTITIES][constants.DATA])
         spam_ratio = count / eo_topic_count
