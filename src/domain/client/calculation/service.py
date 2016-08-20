@@ -11,6 +11,8 @@ from src.domain.client.calculation.rules_engine.rules_engine import RulesEngine
 from src.domain.client.calculation.score_calculator import ScoreCalculator
 from src.domain.common import constants
 
+_binary_score_keys = (constants.LOCATION, constants.NEW_PROSPECT)
+
 
 def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_data_provider=None):
   if not _rules_data_provider: _rules_data_provider = rules_data_provider
@@ -95,10 +97,14 @@ def populate_batch_ea_scores(client_id, score_attrs):
 
     for k, v in score_count_attrs.items():
       count = v[constants.COUNT]
-      score = calcs[k].calculate_normalized_score(count)
+
+      if k in _binary_score_keys:
+        score = count
+      else:
+        score = calcs[k].calculate_normalized_score(count)
 
       if k == constants.LOCATION:
-        score = 2.5 if count else 0
+        score *= 2.5
 
       if k == constants.BIO_TOPIC:
         score *= 1.25
@@ -122,7 +128,8 @@ def populate_batch_ea_scores(client_id, score_attrs):
 
 def _tally_counts(count_attrs, tally):
   for k, v in count_attrs.items():
-    tally[k].append(v[constants.COUNT])
+    if k not in _binary_score_keys:
+      tally[k].append(v[constants.COUNT])
 
 
 def _increment_counter(score_attrs, counter):
