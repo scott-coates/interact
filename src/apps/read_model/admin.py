@@ -2,6 +2,7 @@ import json
 
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from operator import itemgetter
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
@@ -11,10 +12,10 @@ from src.domain.common import constants
 
 
 class DeliveredEaAdmin(admin.ModelAdmin):
-  readonly_fields = ('score_attrs_pretty',)
+  readonly_fields = ('score_attrs_pretty', 'engagement_opportunity')
 
   actions = None
-  list_display = ('name', 'location', 'bio', 'score', 'batch_id')
+  list_display = ('name', 'location', 'bio', 'engagement_opportunity', 'score', 'batch_id')
 
   def has_delete_permission(self, request, obj=None):
     return False
@@ -48,6 +49,16 @@ class DeliveredEaAdmin(admin.ModelAdmin):
 
     # Safe the output
     return mark_safe(style + response)
+
+  def engagement_opportunity(self, instance):
+    """Function to display pretty version of our data"""
+    # Convert the data to sorted, indented JSON
+    aes = instance.score_attrs[constants.ASSIGNED_ENTITIES][constants.DATA]
+    top_eo = sorted(aes, key=itemgetter('score'), reverse=True)[0]
+
+    top_eo_id = top_eo[constants.ID]
+    text = next(ae for ae in instance.assigned_entities if ae[constants.ID] == top_eo_id)[constants.TEXT]
+    return text
 
   score_attrs_pretty.short_description = 'Score Attrs'
 
