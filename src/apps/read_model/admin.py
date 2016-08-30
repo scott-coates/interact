@@ -54,12 +54,14 @@ class DeliveredEaAdmin(admin.ModelAdmin):
     """Function to display pretty version of our data"""
     # Convert the data to sorted, indented JSON
     aes = instance.score_attrs[constants.ASSIGNED_ENTITIES][constants.DATA]
+    total_aes = len(aes)
     top_eos = sorted(aes, key=itemgetter('score'), reverse=True)[:3]
     top_eos_ids = [t[constants.ID] for t in top_eos]
     top_eos_text = [next(ae for ae in instance.assigned_entities if ae[constants.ID] == tid)[constants.TEXT] for tid in
                     top_eos_ids]
 
-    return mark_safe(''.join('<p>{0}</p>'.format(t) for t in top_eos_text))
+    total_p = '<p>Total AE\'s: {0}</p>'.format(total_aes)
+    return mark_safe(total_p + ''.join('<p>{0}</p>'.format(t) for t in top_eos_text))
 
   score_attrs_pretty.short_description = 'Score Attrs'
 
