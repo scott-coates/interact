@@ -4,9 +4,9 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
       <env name="DJANGO_SETTINGS_MODULE" value="src.settings.dev_override" />
       <env name="NO_PROXY" value="1" />
-      <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.virtualenvs/interact/bin/python" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />

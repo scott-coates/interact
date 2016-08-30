@@ -30,6 +30,8 @@ def provide_rules_data(client_id, prospect_id):
 def _provide_keywords(client):
   ret_val = {}
 
+  # some ea's might be tied to a topic with a relevance of 0, so it probably isn't worth using those topics for
+  # computing counts.
   ret_val[constants.TOPICS] = {
     v[constants.NAME]: {
       constants.RELEVANCE: v[constants.RELEVANCE],
