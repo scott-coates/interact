@@ -7,6 +7,7 @@ from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
 
 from src.apps.read_model.relational.client.models import DeliveredEa
+from src.domain.common import constants
 
 
 class DeliveredEaAdmin(admin.ModelAdmin):
@@ -34,7 +35,7 @@ class DeliveredEaAdmin(admin.ModelAdmin):
   def score_attrs_pretty(self, instance):
     """Function to display pretty version of our data"""
     # Convert the data to sorted, indented JSON
-    response = json.dumps(instance.score_attrs, sort_keys=True, indent=2)
+    response = json.dumps(instance.score_attrs[constants.SCORE][constants.SCORE_ATTRS], sort_keys=True, indent=2)
 
     # Get the Pygments formatter
     formatter = HtmlFormatter(style='colorful')

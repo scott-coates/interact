@@ -115,10 +115,8 @@ def populate_batch_ea_scores(client_id, score_attrs):
         score = math.log(max(1 - spam_ratio, .01)) * 2
 
       elif k == constants.BIO_AVOID_KEYWORD:
-        # subtract for bad words
         score *= -1.10
 
-      # if score is not None:
       score_attr[constants.SCORE][constants.SCORE_ATTRS][k][constants.SCORE] = score
 
       total_score += score
