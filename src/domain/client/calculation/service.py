@@ -57,7 +57,6 @@ def get_engagement_assignment_score_attrs(client_id, assignment_attrs, _rules_da
 
 
 def populate_batch_ea_scores(client_id, score_attrs):
-  # todo client rule providers do they go here too?
   for score_attr in score_attrs:
     counter = Counter()
 
@@ -98,30 +97,52 @@ def populate_batch_ea_scores(client_id, score_attrs):
     for k, v in score_count_attrs.items():
       count = v[constants.COUNT]
 
-      if k in _binary_score_keys:
-        score = count
-      else:
-        score = calcs[k].calculate_normalized_score(count)
-
-      if k == constants.LOCATION:
-        score *= 2.5
-
-      if k == constants.BIO_TOPIC:
-        score *= 1.25
-
-      elif k == constants.EO_SPAM:
-        eo_topic_count = len(score_attr[constants.ASSIGNED_ENTITIES][constants.DATA])
-        spam_ratio = count / eo_topic_count
-        score = math.log(max(1 - spam_ratio, .01)) * 2
-
-      elif k == constants.BIO_AVOID_KEYWORD:
-        score *= -1.10
+      score = _get_score_from_count(calcs, count, k, score_attr)
 
       score_attr[constants.SCORE][constants.SCORE_ATTRS][k][constants.SCORE] = score
 
       total_score += score
 
+    # [DATA] key is used here because [SCORE_ATTRS] is a sibling containing counts
     score_attr[constants.SCORE][constants.DATA] = total_score
+
+    # this part calculates each individual AE within the EA (show me the 'best tweet' from this user)
+    aes = score_attr[constants.ASSIGNED_ENTITIES][constants.DATA]
+    for ae in aes:
+      ae_score = 0
+
+      ae_attrs = ae[constants.SCORE_ATTRS]
+
+      for k, v in ae_attrs.items():
+        count = v[constants.COUNT]
+
+        score = _get_score_from_count(calcs, count, k, score_attr)
+        ae_score += score
+
+      ae[constants.SCORE] = ae_score
+
+
+def _get_score_from_count(calcs, count, count_name, score_attr):
+  if count_name in _binary_score_keys:
+    score = count
+  else:
+    score = calcs[count_name].calculate_normalized_score(count)
+
+  if count_name == constants.LOCATION:
+    score *= 2.5
+
+  elif count_name == constants.BIO_TOPIC:
+    score *= 1.25
+
+  elif count_name == constants.EO_SPAM:
+    eo_topic_count = len(score_attr[constants.ASSIGNED_ENTITIES][constants.DATA])
+    spam_ratio = count / eo_topic_count
+    score = math.log(max(1 - spam_ratio, .01)) * 2
+
+  elif count_name == constants.BIO_AVOID_KEYWORD:
+    score *= -1.10
+
+  return score
 
 
 def _tally_counts(count_attrs, tally):
@@ -135,7 +156,7 @@ def _increment_counter(score_attrs, counter):
 
     # the contract here is that COUNT is guaranteed to exist, so we don't need to rely on v.get('count', 0)
     try:
-      counter[k] += v[constants.COUNT][constants.DATA]
+      counter[k] += v[constants.COUNT]
     except KeyError as e:
       raise Exception('is missing', k).with_traceback(e.__traceback__)
 

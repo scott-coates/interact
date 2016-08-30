@@ -17,7 +17,7 @@ class BaseRulesEngine(ABC):
     return score_attrs, counter
 
   def _set_score_attrs_value(self, score_attrs, key, value):
-    score_attrs[key][constants.COUNT][constants.DATA] = value
+    score_attrs[key][constants.COUNT] = value
 
   def _set_score_attrs_counter_value(self, score_attrs, key, counter):
     self._set_score_attrs_value(score_attrs, key, counter[key])
