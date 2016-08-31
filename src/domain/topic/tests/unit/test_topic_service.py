@@ -21,7 +21,7 @@ from src.domain.topic.service import get_topic_stems
    "obsolscence,... ",
    [3]),
   ("RT @PostCrescent: .@FoxValleyTech is coming in with a 95 percent pass rate, making it a leader in the industry "
-   "https://t.co/Q6SfYG4LwB",
+   "https://t.co/Q6SfYG4LwB",  # this one doesn't fail on 'techie' with 'tech is'
    []),
   ("RT @Tamaraw68415067: Go Rubio! https://t.co/iZNMG19Svt",  # this one fails, it finds `ruby`
    []),
