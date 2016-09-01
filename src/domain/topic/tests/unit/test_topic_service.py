@@ -28,6 +28,9 @@ from src.domain.topic.service import get_topic_stems
   ("Join me at the Women in Technology Annual Meeting! So many great things happening in #witwisconsin "
    "http://conta.cc/1tAAyVb  #constantcontact",
    [6]),
+  (
+      "Code written by women approved at a higher rate - but only if gender is not disclosed.” https://gu.com/p/4gjfy/stw  #womenwhocode #womenintech",
+      [7]),
 ])
 def test_topic_service_finds_topics_in_tweet(content, ret_val):
   _topic_read_service = MagicMock(spec=topic_read_service)
@@ -40,6 +43,7 @@ def test_topic_service_finds_topics_in_tweet(content, ret_val):
         _get_topic_mock(4, 'techie'),
         _get_topic_mock(5, 'ruby'),
         _get_topic_mock(6, 'women in tech'),
+        _get_topic_mock(7, 'women code'),
       ]
   )
 
