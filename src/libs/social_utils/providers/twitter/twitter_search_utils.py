@@ -49,6 +49,19 @@ def search_twitter_by_user(screen_name,
 
   return ret_val
 
+def get_user_info(screen_name,
+                           lang="en",
+                           _twitter_client_provider=twitter_client_provider):
+  client = _twitter_client_provider.get_twitter_client()
+
+  search_params = {"lang": lang}
+
+  search_params["screen_name"] = screen_name
+
+  ret_val = client.show_user(**search_params)
+
+  return ret_val
+
 
 def search_twitter(query,
                    screen_name=None,

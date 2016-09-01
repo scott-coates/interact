@@ -11,6 +11,14 @@ def search_twitter_by_user(screen_name, _search=twitter_search_utils, **kwargs):
   return ret_val
 
 
+def get_user_info(screen_name, _search=twitter_search_utils, **kwargs):
+  search_name = 'user_profile'
+  _check_rate_limit(search_name, 180)
+  ret_val = _search.get_user_info(screen_name, **kwargs)
+  _record_twitter_api_call(search_name)
+  return ret_val
+
+
 def search_twitter_by_keywords(keyword, _twitter_client_service=twitter_client_service, **kwargs):
   search_name = 'search_tweets'
   _check_rate_limit(search_name, 450)
