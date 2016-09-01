@@ -1,7 +1,10 @@
 import logging
 
+from twython import TwythonAuthError
+
 from src.apps.social.providers.twitter import twitter_service
 from src.domain.common import constants
+from src.domain.prospect.exceptions import ProfileRestrictedError
 from src.libs.python_utils.logging.logging_utils import log_wrapper
 from src.libs.web_utils.url.url_utils import get_unique_urls_from_iterable
 
@@ -31,13 +34,15 @@ def get_twitter_profile_attrs(external_id, _twitter_service=twitter_service, **k
     followers_count = profile_data['followers_count']
     following_count = profile_data['friends_count']
     location = profile_data['location']
+    protected = profile_data['protected']
 
     user_websites = _get_twitter_profile_websites(profile_data)
 
     twitter_profile_data = {
       constants.URL: profile_url, constants.NAME: name,
       constants.FOLLOWERS_COUNT: followers_count,
-      constants.FOLLOWING_COUNT: following_count
+      constants.FOLLOWING_COUNT: following_count,
+      constants.IS_RESTRICTED: protected
     }
 
     if bio: twitter_profile_data[constants.BIO] = bio

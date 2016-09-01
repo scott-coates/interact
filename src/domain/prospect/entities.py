@@ -78,7 +78,7 @@ class Prospect(AggregateBase):
 
     try:
       profile_attrs = _profile_service.get_profile_attrs_from_provider(external_id, provider_type)
-      profile_is_restricted = False
+      profile_is_restricted = profile_attrs.get(constants.IS_RESTRICTED, False)
     except ProfileRestrictedError:
       # some profiles (like on twitter) might be private
       profile_attrs = {}

@@ -1,5 +1,6 @@
 NAME = 'name'
 SCREEN_NAME = 'screen_name'
+IS_RESTRICTED='is_restricted'
 NAMES = 'names'
 URL = 'url'
 COMPARATIVE_TEXT = 'comparative_text'
