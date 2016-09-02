@@ -75,6 +75,7 @@ def _convert_ea_data_to_deliverable(ea_data):
     {
       constants.ID: _get_value(ae, constants.ID),
       constants.TEXT: _get_value(ae, constants.ATTRS, constants.TEXT),
+      constants.URL: _get_value(ae, constants.ATTRS, constants.URL),
       constants.SCORE_ATTRS: _get_value(ae, constants.SCORE_ATTRS)
     }
     for ae in

@@ -1,8 +1,8 @@
 import json
+from operator import itemgetter
 
 from django.contrib import admin
 from django.utils.safestring import mark_safe
-from operator import itemgetter
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
@@ -57,11 +57,14 @@ class DeliveredEaAdmin(admin.ModelAdmin):
     total_aes = len(aes)
     top_eos = sorted(aes, key=itemgetter('score'), reverse=True)[:3]
     top_eos_ids = [t[constants.ID] for t in top_eos]
-    top_eos_text = [next(ae for ae in instance.assigned_entities if ae[constants.ID] == tid)[constants.TEXT] for tid in
+    top_eos_text = [next(ae for ae in instance.assigned_entities if ae[constants.ID] == tid) for tid in
                     top_eos_ids]
 
     total_p = '<p>Total AE\'s: {0}</p>'.format(total_aes)
-    return mark_safe(total_p + ''.join('<p>{0}</p>'.format(t) for t in top_eos_text))
+    return mark_safe(total_p + ''.join('<p><a href="{0}" target="_blank">{1}</a></p>'.format(t[constants.URL],
+                                                                                             t[constants.TEXT]) for t
+                                       in
+                                       top_eos_text))
 
   score_attrs_pretty.short_description = 'Score Attrs'
 
