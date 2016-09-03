@@ -7,11 +7,11 @@ from src.apps.assignment_delivery.service import deliver_ea_to_analytics_service
 logger = logging.getLogger(__name__)
 
 
-@job('default')
+@job('high')
 def deliver_ea_to_analytics_service_task(ea_data):
   return deliver_ea_to_analytics_service(ea_data)
 
 
-@job('default')
+@job('high')
 def deliver_ea_to_read_model_task(ea_data, batch_id):
   return deliver_ea_to_read_model(ea_data, batch_id)
