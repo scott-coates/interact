@@ -29,4 +29,4 @@ def execute_prospect_added_profile_1(**kwargs):
 def execute_assignment_batch_1(**kwargs):
   event = kwargs['event']
 
-  # tasks.discover_engagement_opportunities_from_batch_assignments_task.delay(event.batch_id, event.assigned)o
+  tasks.discover_engagement_opportunities_from_batch_assignments_task.delay(event.batch_id, event.assigned)
