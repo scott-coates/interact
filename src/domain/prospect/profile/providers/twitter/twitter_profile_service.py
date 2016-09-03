@@ -27,9 +27,10 @@ def get_twitter_profile_attrs(external_id, _twitter_service=twitter_service, **k
 
     with log_wrapper(logger.debug, *twitter_search_log_message):
       try:
-        profile_data = _twitter_service.search_twitter_by_user(external_id, count=1, **kwargs)
+        profile_data = _twitter_service.get_user_info(external_id, **kwargs)
       except TwythonAuthError as e:
         if e.error_code == 403:
+          # 403 indicates a suspended profile
           raise ProfileRestrictedError('Profile suspended:', external_id).with_traceback(e.__traceback__)
         else:
           raise
