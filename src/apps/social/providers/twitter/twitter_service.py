@@ -1,4 +1,4 @@
-from src.apps.key_value.common import get_app_name
+from src.apps.read_model.key_value.common import get_app_name
 from src.libs.key_value_utils.service import record_rate_limit, get_rate_limit_count
 from src.libs.social_utils.providers.twitter import twitter_search_utils, twitter_client_service
 

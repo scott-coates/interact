@@ -111,7 +111,6 @@ LOCAL_APPS = (
   'src.apps.assignment_delivery',
   'src.apps.engagement_discovery',
   'src.apps.geo',
-  'src.apps.read_model.key_value',
   'src.apps.maintenance',
   'src.apps.read_model',
   'src.apps.social',

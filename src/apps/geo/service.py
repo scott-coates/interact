@@ -1,4 +1,4 @@
-from src.apps.key_value.common import get_app_name
+from src.apps.read_model.key_value.common import get_app_name
 from src.libs.geo_utils.complete_address import CompleteAddress
 from src.libs.geo_utils.services import geo_location_service
 from src.libs.key_value_utils.key_value_provider import get_key_value_client

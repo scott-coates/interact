@@ -2,7 +2,7 @@ import logging
 
 from flask import json
 
-from src.apps.key_value.common import get_read_model_name
+from src.apps.read_model.key_value.common import get_read_model_name
 from src.domain.common import constants
 from src.libs.key_value_utils.key_value_provider import get_key_value_client
 from src.libs.key_value_utils.service import push_latest
