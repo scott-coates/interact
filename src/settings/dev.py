@@ -47,10 +47,7 @@ GRAPH_DB_PASSWORD = None
 CACHES = {
   'default': {
     'BACKEND': 'django_redis.cache.RedisCache',
-    'LOCATION': 'localhost:6379',
-    'OPTIONS': {
-      'DB': 0,
-    }
+    'LOCATION': 'localhost:6379?db=0',
   }
 }
 ########## END CACHE CONFIGURATION
