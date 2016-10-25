@@ -13,7 +13,7 @@ def create_client(_aggregate_repository=None, **kwargs):
   client = Client.from_attrs(**command.data)
   _aggregate_repository.save(client, -1)
 
-  return client
+  return client # todo remove return statements from command~
 
 
 @receiver(AssociateWithTopic.command_signal)
