@@ -46,9 +46,11 @@ MIDDLEWARE_CLASSES = (
   'django.middleware.gzip.GZipMiddleware',
   'django.middleware.security.SecurityMiddleware',
   'django.middleware.common.CommonMiddleware',
+  'django.middleware.csrf.CsrfViewMiddleware',
   'django.contrib.sessions.middleware.SessionMiddleware',
   'django.contrib.messages.middleware.MessageMiddleware',
   'django.contrib.auth.middleware.AuthenticationMiddleware',
+  'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 ########## END MIDDLEWARE CONFIGURATION
 
@@ -145,6 +147,26 @@ LOGGING = {
   'handlers': {}
 }
 ########## END LOGGING CONFIGURATION
+
+########## AUTH CONFIGURATION
+# Password validation
+# https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+  {
+    'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+  },
+  {
+    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+  },
+  {
+    'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+  },
+  {
+    'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+  },
+]
+########## END AUTH CONFIGURATION
 
 ########### SOCIAL PROVIDER CONFIGURATION
 REDDIT_USER_AGENT = 'WiFL v0.1 https://github.com/WiFL-co'
